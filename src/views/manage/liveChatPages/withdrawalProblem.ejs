@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Withdrawal Problem</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    body {
+      background-color: #f4f6f9;
+      color: #343a40;
+      font-family: 'Source Sans Pro', sans-serif;
+    }
+    .card {
+      border-radius: 12px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      background: #ffffff;
+    }
+    .card-title {
+      color: #00807c;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .table-responsive {
+      overflow-x: auto;
+      max-height: calc(100vh - 250px);
+    }
+    .table {
+      width: 100%;
+      table-layout: fixed;
+    }
+    .table th {
+      background-color: #00807c;
+      color: white;
+      vertical-align: middle;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .table td {
+      vertical-align: middle;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+      background-color: #DFF5F5;
+    }
+    .btn-primary {
+      background-color: #00807c;
+      border-color: #00807c;
+    }
+    .btn-primary:hover {
+      background-color: #4a44c4;
+      border-color: #4a44c4;
+    }
+    .badge-pending {
+      background-color: #ffc107;
+      color: #212529;
+    }
+    .badge-approved {
+      background-color: #28a745;
+      color: white;
+    }
+    .badge-rejected {
+      background-color: #dc3545;
+      color: white;
+    }
+    .img-thumbnail {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .img-thumbnail:hover {
+      transform: scale(1.05);
+    }
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+    }
+    .action-buttons .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+      min-width: 30px;
+    }
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    /* Improved Modal Styling */
+    #imageModal .modal-dialog {
+      max-width: 50%;
+      max-height: 90vh;
+      margin: 1rem auto;
+    }
+    #imageModal .modal-content {
+      background-color: rgba(255, 255, 255, 0.95);
+      border: none;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    #imageModal .modal-header {
+      background-color: #00807c;
+      color: white;
+      border-bottom: none;
+      padding: 1rem;
+    }
+    #imageModal .modal-title {
+      font-weight: 600;
+    }
+    #imageModal .modal-body {
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f8f9fa;
+      overflow: auto;
+    }
+    #imageModal #modalImage {
+      max-height: 75vh;
+      max-width: 100%;
+      object-fit: contain;
+      padding: 1rem;
+      transition: transform 0.3s ease;
+    }
+    #imageModal #modalImage:hover {
+      transform: scale(1.02);
+    }
+    /* Fixed column widths */
+    .fixed-id {
+      width: 50px;
+    }
+    .fixed-phone {
+      width: 120px;
+    }
+    .fixed-bank {
+      width: 150px;
+    }
+    .fixed-ifsc {
+      width: 120px;
+    }
+    .fixed-account {
+      width: 150px;
+    }
+    .fixed-usdt {
+      width: 180px;
+    }
+    .fixed-order {
+      width: 120px;
+    }
+    .fixed-amount {
+      width: 100px;
+    }
+    .fixed-problem {
+      width: 200px;
+    }
+    .fixed-status {
+      width: 100px;
+    }
+    .fixed-date {
+      width: 150px;
+    }
+    .fixed-proof {
+      width: 120px;
+    }
+    .fixed-action {
+      width: 120px;
+    }
+  </style>
+</head>
+
+<body class="hold-transition sidebar-mini">
+  <div class="wrapper">
+    <%- include('../nav') %>
+    <div class="content-wrapper">
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="text-dark">Withdrawal Problem</h1>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <section class="content">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Withdrawal Problem Details</h3>
+          </div>
+          <div class="card-body p-0 table-responsive">
+            <table class="table table-striped projects">
+              <thead>
+                <tr>
+                  <th class="text-center fixed-id">ID</th>
+                  <th class="text-center fixed-phone">Phone</th>
+                  <th class="text-center fixed-bank">Bank Name</th>
+                  <th class="text-center fixed-ifsc">IFSC Code</th>
+                  <th class="text-center fixed-account">Account</th>
+                  <th class="text-center fixed-usdt">USDT Address</th>
+                  <th class="text-center fixed-order">Order Number</th>
+                  <th class="text-center fixed-amount">Amount</th>
+                  <th class="text-center fixed-problem">Problem</th>
+                  <th class="text-center fixed-status">Status</th>
+                  <th class="text-center fixed-date">Date</th>
+                  <th class="text-center fixed-proof">Proof 1</th>
+                  <th class="text-center fixed-proof">Proof 2</th>
+                  <th class="text-center fixed-action">Action</th>
+                </tr>
+              </thead>
+              <tbody id="withdrawalProblemTable">
+                <tr>
+                  <td colspan="14" class="text-center py-4 loading-spinner">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Image Popup Modal -->
+  <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Image Preview</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="modalImage" src="" class="img-fluid" alt="Preview" style="max-height: 70vh;">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/dist/js/adminlte.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    $(document).ready(function () {
+      // Load Withdrawal Problems
+      function loadWithdrawalProblems() {
+        $.ajax({
+          url: "/api/webapi/withproblem",
+          type: "GET",
+          dataType: "json",
+          beforeSend: function() {
+            $("#withdrawalProblemTable").html(`
+              <tr>
+                <td colspan="14" class="text-center py-4 loading-spinner">
+                  <i class="fas fa-spinner fa-spin fa-2x"></i>
+                </td>
+              </tr>
+            `);
+          },
+          success: function(response) {
+            if (response.success && response.data && response.data.length > 0) {
+              let html = "";
+              response.data.forEach((problem, index) => {
+                // Determine badge class based on status (0: Pending, 1: Approved, 2: Rejected)
+                let statusText, badgeClass;
+                if (problem.status === 1) {
+                  statusText = "Approved";
+                  badgeClass = "badge-approved";
+                } else if (problem.status === 2) {
+                  statusText = "Rejected";
+                  badgeClass = "badge-rejected";
+                } else {
+                  statusText = "Pending";
+                  badgeClass = "badge-pending";
+                }
+                
+                html += `
+                  <tr>
+                    <td class="text-center">${index + 1}</td>
+                    <td class="text-center">${problem.phone || "-"}</td>
+                    <td class="text-center">${problem.BankName || "-"}</td>
+                    <td class="text-center">${problem.ifsccode || "-"}</td>
+                    <td class="text-center">${problem.AccountNumber || "-"}</td>
+                    <td class="text-center">${problem.UsdtAddress || "-"}</td>
+                    <td class="text-center">${problem.OrderNumber || "-"}</td>
+                    <td class="text-center">${problem.OrderAmount ? parseFloat(problem.OrderAmount).toFixed(2) : "0.00"}</td>
+                    <td class="text-center">${problem.ProblemDescription || "-"}</td>
+                    <td class="text-center"><span class="badge ${badgeClass}">${statusText}</span></td>
+                    <td class="text-center">${new Date(problem.created_at).toLocaleString() || "-"}</td>
+                    <td class="text-center">
+                      ${problem.proof1 ? 
+                        `<img src="${problem.proof1}" class="img-thumbnail open-image" data-src="${problem.proof1}" alt="Proof 1">` : 
+                        '<span class="text-muted">N/A</span>'}
+                    </td>
+                    <td class="text-center">
+                      ${problem.proof2 ? 
+                        `<img src="${problem.proof2}" class="img-thumbnail open-image" data-src="${problem.proof2}" alt="Proof 2">` : 
+                        '<span class="text-muted">N/A</span>'}
+                    </td>
+                    <td class="text-center action-buttons">
+                      <button class="btn btn-success btn-sm approve-btn" data-id="${problem.id}"><i class="fas fa-check"></i></button>
+                      <button class="btn btn-danger btn-sm delete-btn" data-id="${problem.id}"><i class="fas fa-trash"></i></button>
+                    </td>
+                  </tr>
+                `;
+              });
+              $("#withdrawalProblemTable").html(html);
+            } else {
+              $("#withdrawalProblemTable").html(`
+                <tr>
+                  <td colspan="14" class="text-center py-4">
+                    No withdrawal problems found.
+                  </td>
+                </tr>
+              `);
+            }
+          },
+          error: function(xhr) {
+            $("#withdrawalProblemTable").html(`
+              <tr>
+                <td colspan="14" class="text-center py-4 text-danger">
+                  Error loading withdrawal problems. Please try again later.
+                </td>
+              </tr>
+            `);
+            console.error("Error loading withdrawal problems:", xhr.responseText);
+          }
+        });
+      }
+
+      // Image popup handler
+      $(document).on("click", ".open-image", function() {
+        const imgSrc = $(this).data("src");
+        if (imgSrc) {
+          $("#modalImage").attr("src", imgSrc);
+          const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+          imageModal.show();
+        }
+      });
+
+      // Approve Action
+      $(document).on("click", ".approve-btn", function() {
+        const id = $(this).data("id");
+        const button = $(this);
+        
+        Swal.fire({
+          title: "Approve Withdrawal?",
+          text: "Are you sure you want to approve this withdrawal problem?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#28a745",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, Approve!",
+          cancelButtonText: "Cancel",
+          reverseButtons: true,
+          backdrop: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            button.html('<i class="fas fa-spinner fa-spin"></i>');
+            button.prop('disabled', true);
+            
+            $.ajax({
+              type: "POST",
+              url: `/api/webapi/withprob/accepted/${id}`,
+              dataType: "json",
+              success: function(response) {
+                if (response.success) {
+                  Swal.fire({
+                    title: "Approved!",
+                    text: response.message || "The withdrawal has been approved.",
+                    icon: "success",
+                    confirmButtonColor: "#28a745",
+                    timer: 2000,
+                    timerProgressBar: true
+                  });
+                  loadWithdrawalProblems();
+                } else {
+                  Swal.fire({
+                    title: "Error!",
+                    text: response.message || "Failed to approve withdrawal.",
+                    icon: "error",
+                    confirmButtonColor: "#d33"
+                  });
+                }
+              },
+              error: function(xhr) {
+                const errorMsg = xhr.responseJSON?.message || "Server error occurred";
+                Swal.fire({
+                  title: "Error!",
+                  text: errorMsg,
+                  icon: "error",
+                  confirmButtonColor: "#d33"
+                });
+              },
+              complete: function() {
+                button.html('<i class="fas fa-check"></i>');
+                button.prop('disabled', false);
+              }
+            });
+          }
+        });
+      });
+
+      // Delete Action
+      $(document).on("click", ".delete-btn", function() {
+        const id = $(this).data("id");
+        const button = $(this);
+        
+        Swal.fire({
+          title: "Delete Record?",
+          text: "Are you sure you want to permanently delete this withdrawal problem record?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#6c757d",
+          confirmButtonText: "Yes, Delete!",
+          cancelButtonText: "Cancel",
+          reverseButtons: true,
+          backdrop: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            button.html('<i class="fas fa-spinner fa-spin"></i>');
+            button.prop('disabled', true);
+            
+            $.ajax({
+              type: "POST",
+              url: `/api/webapi/withprob/rejected/${id}`,
+              dataType: "json",
+              success: function(response) {
+                if (response.success) {
+                  Swal.fire({
+                    title: "Deleted!",
+                    text: response.message || "The record has been deleted.",
+                    icon: "success",
+                    confirmButtonColor: "#28a745",
+                    timer: 2000,
+                    timerProgressBar: true
+                  });
+                  loadWithdrawalProblems();
+                } else {
+                  Swal.fire({
+                    title: "Error!",
+                    text: response.message || "Failed to delete record.",
+                    icon: "error",
+                    confirmButtonColor: "#d33"
+                  });
+                }
+              },
+              error: function(xhr) {
+                const errorMsg = xhr.responseJSON?.message || "Server error occurred";
+                Swal.fire({
+                  title: "Error!",
+                  text: errorMsg,
+                  icon: "error",
+                  confirmButtonColor: "#d33"
+                });
+              },
+              complete: function() {
+                button.html('<i class="fas fa-trash"></i>');
+                button.prop('disabled', false);
+              }
+            });
+          }
+        });
+      });
+
+      // Initial load
+      loadWithdrawalProblems();
+    });
+  </script>
+</body>
+</html>

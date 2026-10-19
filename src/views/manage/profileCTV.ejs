@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Statistics</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            color: #00807c;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .info-box {
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            background: white;
+            color: #00807c;
+        }
+
+        .info-box:hover {
+            transform: scale(1.05);
+        }
+
+        .info-box-icon {
+            border-radius: 50px !important;
+            padding: 20px;
+            font-size: 2rem;
+            background: #E0F7FA;
+
+        }
+
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: #00807c;
+            color: white;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .table th,
+        .table td {
+            text-align: center;
+            padding: 12px;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f9f9f9;
+        }
+
+        .table-striped tbody tr:nth-of-type(even) {
+            background-color: #ffffff;
+        }
+
+        .badge {
+            border-radius: 4px;
+            padding: 5px 10px;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .info-box {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
+    <div class="wrapper">
+        <%- include('nav') %>
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Statistics Data</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="fa fa-user-circle"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Total Members</span>
+                                    <span class="info-box-number totalMember">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="far fa-flag"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Wins Today</span>
+                                    <span class="info-box-number totalWin">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="far fa-flag"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Losses Today</span>
+                                    <span class="info-box-number totalLoss">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="fa fa-user-times"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Locked Members</span>
+                                    <span class="info-box-number totalMemberFail">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="fa fa-check"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Total Deposited Amount</span>
+                                    <span class="info-box-number totalRecharge">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="fa fa-check"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Deposited Amount Today</span>
+                                    <span class="info-box-number totalRechargeToday">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="fa fa-university"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Total Withdrawn Amount</span>
+                                    <span class="info-box-number totalwithdraw">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="fa fa-university"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Withdrawn Amount Today</span>
+                                    <span class="info-box-number totalwithdrawToday">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="fa fa-line-chart"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Total Commissions</span>
+                                    <span class="info-box-number totalRoses">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="fa fa-line-chart"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Commissions Today</span>
+                                    <span class="info-box-number totalRosesToday">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="fa fa-line-chart"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">F1 Commissions</span>
+                                    <span class="info-box-number totalRosesF1">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="fa fa-line-chart"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Team Commissions</span>
+                                    <span class="info-box-number totalRosesF">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 col-sm-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon"><i class="fa fa-money"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Remaining Amount to Generate Giftcode</span>
+                                    <span class="info-box-number moneyCTV">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h3 class="card-title">Giftcode Details</h3>
+                        <div class="card-tools">
+                            <input type="date" id="sort-date" class="form-control" style="width: auto; display: inline-block;">
+                        </div>
+                    </div>
+                    <div class="card-body p-0 overflow-x-auto">
+                        <table class="table table-striped projects" id="table1">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">ID</th>
+                                    <th class="text-center">Creator</th>
+                                    <th class="text-center">Receiver</th>
+                                    <th class="text-center">Amount</th>
+                                    <th class="text-center">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-details-news"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">New Members</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0 overflow-x-auto">
+                        <table class="table table-striped projects" id="table1">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">ID</th>
+                                    <th class="text-center">Account</th>
+                                    <th class="text-center">Amount</th>
+                                    <th class="text-center">Deposited</th>
+                                    <th class="text-center">IP</th>
+                                    <th class="text-center">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-mem-news"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Deposit Today</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0 overflow-x-auto">
+                        <table class="table table-striped projects" id="table1">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">ID</th>
+                                    <th class="text-center">Account</th>
+                                    <th class="text-center">Amount</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-recharge-news"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Withdraw Today</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0 overflow-x-auto">
+                        <table class="table table-striped projects" id="table1">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">ID</th>
+                                    <th class="text-center">Account</th>
+                                    <th class="text-center">Amount</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-withdraw-news"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Increase / Decrease of Account Funds</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0 overflow-x-auto">
+                        <table class="table table-striped projects" id="table1">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">ID</th>
+                                    <th class="text-center">Sender</th>
+                                    <th class="text-center">Receiver</th>
+                                    <th class="text-center">Amount</th>
+                                    <th class="text-center">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="financial_details"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            
+        </div>
+    </div>
+
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+   <script>
+        function formateT(params) {
+            let result = (params < 10) ? "0" + params : params;
+            return result;
+        }
+
+        function timerJoin(params = '') {
+            let date = '';
+            if (params) {
+            date = new Date(Number(params));
+            } else {
+            date = Date.now();
+            date = new Date(Number(date));
+            }
+            let years = formateT(date.getFullYear());
+            let months = formateT(date.getMonth() + 1);
+            let days = formateT(date.getDate());
+            let weeks = formateT(date.getDay());
+        
+            let hours = formateT(date.getHours());
+            let minutes = formateT(date.getMinutes());
+            let seconds = formateT(date.getSeconds());
+            return years + '/' + months + '/' + days + ' - ' + hours + ':' + minutes + ':' + seconds;
+        }
+    </script>
+    <script>
+        const RenderMemberNews = (datas) => {
+            if (datas.length == 0) {
+                $('#list-mem-news').html(`
+                    <tr class="text-center">
+                    <td colspan="7">no data...</td>
+                    </tr>
+                `);
+                return;
+            }
+            let html = '';
+            datas.map((data) => {
+                html += 
+                `
+                <tr class="text-center" style="">
+                    <td>${data.id_user}</td>
+                    <td style="color: #3498db;font-weight: 600;min-width: 210px">${data.phone}</td>
+                    <td><b style="color: #e74c3c">${formatMoney(data.total_money)}</b></td>
+                    <td class="project-state"><span class="badge badge-${(data.total_money > 0 ? 'success' : 'warning')}">${(data.total_money > 0 ? 'success' : 'pending')}</span></td>
+                    <td style="min-width: 110px;"><b>${data.ip_address}</b></td>
+                    <td style="min-width: 110px;"><b>${timerJoin(data.time)}</b></td>
+                </tr>
+                `;
+            });
+            $("#list-mem-news").html(html);
+        }
+
+        const RenderRechargeNews = (datas) => {
+            if (datas.length == 0) {
+                $('#list-recharge-news').html(`
+                    <tr class="text-center">
+                    <td colspan="7">no data...</td>
+                    </tr>
+                `);
+                return;
+            }
+            let html = '';
+            datas.map((data) => {
+                html += 
+                `
+                <tr class="text-center" style="">
+                    <td>${data.id}</td>
+                    <td style="color: #3498db;font-weight: 600;min-width: 210px">${data.phone}</td>
+                    <td><b style="color: #e74c3c">${data.money}</b></td>
+                    <td class="project-state"><span class="badge badge-success">success</span></td>
+                    <td style="min-width: 110px;"><b>${data.today}</b></td>
+                </tr>
+                `;
+            });
+            $("#list-recharge-news").html(html);
+        }
+
+        const RenderWithdrawNews = (datas) => {
+            if (datas.length == 0) {
+                $('#list-withdraw-news').html(`
+                    <tr class="text-center">
+                    <td colspan="7">no data...</td>
+                    </tr>
+                `);
+                return;
+            }
+            let html = '';
+            datas.map((data) => {
+                html += 
+                `
+                <tr class="text-center" style="">
+                    <td>${data.id}</td>
+                    <td style="color: #3498db;font-weight: 600;min-width: 210px">${data.phone}</td>
+                    <td><b style="color: #e74c3c">${data.money}</b></td>
+                    <td class="project-state"><span class="badge badge-success">success</span></td>
+                    <td style="min-width: 110px;"><b>${data.today}</b></td>
+                </tr>
+                `;
+            });
+            $("#list-withdraw-news").html(html);
+        }
+        
+        const redenvelopesUsed = (datas) => {
+            if (datas.length == 0) {
+                $('#list-details-news').html(`
+                    <tr class="text-center">
+                    <td colspan="7">no data...</td>
+                    </tr>
+                `);
+                return;
+            }
+            let html = '';
+            datas.map((data) => {
+                html += 
+                `
+                <tr class="text-center" style="">
+                    <td>${data.id_redenvelops}</td>
+                    <td style="color: #3498db;font-weight: 600;min-width: 210px">${data.phone}</td>
+                    <td style="color: #3498db;font-weight: 600;min-width: 210px">${data.phone_used}</td>
+                    <td><b style="color: #e74c3c">+${data.money}</b></td>
+                    <td style="min-width: 110px;"><b>${data.today}</b></td>
+                </tr>
+                `;
+            });
+            $("#list-details-news").html(html);
+        }
+
+        const financial_details = (datas) => {
+            if (datas.length == 0) {
+                $('#financial_details').html(`
+                    <tr class="text-center">
+                    <td colspan="7">no data...</td>
+                    </tr>
+                `);
+                return;
+            }
+            let html = '';
+            datas.map((data) => {
+                html += 
+                `
+                <tr class="text-center" style="">
+                    <td>${data.id}</td>
+                    <td style="color: #3498db;font-weight: 600;min-width: 210px">${data.phone}</td>
+                    <td style="color: #3498db;font-weight: 600;min-width: 210px">${data.phone_used}</td>
+                    <td><b style="color: #e74c3c">${(data.type == '1') ? '+' : '-'} ${data.money}</b></td>
+                    <td style="min-width: 110px;"><b>${timerJoin(data.time)}</b></td>
+                </tr>
+                `;
+                $("#financial_details").html(html);
+            });
+        }
+    </script>
+    <script>
+        $('#sort-date').change(function (e) { 
+            e.preventDefault();
+            let timeDate = $(this).val();
+            $.ajax({
+                type: "POST",
+                url: "/admin/manager/infoCtv/select",
+                data: {
+                    timeDate: timeDate,
+                    phone: "<%=phone%>",
+                }, 
+                dataType: "json",
+                success: function (response) {
+                    RenderMemberNews(response.list_mems);
+                    RenderRechargeNews(response.list_recharge_news);
+                    RenderWithdrawNews(response.list_withdraw_news);
+                    redenvelopesUsed(response.redenvelopes_used);
+                    financial_details(response.financial_details_today);
+                }
+            });
+        });
+        $.ajax({
+            type: "POST",
+            url: "/admin/manager/infoCtv",
+            data: {
+                phone: "<%=phone%>",
+            },
+            dataType: "json",
+            success: function (response) {
+                RenderMemberNews(response.list_mems);
+                RenderRechargeNews(response.list_recharge_news);
+                RenderWithdrawNews(response.list_withdraw_news);
+                redenvelopesUsed(response.redenvelopes_used);
+                financial_details(response.financial_details_today);
+
+                $('.totalMember').text(response.f1 + response.f2 + response.f3 + response.f4);
+                $('.totalRoses').text(response.totalcommission);
+                $('.totalRosesToday').text(response.todaycommission);
+                $('.totalRosesF1').text(response.datas[0].roses_f1);
+                $('.totalRosesF').text(response.datas[0].roses_f);
+                $('#ip_address').text(' - IP Address ( ' + response.datas[0].ip_address + ' )');
+
+                $('.totalRecharge').text(response.total_recharge);
+                $('.totalwithdraw').text(response.total_withdraw);
+                $('.totalRechargeToday').text(response.total_recharge_today);
+                $('.totalwithdrawToday').text(response.total_withdraw_today);
+                $('.totalMemberFail').text(response.list_mem_baned);
+
+                $('.totalWin').text(Number(response.win).toFixed(2));
+                $('.totalLoss').text(Number(response.loss).toFixed(2));
+
+                $('.moneyCTV').text(response.moneyCTV);
+            }
+        });
+
+    </script>
+</body>
+
+</html>

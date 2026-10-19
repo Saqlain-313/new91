@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css"
+    />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <title>Profit/Loss Statistics</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #eef2f3;
+      }
+      .container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: auto;
+        background-color: #f4f6f9;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+      }
+      h1 {
+        text-align: center;
+        color: #00807c;
+      }
+      .controls {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+        gap: 10px;
+      }
+      .controls select,
+      .controls button {
+        padding: 10px 15px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .controls button {
+        background-color: #00807c;
+        color: #fff;
+        border: none;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+      .stat {
+        text-align: center;
+        background-color: #00807c;
+        color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .stat .value {
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      .graphs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: space-between;
+      }
+      .graph {
+        flex: 1;
+        min-width: 300px;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+      }
+      .table-container {
+        margin-top: 30px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        text-align: center;
+        padding: 10px;
+      }
+      th {
+        background-color: #00807c;
+        color: white;
+      }
+      @media (max-width: 600px) {
+        .controls {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+      .text-success {
+        color: #28a745;
+        font-weight: bold;
+      }
+      .text-danger {
+        color: #dc3545;
+        font-weight: bold;
+      }
+      .text-warning {
+        color: #ffc107;
+        font-weight: bold;
+      }
+      .text-center {
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <!-- Include navigation -->
+      <%- include('nav') %>
+      <div class="content-wrapper">
+        <section class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1
+                  class=""
+                  style="color: #00807c; font-size: 2rem; font-weight: bold"
+                >
+                  Games Profit And Loss Stats
+                </h1>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="container">
+            <div class="controls">
+              <select id="time-range">
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="thisWeek">This Week</option>
+                <option value="thisMonth">This Month</option>
+                <option value="lastMonth">Last Month</option>
+                <option value="allTime">All Time</option>
+              </select>
+              <input
+                type="date"
+                id="startDate"
+                style="display: none"
+                title="Start Date"
+              />
+              <input
+                type="date"
+                id="endDate"
+                style="display: none"
+                title="End Date"
+              />
+              <div class="input-group w-auto">
+                <input
+                  type="search"
+                  id="uid-input"
+                  class="form-control"
+                  placeholder="Search UID..."
+                  aria-label="Search UID"
+                />
+              </div>
+
+              <button id="refresh">Refresh Data</button>
+              <button id="download">Download CSV</button>
+            </div>
+            <div class="row">
+              <!-- Stats Boxes Below -->
+              <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px">
+                <div
+                  style="
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 10px;
+                    height: 100%;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                    text-align: center;
+                  "
+                >
+                  <div
+                    style="font-weight: 600; color: #015956; font-size: 14px"
+                  >
+                    Total Bet Amount
+                  </div>
+                  <div
+                    style="font-size: 1.5rem; font-weight: bold; color: #00807c"
+                    id="total-bet"
+                  >
+                    0
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px">
+                <div
+                  style="
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 10px;
+                    height: 100%;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                    text-align: center;
+                  "
+                >
+                  <div
+                    style="font-weight: 600; color: #015956; font-size: 14px"
+                  >
+                    Total Tax Amount
+                  </div>
+                  <div
+                    style="font-size: 1.5rem; font-weight: bold; color: #00807c"
+                    id="total-tax"
+                  >
+                    0
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px">
+                <div
+                  style="
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 10px;
+                    height: 100%;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                    text-align: center;
+                  "
+                >
+                  <div
+                    style="font-weight: 600; color: #015956; font-size: 14px"
+                  >
+                    Total Win Amount
+                  </div>
+                  <div
+                    style="font-size: 1.5rem; font-weight: bold; color: #00807c"
+                    id="total-win"
+                  >
+                    0
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px">
+                <div
+                  style="
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 10px;
+                    height: 100%;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                    text-align: center;
+                  "
+                >
+                  <div
+                    style="font-weight: 600; color: #015956; font-size: 14px"
+                  >
+                    Total Profit Loss
+                  </div>
+                  <div
+                    style="font-size: 1.5rem; font-weight: bold; color: #00807c"
+                    id="total-loss"
+                  >
+                    0
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px">
+                <div
+                  style="
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 10px;
+                    height: 100%;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                    text-align: center;
+                  "
+                >
+                  <div
+                    style="font-weight: 600; color: #015956; font-size: 14px"
+                  >
+                    Profit Margin
+                  </div>
+                  <div
+                    style="font-size: 1.5rem; font-weight: bold; color: #00807c"
+                    id="profit-margin"
+                  >
+                    0%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="graphs">
+              <div class="graph" id="bet-vs-win">
+                <h3>Bet Amount vs Win Amount</h3>
+                <canvas id="betWinChart"></canvas>
+              </div>
+              <div class="graph" id="cumulative-profit">
+                <h3>Cumulative Profit/Loss</h3>
+                <canvas id="profitLossChart"></canvas>
+              </div>
+            </div>
+            <div class="table-container">
+              <h3>Recent Bets (Last 10)</h3>
+              <div style="overflow-x: auto; width: 100%">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Phone</th>
+                      <th>Game</th>
+                      <th>Bet Type</th>
+                      <th>Bet Amount</th>
+                      <th>Win Amount</th>
+                      <th>Status</th>
+                      <th>Date/Time</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-bets">
+                    <!-- Data will be populated by JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Include scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+    <script>
+      $(document).ready(function () {
+        // Initialize charts
+        const betWinCtx = document
+          .getElementById("betWinChart")
+          .getContext("2d");
+        const profitLossCtx = document
+          .getElementById("profitLossChart")
+          .getContext("2d");
+
+        let betWinChart = new Chart(betWinCtx, {
+          type: "bar",
+          data: {
+            labels: ["Bet Amount", "Win Amount"],
+            datasets: [
+              {
+                label: "Amount",
+                data: [0, 0],
+                backgroundColor: ["#4caf50", "#f44336"],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+          },
+        });
+
+        let profitLossChart = new Chart(profitLossCtx, {
+          type: "line",
+          data: {
+            labels: [],
+            datasets: [
+              {
+                label: "Profit/Loss",
+                data: [],
+                borderColor: "#00807c",
+                fill: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+          },
+        });
+
+        function getFormattedDate(type) {
+          let date = new Date();
+
+          if (type === "yesterday") {
+            date.setDate(date.getDate() - 1);
+          }
+
+          let year = date.getFullYear();
+          let month = String(date.getMonth() + 1).padStart(2, "0");
+          let day = String(date.getDate()).padStart(2, "0");
+
+          return `${year}-${month}-${day}`;
+        }
+
+        function formatDateTime(datetime) {
+          if (!datetime) return "";
+          const date = new Date(datetime);
+          return date.toLocaleString();
+        }
+
+        function fetchProfitLossData() {
+          let selectedDate = $("#time-range").val();
+
+          let uid = $("#uid-input").val().trim(); // <-- grab UID
+
+          let payload = { range: selectedDate };
+          if (uid) {
+            payload.uid = uid; // only add if not empty
+          }
+
+          $.ajax({
+            type: "POST",
+            url: "/api/webapi/get-profit-loss",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            dataType: "json",
+            success: function (response) {
+              //console.log("API Response:", response);
+              if (response.status) {
+                // Update summary stats
+                $("#total-bet").text(response.totalbetMoney);
+                $("#total-win").text(response.totalWinnigMoney);
+                $("#total-loss").text(response.totalLossMoney);
+                $("#total-tax").text(response.totalTextMoney);
+                $("#profit-margin").text(response.winningPercentage + "%");
+
+                // Update charts
+                betWinChart.data.datasets[0].data = [
+                  response.totalbetMoney,
+                  response.totalWinnigMoney,
+                ];
+                betWinChart.update();
+
+                // Update recent bets table
+                const recentBetsTable = $("#recent-bets");
+                recentBetsTable.empty();
+
+                if (response.winGo10 && response.winGo10.length > 0) {
+                  response.winGo10.forEach((bet) => {
+                    const statusText =
+                      bet.status === 1
+                        ? "Win"
+                        : bet.status === 2
+                        ? "Loss"
+                        : "Pending";
+                    const statusClass =
+                      bet.status === 1
+                        ? "text-success"
+                        : bet.status === 2
+                        ? "text-danger"
+                        : "text-warning";
+
+                    recentBetsTable.append(`
+                      <tr>
+                        <td>${bet.id_product || ""}</td>
+                        <td>${bet.phone || ""}</td>
+                        <td>${bet.game || ""}</td>
+                        <td>${bet.bet || ""}</td>
+                        <td>${bet.money || "0.00"}</td>
+                        <td>${bet.get || "0.00"}</td>
+                        <td class="${statusClass}">${statusText}</td>
+                        <td>${formatDateTime(bet.today)}</td>
+                      </tr>
+                    `);
+                  });
+                } else {
+                  recentBetsTable.append(
+                    '<tr><td colspan="8" class="text-center">No recent bets found</td></tr>'
+                  );
+                }
+              } else {
+                console.error("Invalid response format");
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error("API Fetch Error:", status, error);
+            },
+          });
+        }
+
+        $("#refresh").click(function () {
+          fetchProfitLossData();
+        });
+
+        $("#time-range").change(function () {
+          fetchProfitLossData();
+        });
+
+        $("#download").click(function () {
+          // Simple CSV download implementation
+          let csv =
+            "ID,Phone,Game,Bet Type,Bet Amount,Win Amount,Status,Date/Time\n";
+
+          $("#recent-bets tr").each(function () {
+            const cells = $(this).find("td");
+            if (cells.length > 0) {
+              const row = [];
+              cells.each(function () {
+                let text = $(this).text();
+                // Remove status class text if present
+                text = text
+                  .replace("Win", "")
+                  .replace("Loss", "")
+                  .replace("Pending", "")
+                  .trim();
+                row.push(`"${text}"`);
+              });
+              csv += row.join(",") + "\n";
+            }
+          });
+
+          const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+          const link = document.createElement("a");
+          const url = URL.createObjectURL(blob);
+          link.setAttribute("href", url);
+          link.setAttribute("download", "recent_bets.csv");
+          link.style.visibility = "hidden";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+
+        // Initial data load
+        fetchProfitLossData();
+      });
+    </script>
+  </body>
+</html>

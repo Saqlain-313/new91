@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Browse Recharge - Admin Panel</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+
+  <style>
+    body {
+      font-family: "Source Sans Pro", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    h1 {
+      color: #00807c;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .content-wrapper {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px;
+    }
+
+    .search-container input {
+      padding:10px;
+      font-size: 20px;
+      border: 2px solid #00807c;
+      border-radius: 8px 0 0 8px;
+      outline: none;
+      flex: 1;
+      
+    }
+
+    .search-container button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #00807c;
+      color: #fff;
+      border: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .search-container button:hover {
+      background-color: #4a47e0;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      background-color: #00807c;
+      color: white;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .card-body {
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      text-align: center;
+      padding: 12px;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #00807c;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 8px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-success {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: #218838;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #c82333;
+    }
+
+    @media (max-width: 768px) {
+      .search-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-container input {
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+
+      .search-container button {
+        border-radius: 8px;
+      }
+
+      table {
+        font-size: 14px;
+      }
+    }
+
+    
+  </style>
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <%- include('nav') %>
+      <div class="content-wrapper">
+        <section class="content-header">
+          <div>
+            <h1>Approve Recharge</h1>
+          </div>
+        </section>
+
+        <div class="search-container">
+          <input type="text" id="search" class="search-input" placeholder="Enter the order id" />
+          <button id="searchBtn" class="btn">Search</button>
+        </div>
+
+        <section class="content">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Approve Recharge</h3>
+            </div>
+
+            <div class="card-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Account</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>UTR No</th>
+                    <th>Time</th>
+                    <th>Order ID</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Capture the input value
+        let value = $("#search").val().toLowerCase();
+
+        // Function to display the data
+        function show(params, searchValue) {
+          if (params.length === 0) {
+            $("tbody").html(`
+            <tr class="text-center">
+              <td colspan="7">No data available...</td>
+            </tr>
+          `);
+            return;
+          }
+
+          let html = "";
+
+          // If searchValue is provided, filter the data
+          let filteredData = params.filter((data) => {
+            return searchValue
+              ? data.id_order &&
+                  data.id_order.toString().toLowerCase().includes(searchValue)
+              : true;
+          });
+
+          // If no matching data, show "No matching data found..."
+          if (filteredData.length === 0) {
+            $("tbody").html(`
+            <tr class="text-center">
+              <td colspan="7">No matching data found...</td>
+            </tr>
+          `);
+            return;
+          }
+
+          // Generate HTML for the filtered data
+          filteredData.forEach((data) => {
+            if (data.utr !== null && data.utr !== "") {
+              html += `<tr class="text-center">
+        <td id="${data.id}">
+          ${data.id}
+        </td>
+        <td>
+          <b>${data.phone}</b>
+        </td>
+        <td>
+          ${data.type}
+        </td>
+        <td>
+          <b> ${
+            data.type === "USDT"
+              ? "$" + Number(data.money / 93).toFixed(2)
+              : "₹" + data.money
+          }</b>
+        </td>
+        <td style="min-width: 190px;">
+          <b>${data.utr}</b>
+        </td>
+        <td style="min-width: 190px;">
+          <b>${data.today}</b>
+        </td>
+        <td style="min-width: 190px;">
+          <b>${data.id_order}</b>
+        </td>
+        <td class="project-state">
+          ${
+            data.status === 1
+              ? '<span class="badge badge-success">Success</span>'
+              : data.status === 2
+              ? '<span class="badge badge-danger">Fail</span>'
+              : '<span class="badge badge-warning">watting...</span>'
+          }
+        </td>
+      </tr>`;
+            }
+          });
+
+          // Update the HTML content of the tbody
+          $("tbody").html(html);
+
+          // Handle confirm button click
+          $(".btn-success").click(function (e) {
+            e.preventDefault();
+            let id = $(this).attr("data");
+            $.ajax({
+              type: "POST",
+              url: "/api/webapi/admin/rechargeDuyet",
+              data: {
+                id: id,
+                type: "confirm",
+              },
+              dataType: "json",
+              success: function (response) {
+                Swal.fire("Good job!", response.message, "success");
+                setTimeout(() => {
+                  location.reload();
+                }, 100);
+              },
+            });
+          });
+
+          // Handle delete button click
+          $(".btn-danger").click(function (e) {
+            e.preventDefault();
+            let id = $(this).attr("data");
+            $.ajax({
+              type: "POST",
+              url: "/api/webapi/admin/rechargeDuyet",
+              data: {
+                id: id,
+                type: "delete",
+              },
+              dataType: "json",
+              success: function (response) {
+                Swal.fire("Good job!", response.message, "success");
+                setTimeout(() => {
+                  location.reload();
+                }, 100);
+              },
+            });
+          });
+        }
+
+        // Initial AJAX call to load all data
+        $.ajax({
+          type: "POST",
+          url: "/api/webapi/admin/recharge",
+          dataType: "json",
+          success: function (response) {
+            show(response.allRecharge, value); // Show all data by default
+          },
+        });
+
+        // Event listener for the search input
+        $("#search").on("input", function () {
+          value = $(this).val().toLowerCase();
+          $.ajax({
+            type: "POST",
+            url: "/api/webapi/admin/recharge",
+            dataType: "json",
+            success: function (response) {
+              show(response.allRecharge, value); // Filter and show data based on search input
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

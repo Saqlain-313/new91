@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live chat</title>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+  <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<style>
+  body {
+    background-color: #fafafb;
+    color: #343a40;
+  }
+
+  
+  
+
+  
+
+  .bg-primary {
+    background-color: #374992 !important;
+  }
+
+  .dark-mode .nav-pills .nav-link {
+    color: #9cc6ff;
+  }
+
+  
+
+  .navbar-light {
+    background-color: #237ec0;
+    border-color: #dee2e6;
+  }
+
+ 
+  
+
+  
+  .content-wrapper {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex: 1;
+  }
+
+  .navbar-dark {
+    background-color: #ffffff;
+    border-color: #dee2e6;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark-mode .navbar-dark {
+    background-color: #ffffff;
+    border-color: #dee2e6;
+  }
+
+  .nav-sidebar .nav-item>.nav-link {
+    margin-bottom: .2rem;
+    padding: 10px 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .card {
+    background-color: #ffffff;
+    color: #212529;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+
+  .form-control {
+    background-color: #ffffff;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    color: #212529;
+    padding: 15px 20px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .form-control:focus {
+    background-color: #ffffff;
+    color: #212529;
+    border-color: #307fdf;
+    box-shadow: 0 0 5px rgba(65, 158, 244, 0.5);
+  }
+
+  .swal2-show {
+    background-color: #ffffff;
+    color: #212529;
+  }
+
+  #remark {
+    border-color: #ced4da;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100vh;
+    border: none;
+  }
+
+  .ui-btn {
+    cursor: pointer;
+    border-radius: 5px;
+    color: rgb(10, 235, 111);
+    border-style: solid;
+    background-color: transparent;
+    border-color: #00008B;
+    width: 120px;
+    height: 40px;
+    transition: 0.2s ease;
+    text-transform: uppercase;
+    border-width: 2px;
+    
+  }
+
+  .ui-btn:hover {
+    color: rgb(247, 247, 247);
+    background-color: rgb(42, 145, 73);
+    border-color: rgb(42, 145, 73);
+    text-shadow: 0 0 50px white, 0 0 20px white, 0 0 15px white;
+    box-shadow: 0 0 50px rgb(42, 145, 73), 0 0 30px rgb(42, 145, 73),
+      0 0 60px rgb(42, 145, 73), 0 0 120px rgb(42, 145, 73);
+  }
+
+  .atag {
+    background: white;
+    padding: 10px 0px;
+  }
+
+  .ui-btn:active {
+    width: 115px;
+    height: 38px;
+    letter-spacing: 0px;
+  }
+
+  .beautiful-hover {
+    font-weight: bold;
+    font-size: 2.5rem;
+    color: #222;
+    transition: color 0.3s ease;
+    cursor: pointer;
+  }
+
+  .beautiful-hover span {
+    display: inline-block;
+    transition: color 0.3s ease;
+  }
+
+  .beautiful-hover span:hover {
+    color: #ff6f61;
+  }
+
+  .beautiful-hover span+span {
+    margin-left: 0.2em;
+  }
+
+  @media (max-width: 768px) {
+    .beautiful-hover {
+      font-size: 1.5rem;
+    }
+
+    .ui-btn {
+      width: 100px;
+      height: 35px;
+      font-size: 16px;
+    }
+
+    .content-wrapper {
+      padding: 10px;
+    }
+
+    .card {
+      margin-bottom: 10px;
+    }
+
+    .form-control {
+      padding: 8px 10px;
+    }
+  }
+
+  
+tbody tr:nth-child(odd) {
+    background: #DFF5F5 !important;
+}
+
+thead tr {
+    background-color: #00807c; 
+}
+
+
+thead th {
+    background-color: #00807c; /* Sets the background for individual header cells */
+    color: white; /* Optional: Set text color for better contrast */
+}
+
+.card-title {
+    color: #00807c;
+        font-size: 20px;
+        font-weight: bold;
+        
+        
+}
+
+.search {
+      width: 100%;
+      height: 60px;
+      border: 2px solid #ced4da;
+      border-radius: 10px;
+      font-size: 16px;
+      color: #343a40;
+
+    }
+    .search:focus {
+      outline: none;
+      border-color: #00807c;
+      box-shadow: 0 0 4px rgba(0, 123, 255)
+    }
+</style>
+
+<body class="hold-transition sidebar-mini">
+  <div class="wrapper">
+    <!-- Include navigation -->
+    <%- include('nav') %>
+    <div class="content-wrapper">
+      <section class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="text-dark beautiful-hover">Live chat</h1>
+            </div>
+          </div>
+        </div>
+        <div>
+          <a href='https://dashboard.tawk.to/#/chat' target="_blank" class="atag"><button class="ui-btn">Chat Now</button></a>
+        </div>
+      </section>
+      <!--
+        <iframe src="https://dashboard.tawk.to" sandbox="allow-same-origin allow-scripts allow-forms SameSite=None; Secure"></iframe>
+        -->
+
+      <!-- Main content -->
+<div class="mb-3 mx-2 mt-5">
+  <label for="remark" class="form-label text-dark ">Remark</label>
+  <input
+  
+    type="text"
+    class="form-control search "
+    id="remark"
+    name="remark"
+    required
+    placeholder="Enter remark"
+  />
+</div>
+<section class="content">
+  <!-- Default box -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">User Problem</h3>
+      <div class="card-tools">
+        <button
+          type="button"
+          class="btn btn-tool"
+          data-card-widget="collapse"
+          title="Collapse"
+        >
+          <i class="fas fa-minus"></i>
+        </button>
+        <button
+          type="button"
+          class="btn btn-tool"
+          data-card-widget="remove"
+          title="Remove"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    <div class="card-body p-0" style="overflow-y: hidden;">
+      <table class="table table-striped projects">
+        <thead>
+          <tr>
+            <th class="text-center">#</th>
+            <th class="text-center">Phone</th>
+            <th class="text-center">User Id</th>
+            <th class="text-center">Amount</th>
+            <th class="text-center">OrderNo</th>
+            <th class="text-center">UTR</th>
+            <th class="text-center">Issue</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Date</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Withdrawal data will be displayed here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+  </div>
+  
+
+  <!-- Include scripts -->
+  <script src="/plugins/jquery/jquery.min.js"></script>
+  <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/dist/js/adminlte.min.js"></script>
+  <script src="/js/admin/admin.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+  <script>
+    $.ajax({
+      url: 'https://dashboard.tawk.to',
+      method: 'GET',
+      success: function (response) {
+        console.log('Response data:', response);
+      },
+      error: function (error) {
+        console.error('Error:', error);
+      }
+    });
+
+    function show(params) {
+      if (params.length == 0) {
+        $('tbody').html(`
+            <tr class="text-center">
+              <td colspan="10">No more data available...</td>
+            </tr>
+          `);
+        return;
+      }
+      let html = '';
+      let show = params.map((data) => {
+        html += `<tr class="text-center">
+                  <td id="${data.id}">
+                    ${data.id}
+                  </td>
+                  <td>
+                    <b>${data.phone}</b>
+                  </td>
+                  <td>
+                    <b>${data.user_id}</b>
+                  </td>
+                  <td>
+                    <b>${data.amount}</b>
+                  </td>
+                  <td>
+                    <b>${data.orderNo}</b>
+                  </td>
+                  <td style="min-width: 190px;">
+                    <b>${data.utr}</b>
+                  </td>
+                  <td style="min-width: 190px;">
+                    <b>${data.issue}</b>
+                  </td>
+                  <td class="project-state">
+                    <span class="badge badge-warning">Waiting...</span>
+                  </td>
+                  <td>
+                    <b>${(data.today)}</b>
+                  </td>
+                  <td class="project-actions text-center" style="min-width: 160px;">
+                    <a class="btn btn-success text-success  btn-sm confirm-btn" href="" data="${data.id}"><i class="fa fa-check"></i></a>
+                    <a class="btn btn-danger text-danger btn-sm delete-btn" href="#" data="${data.id}"><i class="fas fa-trash"></i></a>
+                  </td>
+                </tr>`;
+      })
+      $('tbody').html(html);
+
+      $('.btn-success').click(function (e) {
+        e.preventDefault();
+        let id = $(this).attr('data');
+        $.ajax({
+          type: "POST",
+          url: "/api/webapi/admin/livechatupdate",
+          data: {
+            id: id,
+            type: 'confirm'
+          },
+          dataType: "json",
+          success: function (response) {
+            Swal.fire(
+              'Good job!',
+              'You clicked the button!',
+              'success'
+            )
+            setTimeout(() => {
+              location.reload();
+            }, 100);
+          }
+        });
+      });
+
+      $('.btn-danger').click(function (e) {
+        e.preventDefault();
+        let id = $(this).attr('data');
+        let remark = $("#remark").val();
+        //console.log("object", remark)
+        $.ajax({
+          type: "POST",
+          url: "/api/webapi/admin/livechatupdate",
+          data: {
+            id: id,
+            type: 'delete',
+            remark: remark
+          },
+          dataType: "json",
+          success: function (response) {
+            setTimeout(() => {
+              location.reload();
+            }, 100);
+            Swal.fire(
+              'Good job!',
+              'You clicked the button!',
+              'success'
+            )
+          }
+        });
+      });
+    }
+
+    $.ajax({
+      type: "GET",
+      url: "/api/webapi/admin/livechat",
+      data: {},
+      dataType: "json",
+      success: function (response) {
+        show(response.data);
+      }
+    });
+
+   
+  </script>
+
+</html>

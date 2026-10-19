@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            color: #333;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .back-button, .menu-button {
+            font-size: 24px;
+            color: #00807c;
+            text-decoration: none;
+        }
+
+        .logo {
+            width: 150px;
+        }
+
+        .login-box {
+            padding: 5px;
+        }
+
+        .login-box h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .login-box p {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .login-phone-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background-color: #00807c;
+            color: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-phone-button:hover {
+            background-color: #055351;
+        }
+
+        .login-phone-button i {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            padding-right: 40px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            background-color: #f9f9f9;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .input-group .dropdown,
+        .input-group .show-password {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .options label input {
+            margin-right: 5px;
+        }
+
+        .forgot-password {
+            font-size: 14px;
+            color: #00807c;
+            text-decoration: none;
+        }
+
+        .login-button, .register-button, .verify-button, .resend-button {
+            display: block;
+            width: 100%;
+            background-color: #00807c;
+            color: #fff;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-button:hover, .register-button:hover,
+        .verify-button:hover, .resend-button:hover {
+            background-color: #055351;
+        }
+
+        .resend-button {
+            background-color: #53b7b3;
+        }
+
+        .resend-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* OTP box */
+        #otpBox {
+            display: none;
+        }
+
+        .otp-input {
+            letter-spacing: 10px;
+            text-align: center;
+            font-size: 22px !important;
+            font-weight: 700;
+        }
+
+        .otp-hint {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            background: #f0f9f8;
+            border-left: 3px solid #00807c;
+            padding: 10px 12px;
+            border-radius: 6px;
+        }
+
+        .otp-hint b {
+            color: #00807c;
+        }
+
+        .back-to-login {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #00807c;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .back-to-login i {
+            margin-right: 5px;
+        }
+
+        /* toast */
+        .alert-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+        }
+
+        .alert-toast .msg {
+            background: #333;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .van-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 9998;
+        }
+    </style>
+</head>
+<body>
+
+<div class="alert-toast"></div>
+<div class="van-overlay"></div>
+
+<div class="container">
+    <div class="header">
+        <a href="#" class="back-button"><i class="fas fa-arrow-left"></i></a>
+        <h3>Admin Login</h3>
+        <div class="menu-button"><i class="fas fa-bars"></i></div>
+    </div>
+
+    <!-- ================= STEP 1 : PASSWORD ================= -->
+    <div class="login-box" id="loginBox">
+        <h2>Log in</h2>
+        <p>Please login with your phone number. An OTP will be sent to your registered email for verification.</p>
+
+        <button class="login-phone-button">
+            <i class="fas fa-user-shield"></i> Log in With Phone
+        </button>
+
+        <form onsubmit="return false;">
+            <label for="phone">Phone Number</label>
+            <div class="input-group">
+                <input type="text" id="phone" placeholder="Enter your phone number">
+            </div>
+
+            <label for="password">Password</label>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Please Enter Your Password">
+                <span class="show-password" onclick="togglePassword()"><i class="fas fa-eye"></i></span>
+            </div>
+
+            <div class="options">
+                <label>
+                    <input type="checkbox" id="remember-me"> Remember Me
+                </label>
+                <a href="#" class="forgot-password">Forgot Password</a>
+            </div>
+        </form>
+
+        <button class="login-button" id="btnSendOtp">Login</button>
+    </div>
+
+    <!-- ================= STEP 2 : OTP ================= -->
+    <div class="login-box" id="otpBox">
+        <h2>Verify OTP</h2>
+        <p>For your security, please enter the OTP sent to your registered email.</p>
+
+        <div class="otp-hint">
+            OTP sent to <b id="otpEmailHint">your registered email</b> for <b id="otpPhoneHint"></b>.
+            <br>Validity: <b id="otpCountdown">05:00</b>
+        </div>
+
+        <form onsubmit="return false;">
+            <label for="otp">Enter OTP</label>
+            <div class="input-group">
+                <input type="text" id="otp" maxlength="6" inputmode="numeric"
+                       class="otp-input" placeholder="••••••">
+            </div>
+        </form>
+
+        <button class="verify-button" id="btnVerifyOtp">Verify &amp; Login</button>
+        <button class="resend-button" id="btnResendOtp" disabled>Resend OTP (30s)</button>
+
+        <a class="back-to-login" id="btnBackToLogin">
+            <i class="fas fa-arrow-left"></i> Back to login
+        </a>
+    </div>
+</div>
+
+<script>
+    function togglePassword() {
+        var passwordField = document.getElementById("password");
+        var passwordIcon = document.querySelector(".show-password i");
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            passwordIcon.classList.remove("fa-eye");
+            passwordIcon.classList.add("fa-eye-slash");
+        } else {
+            passwordField.type = "password";
+            passwordIcon.classList.remove("fa-eye-slash");
+            passwordIcon.classList.add("fa-eye");
+        }
+    }
+</script>
+
+<!-- ================= API LOGIC ================= -->
+<script>
+    function setCookie(cname, cvalue, exdays) {
+        const d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function alertMess(text) {
+        if ($('.alert-toast .msg').length > 0) return;
+        $('.alert-toast').append(
+            `<div class="msg"><div class="msg-content">${text}</div></div>`
+        );
+        setTimeout(() => {
+            $('.msg').fadeOut();
+            setTimeout(() => $('.alert-toast .msg').remove(), 200);
+        }, 2000);
+    }
+
+    // ===== State =====
+    let otpState = {
+        phone: "",
+        timeEnd: 0,
+        countdownTimer: null,
+        resendTimer: null,
+    };
+
+    // ===== Helpers =====
+    function startOtpCountdown(timeEnd) {
+        clearInterval(otpState.countdownTimer);
+        const el = document.getElementById("otpCountdown");
+        const tick = () => {
+            const left = Math.max(0, Math.floor((timeEnd - Date.now()) / 1000));
+            const m = String(Math.floor(left / 60)).padStart(2, "0");
+            const s = String(left % 60).padStart(2, "0");
+            el.textContent = `${m}:${s}`;
+            if (left <= 0) {
+                clearInterval(otpState.countdownTimer);
+                el.textContent = "Expired";
+            }
+        };
+        tick();
+        otpState.countdownTimer = setInterval(tick, 1000);
+    }
+
+    function startResendCooldown(seconds = 30) {
+        const btn = document.getElementById("btnResendOtp");
+        let left = seconds;
+        btn.disabled = true;
+        btn.textContent = `Resend OTP (${left}s)`;
+        clearInterval(otpState.resendTimer);
+        otpState.resendTimer = setInterval(() => {
+            left--;
+            if (left <= 0) {
+                clearInterval(otpState.resendTimer);
+                btn.disabled = false;
+                btn.textContent = "Resend OTP";
+            } else {
+                btn.textContent = `Resend OTP (${left}s)`;
+            }
+        }, 1000);
+    }
+
+    function showOtpScreen(phone, timeEnd) {
+        otpState.phone = phone;
+        otpState.timeEnd = timeEnd || (Date.now() + 5 * 60 * 1000);
+
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("otpBox").style.display = "block";
+        document.getElementById("otpPhoneHint").textContent = phone;
+        document.getElementById("otpEmailHint").textContent = "your registered email";
+        document.getElementById("otp").value = "";
+
+        startOtpCountdown(otpState.timeEnd);
+        startResendCooldown(30);
+        setTimeout(() => document.getElementById("otp").focus(), 200);
+    }
+
+    function showLoginScreen() {
+        clearInterval(otpState.countdownTimer);
+        clearInterval(otpState.resendTimer);
+        document.getElementById("otpBox").style.display = "none";
+        document.getElementById("loginBox").style.display = "block";
+        otpState = { phone: "", timeEnd: 0, countdownTimer: null, resendTimer: null };
+    }
+
+    // ===== STEP 1 : Send OTP =====
+    $('#btnSendOtp').on('click', function () {
+        const username = $('#phone').val().trim();
+        const password = $('#password').val().trim();
+
+        if (!username || !password) {
+            alertMess("Please enter phone and password");
+            return;
+        }
+
+        $('.van-overlay').fadeIn(100);
+
+        $.ajax({
+            type: "POST",
+            url: "/api/webapi/login-admin",
+            data: { username: username, pwd: password },
+            dataType: "json",
+            success: function (response) {
+                $('.van-overlay').fadeOut(200);
+
+                if (response.status === true && response.otpRequired) {
+                    showOtpScreen(response.phone || username, response.timeEnd);
+                    alertMess(response.message || "OTP sent");
+                } else {
+                    alertMess(response.message || "Login failed");
+                }
+            },
+            error: function () {
+                $('.van-overlay').fadeOut(200);
+                alertMess("Network error, please try again");
+            }
+        });
+    });
+
+    // ===== STEP 2 : Verify OTP =====
+    $('#btnVerifyOtp').on('click', function () {
+        const otp = $('#otp').val().trim();
+
+        if (!otpState.phone) {
+            alertMess("Session expired, please login again");
+            showLoginScreen();
+            return;
+        }
+        if (!otp || otp.length !== 6) {
+            alertMess("Please enter 6-digit OTP");
+            return;
+        }
+
+        $('.van-overlay').fadeIn(100);
+
+        $.ajax({
+            type: "POST",
+            url: "/api/webapi/verify-admin-otp",
+            data: { username: otpState.phone, otp: otp },
+            dataType: "json",
+            success: function (response) {
+                $('.van-overlay').fadeOut(200);
+
+                if (response.status === true) {
+                    setCookie('token', response.token, 1);
+                    setCookie('auth', response.value, 1);
+                    alertMess(response.message || "Login Successful");
+                    setTimeout(() => {
+                        location.href = '/admin/manager/index';
+                    }, 500);
+                } else {
+                    alertMess(response.message || "OTP verification failed");
+                }
+            },
+            error: function () {
+                $('.van-overlay').fadeOut(200);
+                alertMess("Network error, please try again");
+            }
+        });
+    });
+
+    // ===== Resend OTP =====
+    $('#btnResendOtp').on('click', function () {
+        if (!otpState.phone) {
+            showLoginScreen();
+            return;
+        }
+
+        $('.van-overlay').fadeIn(100);
+
+        $.ajax({
+            type: "POST",
+            url: "/api/webapi/login-admin",
+            data: {
+                username: otpState.phone,
+                pwd: sessionStorage.getItem('pwd') // Not used — see note below
+            },
+            dataType: "json",
+            success: function () {
+                $('.van-overlay').fadeOut(200);
+                // Re-request OTP directly
+            },
+            error: function () {
+                $('.van-overlay').fadeOut(200);
+                alertMess("Network error, please try again");
+            }
+        });
+
+        // NOTE: See "Resend OTP" section below for the recommended approach
+    });
+
+    // ===== Back to Login =====
+    $('#btnBackToLogin').on('click', function () {
+        showLoginScreen();
+    });
+
+    // ===== Auto submit OTP on 6 digits =====
+    $('#otp').on('input', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 6);
+        if (this.value.length === 6) {
+            $('#btnVerifyOtp').trigger('click');
+        }
+    });
+y
+    // ===== Enter key on login form =====
+    $('#password, #phone').on('keypress', function (e) {
+        if (e.which === 13) $('#btnSendOtp').trigger('click');
+    });
+</script>
+
+<script>
+    let getWBody = $('.mian').width();
+    $('html').css('font-size', `${getWBody / 10}px`);
+    $('.van-tabbar .van-tabbar-item').css({ 'transform': 'scale(0.9)' });
+    $(window).resize(() => {
+        let getWBody = $('.mian').width();
+        $('html').css('font-size', `${getWBody / 10}px`);
+        $('.van-tabbar .van-tabbar-item').css({ 'transform': 'scale(0.9)' });
+    });
+</script>
+</body>
+</html>

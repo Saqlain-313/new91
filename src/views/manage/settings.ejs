@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Settings</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&display=fallback"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa; /* Lighter background */
+        font-family: "Source Sans Pro", sans-serif;
+        color: #343a40; /* Darker text for better contrast */
+      }
+
+      .content-wrapper {
+        /* background-color: #ffffff; */
+        /* padding: 40px;  */
+        border-radius: 12px; /* More rounded corners */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07); /* Softer, more pronounced shadow */
+        margin-top: 30px; /* Space from top */
+      }
+
+      h1 {
+        color: #00807c; /* A vibrant blue for headings */
+        font-size: 2.8rem; /* Larger heading */
+        font-weight: 700; /* Bolder */
+        margin-bottom: 40px; /* More space below heading */
+        text-align: center; /* Centered heading */
+        letter-spacing: -0.5px; /* Slight letter spacing adjustment */
+      }
+
+      .form-group {
+        margin-bottom: 30px;
+        padding: 25px; /* Increased padding */
+        border-radius: 10px; /* Slightly more rounded */
+        background-color: #ffffff; /* White background for form groups */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Lighter, subtle shadow */
+        border: 1px solid #e0e0e0; /* Subtle border */
+      }
+
+      .form-group label {
+        font-weight: 600; /* Bolder label */
+        color: #495057; /* Darker grey for labels */
+        margin-bottom: 10px; /* Space below label */
+        display: block; /* Ensures label takes full width */
+        font-size: 1.1rem; /* Slightly larger label font */
+      }
+
+      .form-control,
+      .form-select {
+        border-radius: 8px; /* Rounded inputs */
+        border: 1px solid #c2d1e0; /* Softer border color */
+        padding: 12px 18px; /* Comfortable padding */
+        transition: all 0.3s ease; /* Smooth transitions */
+        background-color: #fefefe; /* Very light background for inputs */
+        font-size: 1rem; /* Consistent font size */
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: #00807c; /* Blue border on focus */
+        box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25); /* Bootstrap-like focus shadow */
+        background-color: #ffffff; /* White background on focus */
+      }
+
+      .btn-primary {
+        background-color: #00807c;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 25px; /* Larger buttons */
+        font-size: 1.1rem;
+        font-weight: 600;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        letter-spacing: 0.5px; /* Slight letter spacing */
+      }
+
+      .btn-primary:hover {
+        background-color: #05707c; /* Darker blue on hover */
+        transform: translateY(-2px); /* Slight lift effect */
+        box-shadow: 0 6px 15px rgba(7, 171, 200, 0.3); /* Shadow on hover */
+      }
+
+      .text-muted {
+        font-size: 0.9rem;
+        color: #6c757d; /* Standard muted text color */
+      }
+
+      /* Admin Alert Section */
+      .attendance-container {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+        margin-top: 30px;
+      }
+
+      .attendance-dashboard-title {
+        color: #00807c;
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 30px;
+        text-align: center;
+        letter-spacing: -0.5px;
+      }
+
+      .attendance-alert {
+        background-color: #fff3cd; /* Light yellow for warning */
+        color: #856404; /* Dark yellow text */
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        border: 1px solid #ffeeba;
+        font-weight: 500;
+      }
+
+      .attendance-form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        display: block;
+        font-size: 1.1rem;
+      }
+
+      .attendance-form-group1 {
+        display: flex;
+        gap: 10px; /* Space between dropdown and input */
+        margin-bottom: 20px;
+      }
+
+      .attendance-dropdown {
+        flex: 0.3; /* Smaller width for dropdown */
+        min-width: 80px; /* Minimum width */
+      }
+
+      .attendance-phone-input {
+        flex: 1; /* Takes remaining space */
+      }
+
+      .attendance-textarea {
+        resize: vertical; /* Allow vertical resizing */
+        min-height: 120px; /* Minimum height for textarea */
+      }
+
+      .attendance-send-btn {
+        background-color: #00807c; /* Green for send button */
+        border: none;
+        border-radius: 8px;
+        padding: 12px 25px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #fff;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        width: 100%; /* Full width button */
+        margin-top: 20px;
+        letter-spacing: 0.5px;
+      }
+
+      .attendance-send-btn:hover {
+        background-color: #015e5b; /* Darker green on hover */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3); /* Shadow on hover */
+      }
+
+      @media (max-width: 768px) {
+        .content-wrapper,
+        .attendance-container {
+          padding: 20px;
+        }
+
+        h1 {
+          font-size: 2rem;
+          margin-bottom: 30px;
+        }
+
+        .attendance-dashboard-title {
+          font-size: 1.8rem;
+          margin-bottom: 25px;
+        }
+
+        .form-group {
+          padding: 20px;
+        }
+
+        .form-group label {
+          font-size: 1rem;
+        }
+
+        .form-control,
+        .form-select,
+        .btn-primary,
+        .attendance-send-btn {
+          font-size: 0.95rem;
+          padding: 10px 15px;
+        }
+
+        .attendance-form-group1 {
+          flex-direction: column; /* Stack on small screens */
+          gap: 15px;
+        }
+
+        .attendance-dropdown,
+        .attendance-phone-input {
+          flex: auto; /* Auto width on small screens */
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <%- include('nav') %>
+      <div class="content-wrapper">
+        <h1>Admin Settings</h1>
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="buff-id">Increase | Decrease For Members</label>
+                <input
+                  type="text"
+                  class="form-control mb-3"
+                  oninput="value=value.replace(/\D/g,'')"
+                  id="buff-id"
+                  placeholder="Enter account ID"
+                />
+                <select class="form-select mb-3" id="buff-acc">
+                  <option selected value="">
+                    ----------- Select Function ----------
+                  </option>
+                  <option value="1">Increase (+)</option>
+                  <option value="2">Decrease (-)</option>
+                </select>
+                <input
+                  type="text"
+                  class="form-control"
+                  oninput="value=value.replace(/\D/g,'')"
+                  id="buff-money"
+                  placeholder="Enter Amount"
+                />
+                <button
+                  type="submit"
+                  class="btn btn-primary mt-3"
+                  id="buff-username"
+                >
+                  Submit
+                </button>
+              </div>
+
+              <div class="form-group">
+                <label for="need-id"
+                  >Increase | Decrease For Need to Bet Members</label
+                >
+                <input
+                  type="text"
+                  class="form-control mb-3"
+                  oninput="value=value.replace(/\D/g,'')"
+                  id="need-id"
+                  placeholder="Enter account ID"
+                />
+                <select class="form-select mb-3" id="need-acc">
+                  <option selected value="">
+                    ----------- Select Function ----------
+                  </option>
+                  <option value="1">Increase (+)</option>
+                  <option value="2">Decrease (-)</option>
+                </select>
+                <input
+                  type="text"
+                  class="form-control"
+                  oninput="value=value.replace(/\D/g,'')"
+                  id="need-money"
+                  placeholder="Enter Amount"
+                />
+                <button
+                  type="submit"
+                  class="btn btn-primary mt-3"
+                  id="need-username"
+                >
+                  Submit
+                </button>
+              </div>
+
+              <div class="form-group">
+                <label for="edit-momo-name_bank">Manual Settings</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Bank name"
+                  id="edit-momo-name_bank"
+                />
+                <input
+                  type="text"
+                  class="form-control mt-2"
+                  placeholder="Wallet Owner Name"
+                  id="edit-momo-name"
+                />
+                <input
+                  type="text"
+                  class="form-control mt-2"
+                  placeholder="UPI ID"
+                  id="edit-momo-info"
+                />
+                <input
+                  type="text"
+                  class="form-control mt-2"
+                  placeholder="UPI ID second"
+                  id="edit-momo-info2"
+                />
+                <input
+                  type="text"
+                  class="form-control mt-2"
+                  placeholder="UPI ID third"
+                  id="edit-momo-info3"
+                />
+                <input
+                  type="text"
+                  class="form-control mt-2"
+                  placeholder="USDT Wallet Address"
+                  id="edit-momo-qr"
+                />
+                <button type="submit" class="btn btn-primary mt-3 edit-momo">
+                  Submit
+                </button>
+              </div>
+
+              <div class="form-group">
+                <label for="telegram">Communication Links</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="telegram"
+                  placeholder="Enter Telegram Link"
+                />
+                <input
+                  type="text"
+                  class="form-control mt-2"
+                  id="cskh"
+                  placeholder="Online Services Link"
+                />
+                <input
+                  type="text"
+                  class="form-control mt-2"
+                  id="myapp_web"
+                  placeholder="Enter App Link"
+                />
+                <button type="submit" class="btn btn-primary mt-3 telegram">
+                  Submit
+                </button>
+              </div>
+
+              <div class="form-group">
+                <label for="phoneA">Add USDT</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="phoneA"
+                  placeholder="Enter phone number"
+                />
+                <input
+                  type="text"
+                  class="form-control mt-2"
+                  id="usdtA"
+                  placeholder="Enter USDT amount"
+                />
+                <button
+                  type="submit"
+                  class="btn btn-primary mt-3"
+                  onclick="MyUsdt()"
+                >
+                  Submit
+                </button>
+              </div>
+
+              <div class="container-fluid">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="attendance-container">
+                      <h1 class="attendance-dashboard-title">
+                        Admin Alert Message
+                      </h1>
+                      <div
+                        id="attendance-alert"
+                        class="attendance-alert"
+                        style="display: none"
+                      >
+                        <strong>Warning!</strong> Please enter a valid phone
+                        number.
+                      </div>
+
+                      <div class="form-group">
+                        <label class="attendance-form-label" for="country-code"
+                          >Phone Number:</label
+                        >
+                        <div
+                          style="display: flex; gap: 10px; align-items: stretch"
+                        >
+                          <select
+                            id="country-code"
+                            required
+                            style="
+                              height: 45px;
+                              padding: 8px 12px;
+                              font-size: 14px;
+                              border: 1px solid #ccc;
+                              border-radius: 6px;
+                              background-color: #fff;
+                              outline: none;
+                            "
+                          >
+                            <option value="91">91+</option>
+                          </select>
+
+                          <input
+                            type="text"
+                            id="attendance-phone"
+                            placeholder="Enter 10-digit phone number"
+                            pattern="[0-9]{10}"
+                            title="Enter a valid 10-digit phone number"
+                            required
+                            style="
+                              height: 45px;
+                              padding: 8px 12px;
+                              font-size: 14px;
+                              border: 1px solid #ccc;
+                              border-radius: 6px;
+                              flex: 1;
+                              outline: none;
+                            "
+                          />
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label
+                          class="attendance-form-label"
+                          for="attendance-message"
+                          >Message:</label
+                        >
+                        <textarea
+                          class="form-control attendance-textarea"
+                          id="attendance-message"
+                          rows="4"
+                          placeholder="Enter your alert message here..."
+                        ></textarea>
+                      </div>
+                      <button
+                        class="attendance-send-btn"
+                        onclick="attendanceSendMessage()"
+                      >
+                        Send Alert
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+      function attendanceSendMessage() {
+        //console.log("jwgytewgtygytgtygtygtygty");
+        const countryCode = document.getElementById("country-code").value;
+        const phone = document.getElementById("attendance-phone").value.trim();
+        const message = document
+          .getElementById("attendance-message")
+          .value.trim();
+
+        // Full Phone Number (Including Country Code)
+        const fullPhone = `${phone}`;
+
+        // Validation: Ensure phone is 10 digits
+        if (!/^\d{10}$/.test(phone)) {
+          Swal.fire({
+            title: "Invalid Phone!",
+            text: "Please enter a valid 10-digit phone number.",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+          return;
+        }
+
+        // Validation: Ensure message is not empty
+        if (message === "") {
+          Swal.fire({
+            title: "Message Required!",
+            text: "Please enter a message before sending.",
+            icon: "warning",
+            confirmButtonText: "OK",
+          });
+          return;
+        }
+
+        // Prepare Data
+        const data = { phone: fullPhone, message };
+
+        // AJAX Request to Update Message
+        $.ajax({
+          url: "/api/webapi/set-warning-alert",
+          method: "POST",
+          contentType: "application/json",
+          data: JSON.stringify(data),
+          success: function (response) {
+            Swal.fire({
+              title: "Success!",
+              text: "Message updated successfully.",
+              icon: "success",
+              confirmButtonText: "OK",
+            });
+          },
+          error: function (error) {
+            Swal.fire({
+              title: "Error!",
+              text: "Failed to update message. Please try again!",
+              icon: "error",
+              confirmButtonText: "OK",
+            });
+          },
+        });
+      }
+    </script>
+
+    <script>
+      function attendanceSendMessage() {
+        const phone = document.getElementById("attendance-phone").value;
+        const message = document.getElementById("attendance-message").value;
+        const alertDiv = document.getElementById("attendance-alert");
+
+        // Basic phone number validation (you should implement more robust validation)
+        if (!phone.match(/^\d{10}$/)) {
+          alertDiv.style.display = "block";
+          return;
+        } else {
+          alertDiv.style.display = "none";
+        }
+
+        // Here you would implement the logic to send the message
+        // (e.g., using a third-party API like Twilio, or sending an email)
+        //console.log("Sending message to:", phone);
+        //console.log("Message:", message);
+      }
+    </script>
+
+    <script>
+      function MyUsdt() {
+        let phoneA = $("#phoneA").val().trim();
+        let usdtA = $("#usdtA").val().trim();
+
+        $.ajax({
+          type: "POST",
+          url: "/admin/manager/addust",
+          data: {
+            phone: phoneA,
+            usdt: usdtA,
+          },
+          dataType: "json",
+          success: function (response) {
+            if (response.status) {
+              Swal.fire("Good job!", "You clicked the button!", "success");
+            } else if (response.message == 2) {
+              Swal.fire({
+                icon: "error",
+                title: "Phone number does not exist",
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "An unknown error !",
+              });
+            }
+          },
+        });
+      }
+
+      function sendRequest(params1, params2, typer) {
+        $.ajax({
+          type: "POST",
+          url: "/manage/admin/settings",
+          data: {
+            params1: params1,
+            params2: params2,
+            typer: typer,
+          },
+          dataType: "json",
+          success: function (response) {
+            Swal.fire("Good job!", "You clicked the button!", "success");
+          },
+        });
+      }
+
+      function sendRequestBank(
+        name_bank = "",
+        name = "",
+        info = "",
+        qr = "",
+        typer = ""
+      ) {
+        $.ajax({
+          type: "POST",
+          url: "/admin/manager/settings/bank",
+          data: {
+            name_bank: name_bank,
+            name: name,
+            info: info,
+            qr: qr,
+            typer: typer,
+          },
+          dataType: "json",
+          success: function (response) {
+            Swal.fire("Good job!", "Updated Successfully!", "success");
+          },
+        });
+      }
+      $(".buff-money").click(function (e) {
+        e.preventDefault();
+        const phone = $("#buff-phone").val();
+        const money = $("#buff-money").val();
+        const checkMoney = $.isNumeric(money);
+        if (phone && checkMoney) {
+          sendRequest(phone, money, "buff");
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Empty or Wrong Details",
+          });
+        }
+      });
+
+      const alertMessage = (text) => {
+        const msg = document.createElement("div");
+        msg.setAttribute("data-v-1dcba851", "");
+        msg.className = "msg";
+
+        const msgContent = document.createElement("div");
+        msgContent.setAttribute("data-v-1dcba851", "");
+        msgContent.className = "msg-content v-enter-active v-enter-to";
+        msgContent.style = "";
+        msgContent.textContent = text;
+
+        msg.appendChild(msgContent);
+        document.body.appendChild(msg);
+
+        setTimeout(() => {
+          msgContent.classList.remove("v-enter-active", "v-enter-to");
+          msgContent.classList.add("v-leave-active", "v-leave-to");
+
+          setTimeout(() => {
+            document.body.removeChild(msg);
+          }, 100);
+        }, 1000);
+      };
+
+      $(".edit-momo").click(async (e) => {
+        try {
+          e.preventDefault();
+          const bank_name = $("#edit-momo-name_bank").val();
+          const username = $("#edit-momo-name").val();
+          const upi_id = $("#edit-momo-info").val();
+          const upi_id2 = $("#edit-momo-info2").val();
+          const upi_id3 = $("#edit-momo-info3").val();
+          const usdt_wallet_address = $("#edit-momo-qr").val();
+
+          const response = await axios.post("/admin/manager/settings/bank", {
+            bank_name,
+            username,
+            upi_id,
+            upi_id2,
+            upi_id3,
+            usdt_wallet_address,
+            typer: "bank",
+          });
+
+          if (response.data.status == true) {
+            Swal.fire(
+              "Good job!",
+              "Your Links Updated Successfully!",
+              "success"
+            );
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Empty or Wrong",
+            });
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      });
+
+      $(".edit-momo").click(function (e) {
+        e.preventDefault();
+        const bank_name = $("#edit-momo-name_bank").val();
+        const username = $("#edit-momo-name").val();
+        const upi_id = $("#edit-momo-info").val();
+        const upi_id2 = $("#edit-momo-info2").val();
+        const upi_id3 = $("#edit-momo-info3").val();
+        const usdt_wallet_address = $("#edit-momo-qr").val();
+        $.ajax({
+          type: "POST",
+          url: "/admin/manager/settings/bank",
+          data: {
+            bank_name,
+            username,
+            upi_id,
+            upi_id2,
+            upi_id3,
+            usdt_wallet_address,
+            typer: "bank",
+          },
+          dataType: "json",
+          success: function (response) {
+            if (response.status == true) {
+              Swal.fire(
+                "Good job!",
+                "Your Links Updated Successfully!",
+                "success"
+              );
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Empty or Wrong",
+              });
+            }
+          },
+        });
+      });
+
+      $(".telegram").click(function (e) {
+        e.preventDefault();
+        const telegram = $("#telegram").val();
+        const cskh = $("#cskh").val();
+        const myapp_web = $("#myapp_web").val();
+        $.ajax({
+          type: "POST",
+          url: "/admin/manager/settings/cskh",
+          data: {
+            telegram: telegram,
+            cskh: cskh,
+            myapp_web: myapp_web,
+          },
+          dataType: "json",
+          success: function (response) {
+            if (response.status == true) {
+              Swal.fire(
+                "Good job!",
+                "Your Links Updated Successfully!",
+                "success"
+              );
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Empty or Wrong",
+              });
+            }
+          },
+        });
+      });
+
+      $("#need-username").click(function (e) {
+        e.preventDefault();
+        let id_user = $("#need-id").val().trim();
+        let buff_acc = $("#need-acc").val().trim();
+        let money_value = $("#need-money").val().trim();
+        if (id_user && buff_acc && money_value) {
+          $.ajax({
+            type: "POST",
+            url: "/admin/manager/settings/need",
+            data: {
+              id_user: id_user,
+              buff_acc: buff_acc,
+              money_value: money_value,
+            },
+            dataType: "json",
+            success: function (response) {
+              if (response.status == true) {
+                Swal.fire("Good job!", "Data Added Successfully!", "success");
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "User ID does not exist",
+                });
+              }
+            },
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Please enter complete information",
+          });
+        }
+      });
+
+      $("#buff-username").click(function (e) {
+        e.preventDefault();
+        let id_user = $("#buff-id").val().trim();
+        let buff_acc = $("#buff-acc").val().trim();
+        let money_value = $("#buff-money").val().trim();
+        if (id_user && buff_acc && money_value) {
+          $.ajax({
+            type: "POST",
+            url: "/admin/manager/settings/buff",
+            data: {
+              id_user: id_user,
+              buff_acc: buff_acc,
+              money_value: money_value,
+            },
+            dataType: "json",
+            success: function (response) {
+              if (response.status == true) {
+                Swal.fire("Good job!", "Data Added Successfully!", "success");
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "User ID does not exist",
+                });
+              }
+            },
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Please enter complete information",
+          });
+        }
+      });
+
+      $("#demo-username").click(function (e) {
+        e.preventDefault();
+        let id_user = $("#demo-id").val().trim();
+        let user_pass = $("#demo-pass").val().trim();
+
+        if (id_user) {
+          $.ajax({
+            type: "POST",
+            url: "/admin/manager/settings/demo",
+            data: {
+              username: id_user,
+              password: user_pass,
+            },
+            dataType: "json",
+            success: function (response) {
+              if (response.status == true) {
+                Swal.fire("Good job!", "Data Added Successfully!", "success");
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "User ID does not exist",
+                });
+              }
+            },
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Please enter complete information",
+          });
+        }
+      });
+
+      $.ajax({
+        type: "POST",
+        url: "/admin/manager/settings/get",
+        data: "data",
+        dataType: "json",
+        success: function (response) {
+          let bank = response.datas[0];
+          let momo = response.datas[0];
+          //console.log("FFF", momo);
+          $("#edit-momo-name_bank").val(momo?.name_bank);
+          $("#edit-momo-name").val(momo.name_user);
+          $("#edit-momo-info").val(momo.stk);
+          $("#edit-momo-info2").val(momo.upi2);
+          $("#edit-momo-info3").val(momo.upi3);
+          $("#edit-momo-qr").val(momo.usdt);
+
+          // $('#edit-momo-qr').val(momo.qr_code_image);
+
+          $("#telegram").val(response.settings[0].telegram);
+          $("#cskh").val(response.settings[0].cskh);
+          $("#myapp_web").val(response.settings[0].app);
+        },
+      });
+    </script>
+  </body>
+</html>

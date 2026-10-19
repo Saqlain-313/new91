@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Attendance Bonus Configuration</title>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+
+  <style>
+    :root {
+      --primary-color: #00807c;
+      --secondary-color: #5ccfcb;
+      --light-bg: #f8f9fa;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+      font-family: 'Source Sans Pro', sans-serif;
+      background-color: var(--light-bg);
+      color: #333;
+    }
+
+    .content-wrapper {
+      flex: 1;
+      padding: 4px;
+      background-color: var(--light-bg);
+    }
+
+    .main-container {
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      padding: 30px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #666;
+    }
+
+    .day-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid var(--secondary-color);
+    }
+
+    .day-title {
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+
+    .form-label {
+      font-weight: 500;
+      color: #555;
+    }
+
+    .form-control {
+      border-radius: 8px;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+    }
+
+    .form-control:focus {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 0.25rem rgba(92, 207, 203, 0.25);
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+      border: none;
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      color: white;
+      width: 100%;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 128, 124, 0.3);
+    }
+  </style>
+</head>
+<body class="hold-transition sidebar-mini">
+  <div class="wrapper">
+    <%- include('../nav') %>
+
+    <div class="content-wrapper">
+      <div class="container-fluid">
+        <div class="main-container">
+          <div class="header">
+            <h1>Attendance Bonus Configuration</h1>
+            <p>Set daily attendance bonuses and recharge amounts</p>
+          </div>
+
+          <div id="attendanceContainer"></div>
+          <button class="submit-btn" id="saveAttendanceBtn">Save Configuration</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="/dist/js/adminlte.min.js"></script>
+  <script src="/js/admin/admin.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      $('[data-widget="pushmenu"]').PushMenu('init');
+      fetchAttendanceData();
+
+      $('#saveAttendanceBtn').click(function () {
+        submitAttendanceData();
+      });
+    });
+
+    function fetchAttendanceData() {
+      $.ajax({
+        url: "/api/webapi/get-attendencs-bonus",
+        method: "GET",
+        success: function (response) {
+          if (response.success || response.status === true) {
+            renderAttendanceForm(response.data);
+          } else {
+            showError(response.message || "Failed to load attendance data. Please try again.");
+          }
+        },
+        error: function () {
+          showError("Network error occurred while fetching data.");
+        }
+      });
+    }
+
+    function renderAttendanceForm(data) {
+      let html = '';
+      for (let i = 1; i <= 7; i++) {
+        const dayBonus = data?.[`day${i}`] ?? '';
+        const dayRecharge = data?.[`day${i}rech`] ?? '';
+
+        html += `
+          <div class="day-card">
+            <h4 class="day-title">Day ${i}</h4>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Attendance Bonus</label>
+                <input type="number" class="form-control" id="day${i}" value="${dayBonus}" placeholder="Day ${i} bonus" />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Recharge Amount</label>
+                <input type="number" class="form-control" id="recharge${i}" value="${dayRecharge}" placeholder="Day ${i} recharge" />
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      $('#attendanceContainer').html(html);
+    }
+
+    function submitAttendanceData() {
+      const dataToSend = { days: {} };
+      let isValid = true;
+
+      for (let i = 1; i <= 7; i++) {
+        const dayVal = $(`#day${i}`).val().trim();
+        const rechargeVal = $(`#recharge${i}`).val().trim();
+
+        if (!dayVal || isNaN(parseFloat(dayVal)) || !rechargeVal || isNaN(parseFloat(rechargeVal))) {
+          isValid = false;
+          break;
+        }
+
+        dataToSend.days[`day${i}`] = parseFloat(dayVal);
+        dataToSend.days[`day${i}rech`] = parseFloat(rechargeVal);
+      }
+
+      if (!isValid) {
+        showError('Please fill in all fields with valid numbers.');
+        return;
+      }
+
+      $('#saveAttendanceBtn').html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+      $('#saveAttendanceBtn').prop('disabled', true);
+
+      $.ajax({
+        url: "/api/webapi/update-attendencs-bonus",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(dataToSend),
+        success: function (response) {
+          $('#saveAttendanceBtn').html('Save Configuration');
+          $('#saveAttendanceBtn').prop('disabled', false);
+
+          if (response.success || response.status === true) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: response.message || 'Attendance bonuses updated successfully.'
+            });
+            fetchAttendanceData();
+          } else {
+            showError(response.message || "Failed to update attendance bonuses. Please try again.");
+          }
+        },
+        error: function (jqXHR) {
+          $('#saveAttendanceBtn').html('Save Configuration');
+          $('#saveAttendanceBtn').prop('disabled', false);
+
+          let errorMessage = "Network error occurred while saving data.";
+          if (jqXHR.status === 404) {
+            errorMessage = "API endpoint not found.";
+          } else if (jqXHR.status === 500) {
+            errorMessage = "Server error occurred.";
+          } else if (jqXHR.responseJSON?.message) {
+            errorMessage = jqXHR.responseJSON.message;
+          }
+          showError(errorMessage);
+        }
+      });
+    }
+
+    function showError(message) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: message
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Dashboard</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+
+    <!-- JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #5ccfcb;
+            --primary-dark: #00807c;
+            --gradient: linear-gradient(135deg, #5ccfcb, #00807c);
+            --text-dark: #00807c;
+            --text-medium: #64748b;
+            --text-light: #94a3b8;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #dff5f5;
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            width: 40px;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
+        }
+
+        .content-wrapper {
+            background:#dff5f5;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Card Styles */
+        .stat-card {
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: none;
+            position: relative;
+            background: var(--gradient);
+            color: white;
+            height: 100%;
+        }
+
+        .stat-card .card-body {
+           
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card .card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.2);
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-card .card-title {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .card-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin: 0.5rem 0;
+        }
+
+        .stat-card .card-trend {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-card .card-trend i {
+            margin-right: 4px;
+        }
+
+        /* Settings Card */
+        .settings-card {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            height: 100%;
+            background: var(--bg-white);
+            overflow: hidden;
+        }
+
+        .settings-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .settings-card .card-header {
+            background-color: #00807c;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            color: white;
+            padding: 1.25rem 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .settings-card .card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: start;
+}
+
+
+        .settings-card .card-description {
+            color: var(--text-medium);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .toggle-switch-label {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .toggle-switch-btn {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .toggle-switch-btn input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2e8f0;
+            border-radius: 34px;
+            transition: var(--transition);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .toggle-switch-btn input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        .toggle-switch-btn input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Progress Bars */
+        .progress-container {
+            margin-top: 1.5rem;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-medium);
+        }
+
+        .progress-label span:first-child {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e2e8f0;
+        }
+
+        .progress-bar {
+            border-radius: 4px;
+            background: var(--gradient);
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-gap: 1.5rem;
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: repeat(1, 1fr);
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-cols-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1200px) {
+            .grid-cols-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .content-wrapper {
+                padding: 1.5rem;
+            }
+            
+            .grid-cols-2, .grid-cols-3 {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: 1.3rem;
+            }
+            
+            .stat-card .card-value {
+                font-size: 1.5rem;
+            }
+            
+            .grid-cols-4 {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .content-wrapper {
+                padding: 1.25rem;
+            }
+            
+            .section-title {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <!-- Include Navigation -->
+        <%- include('nav') %>
+
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <div class="container-fluid">
+                <!-- Dashboard Header -->
+                <div class="dashboard-header">
+                    <h1 class="section-title">Dashboard Overview</h1>
+                    
+                    <!-- User Stats Row -->
+                    <div class="grid grid-cols-4">
+                        <div class="stat-card">
+                            <div class="card-body">
+                                <div class="card-icon">
+                                    <i class="fas fa-user-clock"></i>
+                                </div>
+                                <h5 class="card-title">Active Users</h5>
+                                <br>
+                                <p class="card-value" id="activeUser">0</p>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="card-body">
+                                <div class="card-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h5 class="card-title">Total Users</h5>
+                                 <br>
+                                <p class="card-value" id="totalUser">0</p>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="card-body">
+                                <div class="card-icon">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <h5 class="card-title">Today's Registrations</h5>
+                                 <br>
+                                <p class="card-value" id="totalDemoUser">0</p>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="card-body">
+                                <div class="card-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <h5 class="card-title">User Balance</h5>
+                                 <br>
+                                <p class="card-value" id="totalUserBlance">₹0</p>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Game Settings Section -->
+                    <div class="mt-5">
+                        <h2 class="section-title">Game Settings</h2>
+                        <div class="grid grid-cols-3">
+                            <div class="settings-card card">
+                                <div class="card-header">
+                                    Game Winning Type
+                                </div>
+                                <div class="card-body">
+                                    <div class="toggle-switch">
+                                        <span class="toggle-switch-label mr-2">Random Winning</span>
+                                        <label class="toggle-switch-btn">
+                                            <input type="checkbox" id="random-winning">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <p class="card-description">
+                                        "Random Winning" selects the winner by chance, while "Least Bet" rewards the player with the smallest unique bet.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-card card">
+                                <div class="card-header">
+                                    Deposit Requirement
+                                </div>
+                                <div class="card-body">
+                                    <div class="toggle-switch">
+                                        <span class="toggle-switch-label mr-2">Deposit Required</span>
+                                        <label class="toggle-switch-btn ">
+                                            <input type="checkbox" id="deposit-required">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div> 
+                                    <p class="card-description">
+                                        If enabled, players must deposit funds to participate. If disabled, players can join without a deposit.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="settings-card card">
+                                <div class="card-header">
+                                    Same Period Same Result
+                                </div>
+                                <div class="card-body">
+                                    <div class="toggle-switch">
+                                        <span class="toggle-switch-label mr-2">Enable Matching</span>
+                                        <label class="toggle-switch-btn">
+                                            <input type="checkbox" id="same-period-result">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <p class="card-description">
+                                        Enable to match same period with same results. This ensures consistency in game outcomes for identical periods.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Financial Stats Row -->
+                    <div class="grid grid-cols-4 mt-4">
+                        <div class="stat-card">
+                            <div class="card-body">
+                                <div class="card-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h5 class="card-title">Daily Active Users</h5>
+                                <br>
+                                <p class="card-value" id="dailyActiveUsers">0</p>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="card-body">
+                                <div class="card-icon">
+                                    <i class="fas fa-money-check-alt"></i>
+                                </div>
+                                <h5 class="card-title">Total Deposits</h5>
+                                 <br>
+                                <p class="card-value" id="totaldeposits">0</p>
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="card-body">
+                                <div class="card-icon">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
+                                <h5 class="card-title">Total Withdrawals</h5>
+                                 <br>
+                                <p class="card-value" id="totalwithdrawals">0</p>
+                                
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="card-body">
+                                <div class="card-icon">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <h5 class="card-title">Today's Profit</h5>
+                                 <br>
+                                <p class="card-value" id="todaysProfit">₹0</p>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Winning Percentage Row -->
+                    <div class="grid grid-cols-2 mt-4">
+                        <div class="stat-card">
+                            <div class="card-body">
+                                <div class="card-icon">
+                                    <i class="fas fa-percent"></i>
+                                </div>
+                                <h5 class="card-title">Admin Winning Percentage</h5>
+                                 <br>
+                                <p class="card-value" id="winningPercentage">0%</p>
+                               
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="card-body">
+                                <div class="card-icon">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <h5 class="card-title">User Winning Percentage</h5>
+                                 <br>
+                                <p class="card-value" id="userwinningPercentage">0%</p>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Transactions Section -->
+                    <div class="grid grid-cols-2 mt-4">
+                        <div class="settings-card card">
+                            <div class="card-header">
+                                <h5>Deposits Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="progress-label">
+                                    <span>Today's Recharge:</span>
+                                    <span id="todayrecharge">0</span>
+                                </div>
+                                <div class="progress-label">
+                                    <span>Pending Recharges:</span>
+                                    <span id="pendingRecharge">0</span>
+                                </div>
+                                <div class="progress-label">
+                                    <span>Successful Recharges:</span>
+                                    <span id="successFullRechare">0</span>
+                                </div>
+                                <div class="progress-label">
+                                    <span>Failed Recharges:</span>
+                                    <span id="successFullRechare">0</span>
+                                </div>
+                                <div class="progress-container mt-3">
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 0%;" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-card card">
+                            <div class="card-header">
+                                <h5>Withdrawals Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="progress-label">
+                                    <span>Today's Withdrawal:</span>
+                                    <span id="todaywithdrawal">0</span>
+                                </div>
+                                <div class="progress-label">
+                                    <span>Pending Withdrawals:</span>
+                                    <span id="pendingwithdrawal">0</span>
+                                </div>
+                                <div class="progress-label">
+                                    <span>Total Withdrawals:</span>
+                                    <span id="totalwithdrawal">0</span>
+                                </div>
+                                <div class="progress-label">
+                                    <span>Failed Withdrawals:</span>
+                                    <span id="totalwithdrawal">0</span>
+                                </div>
+                                <div class="progress-container mt-3">
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width: 0%;" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+
+    <script>
+        // Initialize dashboard data
+        $(document).ready(function() {
+            // Load all dashboard data
+            loadDashboardData();
+            
+            // Set up toggle switch handlers
+            setupToggleSwitches();
+            
+            // Refresh data every 60 seconds
+            setInterval(loadDashboardData, 60000);
+        });
+
+        function loadDashboardData() {
+            // Load active user stats
+            $.ajax({
+                url: '/api/webapi/get-active-user',
+                method: 'GET',
+                success: function(response) {
+                    if (response && response.activeUsers) {
+                        $("#activeUser").text(response.activeUsers);
+                        $("#totalUser").text(response.totalUser);
+                        $("#totalDemoUser").text(response.todayUser);
+                        $("#totalUserBlance").text("₹" + (response.totalMoney || 0));
+                        $("#dailyActiveUsers").text(response.todayUser || 0);
+                    }
+                },
+                error: function(error) {
+                    console.error('Error loading user stats:', error);
+                }
+            });
+
+            // Load winning percentages
+            $.ajax({
+                url: '/api/webapi/get-winning-percentage',
+                method: 'GET',
+                success: function(response) {
+                    if (response) {
+                        $("#winningPercentage").text((50) + "%");
+                        $("#userwinningPercentage").text((50) + "%");
+                    }
+                },
+                error: function(error) {
+                    console.error('Error loading winning percentages:', error);
+                }
+            });
+
+            // Load transaction stats
+            const todayDate = new Date().toISOString().split("T")[0];
+            $.ajax({
+                type: "POST",
+                url: "/api/webapi/admin/statistical",
+                data: { today: todayDate },
+                dataType: "json",
+                success: function(response) {
+                    $("#totaldeposits").text(response.recharges || 0);
+                    $("#successFullRechare").text(response.recharges || 0);
+                    $("#totalwithdrawals").text(response.withdraws || 0);
+                    $("#totalwithdrawal").text(response.withdraws || 0);
+                    $("#todayrecharge").text(response.rechargeToday || 0);
+                    $("#todaywithdrawal").text(response.withdrawToday || 0);
+                    $("#pendingwithdrawal").text(response.pendigwithdraws || 0);
+                    $("#pendingRecharge").text(response.pendigrecharges || 0);
+                    $("#todaysProfit").text("₹" + (response.pltoday || 0));
+                    
+                    // Update progress bars
+                    updateProgressBars();
+                },
+                error: function(error) {
+                    console.error('Error loading transaction stats:', error);
+                }
+            });
+
+            // Load game settings
+            loadGameSettings();
+        }
+
+        function loadGameSettings() {
+            // Load website mode setting (this will control both first and third toggles)
+            $.ajax({
+                url: "/api/webapi/get-website-mode",
+                method: "GET",
+                success: function(response) {
+                    if (response.data) {
+                        // First toggle (Random Winning) - checked if response is "1"
+                        $("#random-winning").prop("checked", response.data === "1");
+                        // Third toggle (Same Period Result) - opposite of first toggle
+                        $("#same-period-result").prop("checked", response.data !== "1");
+                    }
+                }
+            });
+
+            // Load deposit requirement setting
+            $.ajax({
+                url: "/api/webapi/get-deposite-requrment",
+                method: "GET",
+                success: function(response) {
+                    if (response.data) {
+                        $("#deposit-required").prop("checked", response.data === "1");
+                    }
+                }
+            });
+        }
+
+        function setupToggleSwitches() {
+            // Random winning toggle (first toggle)
+            $("#random-winning").change(function() {
+                const websiteMode = this.checked ? "1" : "0";
+                $.ajax({
+                    url: "/api/webapi/set-website-mode",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ id: 1, depositerequrments: websiteMode }),
+                    success: function() {
+                        // Update the third toggle to be the opposite of the first toggle
+                        $("#same-period-result").prop("checked", !this.checked);
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Setting Updated',
+                            text: 'Game winning type has been updated successfully',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }.bind(this) // Bind this to the callback to access the checkbox state
+                });
+            });
+
+            // Deposit required toggle (second toggle)
+            $("#deposit-required").change(function() {
+                const depositRequired = this.checked ? "1" : "0";
+                $.ajax({
+                    url: "/api/webapi/set-deposite-requrment",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ id: 1, depositerequrments: depositRequired }),
+                    success: function() {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Setting Updated',
+                            text: 'Deposit requirement has been updated successfully',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            });
+
+            // Same period same result toggle (third toggle)
+            $("#same-period-result").change(function() {
+                // This toggle will automatically be the opposite of the first toggle
+                const websiteMode = this.checked ? "0" : "1"; // Opposite of what we want for the first toggle
+                
+                $.ajax({
+                    url: "/api/webapi/set-website-mode",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ id: 1, depositerequrments: websiteMode }),
+                    success: function() {
+                        // Update the first toggle to be the opposite of this toggle
+                        $("#random-winning").prop("checked", !this.checked);
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Setting Updated',
+                            text: 'Same period result setting has been updated successfully',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }.bind(this) // Bind this to the callback to access the checkbox state
+                });
+            });
+        }
+
+        function updateProgressBars() {
+            // Calculate deposit progress (example - adjust according to your logic)
+            const totalDeposits = parseInt($("#totaldeposits").text()) || 1;
+            const todayDeposits = parseInt($("#todayrecharge").text()) || 0;
+            const depositProgress = Math.min(100, (todayDeposits / totalDeposits) * 100);
+            
+            $(".progress-bar").first().css("width", depositProgress + "%");
+            $(".progress-bar").first().attr("aria-valuenow", depositProgress);
+            $(".progress-bar").first().text(Math.round(depositProgress) + "%");
+
+            // Calculate withdrawal progress (example - adjust according to your logic)
+            const totalWithdrawals = parseInt($("#totalwithdrawal").text()) || 1;
+            const todayWithdrawals = parseInt($("#todaywithdrawal").text()) || 0;
+            const withdrawalProgress = Math.min(100, (todayWithdrawals / totalWithdrawals) * 100);
+            
+            $(".progress-bar").last().css("width", withdrawalProgress + "%");
+            $(".progress-bar").last().attr("aria-valuenow", withdrawalProgress);
+            $(".progress-bar").last().text(Math.round(withdrawalProgress) + "%");
+        }
+    </script>
+</body>
+</html>

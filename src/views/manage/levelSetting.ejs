@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recharge</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css"
+    />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+
+  <style>
+    /* Global Styles */
+    body {
+      font-family: "Source Sans Pro", sans-serif;
+      background-color: #f1f2f6;
+      color: #333;
+    }
+
+    .content-wrapper {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+    }
+
+    h1 {
+      color: #2c3e50;
+      font-size: 28px;
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+
+    /* Card Component */
+    .card {
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      overflow: hidden;
+      transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .card:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-tools button {
+      background-color: transparent;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #dff5f5 !important;
+    }
+
+    thead tr {
+      background-color: #00807c;
+    }
+
+    thead tr {
+      background-color: #00807c; /* Sets the background for the table header row */
+    }
+
+    thead th {
+      background-color: #00807c; /* Sets the background for individual header cells */
+      color: white; /* Optional: Set text color for better contrast */
+    }
+
+    .card-title {
+      color: #00807c;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-primary {
+      background-color: #3498db;
+      border-color: #3498db;
+    }
+
+    .btn-primary:hover {
+      background-color: #2980b9;
+      border-color: #2980b9;
+    }
+
+    .btn-success {
+      background-color: #06b156;
+      border-color: #5091f3;
+    }
+
+    .btn-success:hover {
+      background-color: #27ae60;
+      border-color: #27ae60;
+    }
+
+    .btn-tool {
+      background-color: transparent;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .btn-tool:hover {
+      color: #e74c3c;
+    }
+
+    /* Sweetalert */
+    .swal2-popup {
+      background-color: #fff;
+      color: #333;
+    }
+    .form-control {
+      width: 100px;
+    }
+  </style>
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <!-- Include navigation -->
+      <%- include('nav') %>
+      <div class="content-wrapper">
+        <section class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1 class="" style="color: #00807c">Levels Setting</h1>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="content">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Levels Setting</h3>
+              <div class="card-tools">
+                <button
+                  type="button"
+                  class="btn btn-tool"
+                  data-card-widget="collapse"
+                  title="Collapse"
+                >
+                  <i class="fas fa-minus"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-tool"
+                  data-card-widget="remove"
+                  title="Remove"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <div class="card-body p-0" style="overflow-y: hidden">
+              <table class="table table-striped projects" id="tableget">
+                <thead>
+                  <tr>
+                    <th class="text-center">Levels</th>
+                    <th class="text-center">Commission</th>
+                    <th class="text-center">Update</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>
+                      <input type="text" value="0" class="form-control" />
+                    </td>
+
+                    <td>
+                      <a
+                        class="btn btn-success btn-sm confirm-btn"
+                        href=""
+                        data="id"
+                      >
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+      $.ajax({
+        type: "GET",
+        url: "/api/webapi/admin/getLevelInfo",
+        dataType: "json",
+        success: function (response) {
+          if (Array.isArray(response.rows) && response.rows.length > 0) {
+            var tableBody = $("#tableget").find("tbody");
+            tableBody.empty();
+
+            response.rows.forEach(function (item) {
+              var row =
+                "<tr>" +
+                '<td class="text-center">' +
+                (item.level + 1) +
+                "</td>" +
+                '<td class="text-center"><input type="text" name="f1" value="' +
+                item.f1 +
+                '" class="form-control" style="display:inline-block;width:100px;"></td>' +
+                '<td class="text-center"><a class="btn btn-sm confirm-btn bg-info" href="" data-id="' +
+                item.id +
+                '"><i class="fa-solid fa-arrows-rotate"></i></a></td>' +
+                "</tr>";
+              tableBody.append(row);
+            });
+          } else {
+            //console.log("No data found or invalid response format");
+          }
+        },
+        error: function (xhr, status, error) {
+          //console.log("Error fetching data:", error);
+        },
+      });
+
+      $("#tableget").on("click", ".confirm-btn", function (event) {
+        event.preventDefault();
+        var row = $(this).closest("tr");
+        var id = $(this).data("id");
+        var f1 = row.find('input[name="f1"]').val();
+        var f2 = 0;
+        var f3 = 0;
+        var f4 = 0;
+
+        $.ajax({
+          type: "POST",
+          url: "/api/webapi/admin/updateLevel",
+          dataType: "json",
+          data: {
+            id: id,
+            f1: f1,
+            f2: f2,
+            f3: f3,
+            f4: f4,
+          },
+          success: function (response) {
+            Swal.fire("UPDATED SUCCESSFULLY");
+          },
+          error: function (xhr, status, error) {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+            });
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

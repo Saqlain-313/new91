@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js" integrity="sha512-NQfB/bDaB8kaSXF8E77JjhHG5PM6XVRxvHzkZiwl3ddWCEPBa23T76MuWSwAJdMGJnmQqM0VeY9kFszsrBEFrQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <style>
+        :root {
+            --primary-color: #00807c;
+            --secondary-color: #4e4bc1;
+            --accent-color: #22baa6;
+            --background-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: "Segoe UI", system-ui, sans-serif;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .settings-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .settings-title {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .settings-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .settings-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(96, 91, 255, 0.1);
+            background: linear-gradient(90deg, #5ccfcb, #00807c);
+            color: white;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+           
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* margin-right: 1rem; */
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-label i {
+            color: var(--accent-color);
+            font-size: 0.9em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--card-bg);
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(96, 91, 255, 0.15);
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: #a0aec0;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 300px;
+            margin: 2rem auto 0;
+            box-shadow: 0 4px 6px rgba(96, 91, 255, 0.1);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(96, 91, 255, 0.2);
+            opacity: 0.95;
+        }
+
+        @media (max-width: 1024px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 0 1rem;
+            }
+
+            .settings-title {
+                font-size: 2rem;
+            }
+
+            .settings-card {
+                padding: 1.5rem;
+            }
+
+            .card-icon {
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .settings-title {
+                font-size: 1.75rem;
+            }
+
+            .form-input {
+                padding: 0.75rem 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <%- include('nav') %>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="" style="color: #00807c; font-size: 2rem; font-weight: bold">Activity Banner Settings</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="dashboard-container">
+                <div class="settings-header">
+                    <h1 class="settings-title">Banner Management</h1>
+                </div>
+
+                <div class="settings-grid">
+                    <!-- Daily Check-in Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon">🎁</div>
+                            <h2 class="card-title" style="color: white;">Recharge Banner</h2>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Recharge Banner</label>
+                            <input type="text" class="form-input" id="ban1" placeholder="Enter banner URL" />
+                        </div>
+                    </div>
+
+                    <!-- VIP Packages Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon">⭐</div>
+                            <h2 class="card-title" style="color: white;">VIP Level</h2>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Primary Banner</label>
+                            <input type="text" class="form-input" id="ban2" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Secondary Banner</label>
+                            <input type="text" class="form-input" id="ban22" placeholder="Enter banner URL" />
+                        </div>
+                    </div>
+
+                    <!-- Member Activities Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon">🏆</div>
+                            <h2 class="card-title" style="color: white;">Winning Streak</h2>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Main Banner</label>
+                            <input type="text" class="form-input" id="ban3" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Secondary Banner</label>
+                            <input type="text" class="form-input" id="ban33" placeholder="Enter banner URL" />
+                        </div>
+                    </div>
+
+                    <!-- Video Creation Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon">🎥</div>
+                            <h2 class="card-title" style="color: white;">Aviator Additional Bounce</h2>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Primary Banner</label>
+                            <input type="text" class="form-input" id="ban4" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Secondary Banner</label>
+                            <input type="text" class="form-input" id="ban44" placeholder="Enter banner URL" />
+                        </div>
+                    </div>
+
+                    <!-- Lucky "10" Days of Interest -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon">🎲</div>
+                            <h2 class="card-title" style="color: white;">Loss Bounce</h2>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Primary Banner</label>
+                            <input type="text" class="form-input" id="ban5" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Secondary Banner</label>
+                            <input type="text" class="form-input" id="ban55" placeholder="Enter banner URL" />
+                        </div>
+                    </div>
+
+                    <!-- Aviator Fly High & Win Big Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon">✈️</div>
+                            <h2 class="card-title" style="color: white;">Lucky Spin</h2>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Primary Banner</label>
+                            <input type="text" class="form-input" id="ban6" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Secondary Banner</label>
+                            <input type="text" class="form-input" id="ban66" placeholder="Enter banner URL" />
+                        </div>
+                    </div>
+
+                    <!-- Mysterious Gift Section -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon">🎁</div>
+                            <h2 class="card-title" style="color: white;">Patner Reward Bounce</h2>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Primary Banner</label>
+                            <input type="text" class="form-input" id="ban7" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Secondary Banner</label>
+                            <input type="text" class="form-input" id="ban77" placeholder="Enter banner URL" />
+                        </div>
+                    </div>
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <!-- <div class="card-icon">🎁</div> -->
+                            <h2 class="card-title" style="color: white;">Video Content Bounce</h2>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Primary Banner</label>
+                            <input type="text" class="form-input" id="ban8" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i> Secondary Banner</label>
+                            <input type="text" class="form-input" id="ban88" placeholder="Enter banner URL" />
+                        </div>
+                        <!-- <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Telegram Banner</label>
+                            <input type="text" class="form-input" id="ban888" placeholder="Enter banner URL" />
+                        </div>
+                          <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Telegram link</label>
+                            <input type="text" class="form-input" id="telelink" placeholder="Enter Telegram link" />
+                        </div>
+                          <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Luck Bonus Telegram link</label>
+                            <input type="text" class="form-input" id="telelink2" placeholder="Enter Telegram link" />
+                        </div> -->
+                    </div>
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <!-- <div class="card-icon">🎁</div> -->
+                            <h2 class="card-title" style="color: white;">Weekly Deposit Bounce</h2>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Spin Wheal Banner</label>
+                            <input type="text" class="form-input" id="ban9" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Bounce Event Banner</label>
+                            <input type="text" class="form-input" id="ban99" placeholder="Enter banner URL" />
+                        </div>
+                        <!-- <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Bounce Event Banner 2</label>
+                            <input type="text" class="form-input" id="ban992" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Winning Streak Banner</label>
+                            <input type="text" class="form-input" id="ban999" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Winning Streak Banner 2</label>
+                            <input type="text" class="form-input" id="ban9992" placeholder="Enter banner URL" />
+                        </div>
+                          <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Support Fund Banner</label>
+                            <input type="text" class="form-input" id="ban9999" placeholder="Enter banner url" />
+                        </div>
+                          <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Support Fund Banner 2</label>
+                            <input type="text" class="form-input" id="ban99992" placeholder="Enter banner url" />
+                        </div> -->
+                    </div>
+                    <!-- <div class="settings-card">
+                        <div class="card-header">
+                            <h2 class="card-title"></h2>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Deposit Usdt Bouns Banner</label>
+                            <input type="text" class="form-input" id="ban101" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Deposit Usdt Bouns Banner 2</label>
+                            <input type="text" class="form-input" id="ban1012" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Prediction channel Banner</label>
+                            <input type="text" class="form-input" id="ban102" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Prediction Channel Link</label>
+                            <input type="text" class="form-input" id="ban103" placeholder="Enter banner URL" />
+                        </div>
+                    </div> -->
+                    <!-- <div class="settings-card">
+                        <div class="card-header">
+                            <h2 class="card-title">66Win partner banners</h2>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>66win Patner bouns Banner</label>
+                            <input type="text" class="form-input" id="ban104" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Luxury partner Banner</label>
+                            <input type="text" class="form-input" id="ban105" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>BMW X1 car Banner</label>
+                            <input type="text" class="form-input" id="ban106" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Dimond reeward Banner</label>
+                            <input type="text" class="form-input" id="ban107" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Tur gold brs Banner</label>
+                            <input type="text" class="form-input" id="ban108" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Trip to Goa Banner</label>
+                            <input type="text" class="form-input" id="ban109" placeholder="Enter banner URL" />
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label"><i class="fas fa-image"></i>Gold Treasure Banner</label>
+                            <input type="text" class="form-input" id="ban110" placeholder="Enter banner URL" />
+                        </div>
+                    </div> -->
+
+                    <!-- Additional Sections can be added here following the same structure -->
+
+                </div>
+
+                <button class="btn-submit edit-banner">
+                    <i class="fas fa-save"></i>
+                    Save All Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+        $.ajax({
+            type: "GET",
+            url: "/api/webapi/banner",
+            data: {},
+            dataType: "json",
+            success: function (response) {
+                let data = response.activity;
+                $("#ban1").val(data?.ban1);
+                $("#ban2").val(data?.ban2);
+                $("#ban22").val(data?.ban22);
+                $("#ban3").val(data?.ban3);
+                $("#ban33").val(data?.ban33);
+                $("#ban4").val(data?.ban4);
+                $("#ban44").val(data?.ban44);
+                $("#ban5").val(data?.ban5);
+                $("#ban55").val(data?.ban55);
+                $("#ban6").val(data?.ban6);
+                $("#ban66").val(data?.ban66);
+                $("#ban7").val(data?.ban7);
+                $("#ban77").val(data?.ban77);
+                $("#ban8").val(data?.ban8);
+                $("#ban88").val(data?.ban88);
+                $("#ban888").val(data?.ban888);
+                $("#telelink").val(data?.telelink);
+                $("#telelink2").val(data?.telelink2);
+                $("#ban9").val(data?.ban9);
+                $("#ban99").val(data?.ban99);
+                $("#ban992").val(data?.ban992);
+                $("#ban999").val(data?.ban999);
+                $("#ban9992").val(data?.ban9992);
+                $("#ban99992").val(data?.ban99992);
+                $("#ban9999").val(data?.ban9999);
+                $("#ban101").val(data?.ban101);
+                $("#ban1012").val(data?.ban1012);
+                $("#ban102").val(data?.ban102);
+                $("#ban103").val(data?.ban103);
+                $("#ban104").val(data?.ban104);
+                $("#ban105").val(data?.ban105);
+                $("#ban106").val(data?.ban106);
+                $("#ban107").val(data?.ban107);
+                $("#ban108").val(data?.ban108);
+                $("#ban109").val(data?.ban109);
+                $("#ban110").val(data?.ban110);
+            },
+        });
+
+        $(".edit-banner").click(function (e) {
+            e.preventDefault();
+            const ban1 = $("#ban1").val();
+            const ban2 = $("#ban2").val();
+            const ban22 = $("#ban22").val();
+            const ban3 = $("#ban3").val();
+            const ban33 = $("#ban33").val();
+            const ban4 = $("#ban4").val();
+            const ban44 = $("#ban44").val();
+            const ban5 = $("#ban5").val();
+            const ban55 = $("#ban55").val();
+            const ban6 = $("#ban6").val();
+            const ban66 = $("#ban66").val();
+            const ban7 = $("#ban7").val();
+            const ban77 = $("#ban77").val();
+            const ban8 = $("#ban8").val();
+            const ban88 = $("#ban88").val();
+            const ban888 = $("#ban888").val();
+            const telelink = $("#telelink").val();
+            const telelink2 = $("#telelink2").val();
+            const ban9 = $("#ban9").val();
+            const ban99 = $("#ban99").val();
+            const ban992 = $("#ban992").val();
+            const ban999 = $("#ban999").val();
+            const ban9999 = $("#ban9999").val();
+            const ban101 = $("#ban101").val();
+            const ban102 = $("#ban102").val();
+            const ban103 = $("#ban103").val();
+            const ban104 = $("#ban104").val();
+            const ban105 = $("#ban105").val();
+            const ban106 = $("#ban106").val();
+            const ban107 = $("#ban107").val();
+            const ban108 = $("#ban108").val();
+            const ban109 = $("#ban109").val();
+            const ban110 = $("#ban110").val();
+            const ban9992 = $("#ban9992").val();
+            const ban99992 = $("#ban99992").val();
+            const ban1012 = $("#ban1012").val();
+            $.ajax({
+                type: "POST",
+                url: "/api/webapi/activity-banners",
+                data: {
+                    ban1: ban1,
+                    ban11: "not",
+                    ban2: ban2,
+                    ban22: ban22,
+                    ban3: ban3,
+                    ban33: ban33,
+                    ban4: ban4,
+                    ban44: ban44,
+                    ban5: ban5,
+                    ban55: ban55,
+                    ban6: ban6,
+                    ban66: ban66,
+                    ban7: ban7,
+                    ban77: ban77,
+                    ban8: ban8,
+                    ban88: ban88,
+                    ban888: "not",
+                    telelink: "not",
+                    telelink2: "not",
+                    ban9: ban9,
+                    ban99: ban99,
+                    ban992: "not",
+                    ban999: "not",
+                    ban9999: "not",
+                    ban101: "not",
+                    ban102: "not",
+                    ban103: "not",
+                    ban104: "not",
+                    ban105: "not",
+                    ban106: "not",
+                    ban107: "not",
+                    ban108: "not",
+                    ban109: "not",
+                    ban110: "not",
+                    ban9992: "not",
+                    ban99992: "not",
+                    ban1012: "not",
+                },
+                dataType: "json",
+                success: function (response) {
+                    if (response.status == true) {
+                        Swal.fire("Good job!", "Your Links Updated Successfully!", "success");
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Empty or Wrong",
+                        });
+                    }
+                },
+            });
+        });
+    </script>
+</body>
+</html>

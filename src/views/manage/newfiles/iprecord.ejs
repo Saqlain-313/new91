@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IP Intelligence Dashboard</title>
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css">
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+     <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+   <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+     <!-- jQuery -->
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #5ccfcb;
+            --primary-dark: #00807c;
+            --gradient: linear-gradient(135deg, #5ccfcb, #00807c);
+            --text-dark: #2c3e50;
+            --text-medium: #64748b;
+            --text-light: #94a3b8;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+            /* Custom Risk Colors */
+            --risk-low-bg: #e6ffe6;
+            --risk-low-text: #28a745;
+            --risk-medium-bg: #fffbe6;
+            --risk-medium-text: #ffc107;
+            --risk-high-bg: #ffe6e6;
+            --risk-high-text: #dc3545;
+
+            /* New Darker Colors */
+            --dark-background: #343a40;
+            --dark-text: #e9ecef;
+            --dark-hover: #495057;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            padding-top: 20px;
+        }
+
+        .navbar {
+            background: var(--gradient);
+        }
+
+        .dashboard-header {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .dashboard-header h2 {
+            margin-bottom: 0;
+            font-size: 1.5rem;
+        }
+
+        .card {
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background-color: var(--bg-white);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            border-top-left-radius: var(--border-radius) !important;
+            border-top-right-radius: var(--border-radius) !important;
+            color: var(--text-dark);
+            padding: 1rem 1.5rem;
+        }
+
+        .summary-card {
+            background-color: var(--bg-white);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            height: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .summary-card .icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card .label {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+        }
+
+        .btn-primary-custom {
+            background: var(--gradient);
+            border: none;
+            color: white;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary-custom:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs {
+            border-bottom: none;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            display: flex;
+        }
+
+        .nav-tabs .nav-link {
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+            color: var(--text-medium);
+            border: 1px solid transparent;
+            border-bottom: none;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-tabs .nav-link:hover:not(.active) {
+            color: var(--primary);
+            border-color: transparent transparent var(--primary);
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-dark);
+            background-color: var(--bg-white);
+            border-color: #dee2e6 #dee2e6 var(--bg-white);
+            font-weight: 600;
+        }
+
+        .table-responsive {
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+        }
+
+        .table {
+            margin-bottom: 0;
+            color: var(--text-dark);
+            min-width: 768px;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 0.75rem;
+        }
+
+        .table thead tr {
+            background: var(--gradient);
+            color: white;
+            border-bottom: none;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+
+        }
+
+        .badge-low-risk {
+            background-color: var(--risk-low-bg);
+            color: var(--risk-low-text);
+            padding: 0.4em 0.8em;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+
+        .badge-medium-risk {
+            background-color: var(--risk-medium-bg);
+            color: var(--risk-medium-text);
+            padding: 0.4em 0.8em;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+
+        .badge-high-risk {
+            background-color: var(--risk-high-bg);
+            color: var(--risk-high-text);
+            padding: 0.4em 0.8em;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+
+        .badge-active {
+            background-color: #e0f7fa;
+            color: #00bcd4;
+            padding: 0.4em 0.8em;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+
+        .badge-blocked {
+            background-color: var(--risk-high-bg);
+            color: var(--risk-high-text);
+            padding: 0.4em 0.8em;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+
+        .action-icon {
+            color: var(--text-medium);
+            font-size: 1.1rem;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .action-icon:hover {
+            color: var(--primary-dark);
+        }
+
+        .form-label {
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e2e8f0;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(92, 207, 203, 0.2);
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-radius: 8px 0 0 8px !important;
+            color: var(--text-dark);
+            padding: 0.5rem 0.75rem;
+        }
+
+        /* --- Media Queries for Responsiveness --- */
+
+        /* Extra small devices (phones, 575px and down) */
+        @media (max-width: 575.98px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
+            }
+
+            .dashboard-header h2 {
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+
+            .dashboard-header .btn {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+
+            .summary-card {
+                padding: 1rem;
+            }
+
+            .summary-card .value {
+                font-size: 1.75rem;
+            }
+
+            .nav-tabs {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                -ms-overflow-style: -ms-autohiding-scrollbar;
+            }
+
+            .nav-tabs .nav-item {
+                flex: 0 0 auto;
+            }
+
+            .nav-tabs .nav-link {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .card .p-4 {
+                padding: 1rem !important;
+            }
+
+            .table thead {
+                display: none;
+            }
+
+            .table tbody, .table tr, .table td {
+                display: block;
+                width: 100%;
+            }
+
+            .table tr {
+                margin-bottom: 1rem;
+                border: 1px solid #e2e8f0;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow-sm);
+                background-color: var(--bg-white);
+                padding: 0.75rem;
+            }
+
+            .table td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+                border-top: 1px solid #f1f1f1;
+            }
+
+            .table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0.75rem;
+                width: calc(50% - 1.5rem);
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: 600;
+                color: var(--text-dark);
+            }
+
+            .table td:last-child {
+                border-bottom: none;
+            }
+
+            .table .action-icon {
+                margin: 0 8px;
+                font-size: 1rem;
+            }
+        }
+
+         @media (max-width: 575.98px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
+            }
+
+            .dashboard-header h2 {
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+
+            .dashboard-header .btn {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+
+            .summary-card {
+                padding: 1rem;
+            }
+
+            .summary-card .value {
+                font-size: 1.75rem;
+            }
+
+            .nav-tabs {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                -ms-overflow-style: -ms-autohiding-scrollbar;
+            }
+
+            .nav-tabs .nav-item {
+                flex: 0 0 auto;
+            }
+
+            .nav-tabs .nav-link {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .card .p-4 {
+                padding: 1rem !important;
+            }
+
+            /* Improved table styling for mobile */
+            .table-responsive {
+                border: none;
+                padding: 0;
+               
+            }
+
+            .table {
+                min-width: 100%;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table thead {
+                display: none;
+            }
+
+            .table tbody {
+                display: table;
+                width: 100%;
+            }
+
+            .table tr {
+                display: table-row;
+                border-bottom: 1px solid #e2e8f0;
+                margin-bottom: 0;
+                box-shadow: none;
+                background-color: transparent;
+                padding: 0;
+            }
+
+            .table td {
+                display: table-cell;
+                padding: 0.75rem;
+                text-align: left;
+                position: static;
+                border-top: none;
+                white-space: normal;
+            }
+
+            .table td::before {
+                content: none;
+            }
+
+            /* Add visual separation between rows */
+            .table tbody tr {
+                border-bottom: 15px solid var(--bg-light);
+            }
+
+            /* Highlight the first column (IP Address) */
+            .table td:first-child {
+                font-weight: 600;
+                color: var(--text-dark);
+            }
+
+            /* Adjust action icons */
+            .table .action-icon {
+                margin: 0 5px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Small devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .dashboard-header {
+                flex-direction: row;
+                align-items: center;
+                padding: 1.25rem;
+            }
+
+            .dashboard-header h2 {
+                margin-bottom: 0;
+                font-size: 1.5rem;
+            }
+
+            .summary-card {
+                padding: 1.25rem;
+            }
+
+            .nav-tabs .nav-link {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .table td, .table th {
+                padding: 0.5rem;
+            }
+
+            /* Adjust table for medium-small screens */
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            .table {
+                min-width: 100%;
+                display: table;
+            }
+
+            .table thead {
+                display: table-header-group;
+            }
+
+            .table tbody {
+                display: table-row-group;
+            }
+
+            .table tr {
+                display: table-row;
+            }
+
+            .table td, .table th {
+                display: table-cell;
+            }
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <%- include('../nav') %>
+
+        <div class="content-wrapper mt-3">
+            <div class="container-fluid">
+                <div class="dashboard-header">
+                    <h2><i class="fas fa-shield-alt me-2"></i>IP Intelligence Dashboard</h2>
+                    <button class="btn btn-primary-custom" id="refreshBtn">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh Data
+                    </button>
+                </div>
+
+                <div class="card p-4 mb-4">
+  <div class="row g-3 align-items-end">
+    
+    <!-- Search -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <label for="searchIp" class="form-label">Search IP or Location</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fas fa-search"></i></span>
+        <input type="text" class="form-control" id="searchIp" placeholder="Search IP or Location">
+      </div>
+    </div>
+
+    <!-- Risk Level -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <label for="riskLevel" class="form-label">Risk Level</label>
+      <select class="form-select" id="riskLevel">
+        <option value="all" selected>All Risks</option>
+        <option value="Low">Low</option>
+        <option value="Normal">Normal</option>
+        <option value="High">High</option>
+      </select>
+    </div>
+
+    <!-- Activity Type -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <label for="activityType" class="form-label">Activity Type</label>
+      <select class="form-select" id="activityType">
+        <option value="all" selected>All Activities</option>
+        <option value="Register">Register</option>
+        <option value="login">Login</option>
+      </select>
+    </div>
+
+    <!-- Time Range -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <label for="timeRange" class="form-label">Time Range</label>
+      <select class="form-select" id="timeRange">
+        <option value="all" selected>All Time</option>
+        <option value="24h">Last 24 Hours</option>
+        <option value="7d">Last 7 Days</option>
+        <option value="30d">Last 30 Days</option>
+      </select>
+    </div>
+
+  </div>
+</div>
+
+
+                <div class="row mb-4">
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="summary-card">
+                            <div class="icon text-primary"><i class="fas fa-globe"></i></div>
+                            <div class="value" id="totalIps">6</div>
+                            <div class="label">Total Active IPs</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="summary-card">
+                            <div class="icon text-danger"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="value" id="highRiskIps">0</div>
+                            <div class="label">High Risk IPs</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="summary-card">
+                            <div class="icon text-warning"><i class="fas fa-ban"></i></div>
+                            <div class="value" id="blockedIps">0</div>
+                            <div class="label">Blocked IPs</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <div class="summary-card">
+                            <div class="icon text-success"><i class="fas fa-users"></i></div>
+                            <div class="value" id="activeUsers">14</div>
+                            <div class="label">Active Users</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header p-0">
+                        <ul class="nav nav-tabs" id="ipTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="ip-overview-tab" data-bs-toggle="tab" data-bs-target="#ip-overview" type="button" role="tab" aria-controls="ip-overview" aria-selected="true">
+                                    <i class="fas fa-desktop me-2"></i>IP Overview
+                                </button>
+                            </li>
+                            
+                        </ul>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="tab-content" id="ipTabsContent">
+                            <div class="tab-pane fade show active" id="ip-overview" role="tabpanel" aria-labelledby="ip-overview-tab">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="ipTable">
+                                        <thead>
+                                            <tr>
+                                                <th>IP Address</th>
+                                                <th>Risk Level</th>
+                                                <th>Total Activities</th>
+                                                <th>Unique Users</th>
+                                                <th>Actions</th>
+                                                <th>Last Activity</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="suspicious-activities" role="tabpanel" aria-labelledby="suspicious-activities-tab">
+                                <div class="p-4 text-center  " style="color: white;">
+                                    <p class="mb-0">No suspicious activities to display at this time.</p>
+                                    <p>Check back later or adjust your filters.</p>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="activity-timeline" role="tabpanel" aria-labelledby="activity-timeline-tab">
+                                <div class="p-4 text-center " style="color: white;">
+                                    <p class="mb-0">Activity timeline data will appear here.</p>
+                                    <p>This section could display charts or a detailed log of activities over time.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+
+
+
+<!-- Custom Admin Script -->
+<script src="/js/admin/admin.js"></script>
+<script src="/dist/js/adminlte.min.js"></script>
+
+
+
+
+
+    <script>
+        $(document).ready(function() {
+            // Load initial data
+            loadIpData();
+
+            // Refresh button click handler
+            $('#refreshBtn').click(function() {
+                Swal.fire({
+                    title: 'Refreshing Data',
+                    html: 'Please wait while we update the IP intelligence data...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Simulate API call (replace with actual API call)
+                setTimeout(() => {
+                    Swal.close();
+                    loadIpData();
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Data has been refreshed successfully',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }, 1500);
+            });
+
+           
+
+            // Block IP action
+            $(document).on('click', '.block-ip', function() {
+                const ipAddress = $(this).data('ip');
+
+                Swal.fire({
+                    title: 'Block IP Address?',
+                    text: `Are you sure you want to block ${ipAddress}?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, block it!',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#d33',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Simulate API call to block IP
+                        setTimeout(() => {
+                            Swal.fire(
+                                'Blocked!',
+                                `IP address ${ipAddress} has been blocked.`,
+                                'success'
+                            );
+                            loadIpData(); // Refresh data
+                        }, 800);
+                    }
+                });
+            });
+
+            // View details action
+            $(document).on('click', '.view-details', function() {
+                const ipAddress = $(this).data('ip');
+
+                Swal.fire({
+                    title: `Details for ${ipAddress}`,
+                    html: `
+                        <div class="text-start">
+                            <p><strong>Location:</strong> Asansol, IN</p>
+                            <p><strong>ISP:</strong> Example ISP</p>
+                            <p><strong>First Seen:</strong> 2023-01-01</p>
+                            <p><strong>Last Activity:</strong> 2023-01-15</p>
+                            <p><strong>Risk Score:</strong> 25/100 (Low)</p>
+                        </div>
+                    `,
+                    confirmButtonText: 'Close',
+                    width: '600px'
+                });
+            });
+
+            let allIpData = []; // store raw data globally
+
+function loadIpData() {
+  $.ajax({
+    url: "/api/ip-records",
+    method: "GET",
+    dataType: "json",
+    success: function (resp) {
+      allIpData = resp.data; // keep original data
+      renderTable(allIpData);
+
+      // Update summary cards
+      $('#totalIps').text(resp.summary.totalActiveIps);
+      $('#highRiskIps').text(resp.summary.highRiskIps);
+      $('#activeUsers').text(resp.summary.activeUsers);
+    },
+    error: function () {
+      alert("Failed to load IP data");
+    }
+  });
+}
+
+function renderTable(data) {
+  const tableBody = $('#ipTable tbody');
+  tableBody.empty();
+
+  data.forEach(ip => {
+    // Risk badge
+    let riskBadge = '';
+    if (ip.risk === 'Normal') {
+      riskBadge = '<span class="badge badge-normal">Normal</span>';
+    } else if (ip.risk === 'High') {
+      riskBadge = '<span class="badge badge-high-risk">High</span>';
+    } else if (ip.risk === 'Low') {
+      riskBadge = '<span class="badge badge-low-risk">Low</span>';
+    }
+
+    // Phone list
+    let phoneList = '';
+    if (ip.phones && ip.phones.length > 0) {
+      phoneList = '<ul class="phone-list">';
+      ip.phones.forEach(p => {
+        phoneList += `<li>${p}</li>`;
+      });
+      phoneList += '</ul>';
+    } else {
+      phoneList = '<em>No users</em>';
+    }
+
+    // Append row
+    tableBody.append(`
+      <tr>
+          <td data-label="IP Address">${ip.ip}</td>
+          <td data-label="Risk Level">${riskBadge}</td>
+          <td data-label="Total Activities">${ip.activities}</td>
+          <td data-label="Unique Users">${ip.users}</td>
+          <td data-label="Users & Actions">${phoneList}</td>
+          <td data-label="Last Activity">${ip.lastActivity}</td>
+          <td data-label="Actions">
+              <button class="btn btn-sm btn-info check-location" data-ip="${ip.ip}">
+                <i class="fas fa-map-marker-alt"></i> Check Location
+              </button>
+          </td>
+      </tr>
+    `);
+  });
+
+  // Re-bind location buttons
+  $('.check-location').off('click').on('click', function () {
+    const ip = $(this).data('ip');
+    const btn = $(this);
+
+    btn.prop('disabled', true).text("Loading...");
+    $.get(`https://ipwho.is/${ip}`, function (res) {
+      if (res && res.success) {
+        alert(`📍 IP: ${ip}\nCountry: ${res.country}\nCity: ${res.city}\nISP: ${res.connection?.isp || 'N/A'}`);
+      } else {
+        alert(`❌ Could not fetch location for ${ip}`);
+      }
+    }).always(() => {
+      btn.prop('disabled', false).html('<i class="fas fa-map-marker-alt"></i> Check Location');
+    });
+  });
+}
+
+// 🔎 Filter logic
+function applyFilters() {
+  let filtered = allIpData;
+
+  // Search (IP or location)
+  const search = $('#searchIp').val().toLowerCase();
+  if (search) {
+    filtered = filtered.filter(item =>
+      item.ip.toLowerCase().includes(search) ||
+      (item.location && item.location.toLowerCase().includes(search))
+    );
+  }
+
+  // Risk level
+  const risk = $('#riskLevel').val();
+  if (risk !== "all") {
+    filtered = filtered.filter(item => item.risk === risk);
+  }
+
+  // Activity type (check if in phones/actions list)
+  const activityType = $('#activityType').val();
+  if (activityType !== "all") {
+    filtered = filtered.filter(item =>
+      item.phones && item.phones.some(p => p.toLowerCase().includes(activityType.toLowerCase()))
+    );
+  }
+
+  // Time range filter
+  const range = $('#timeRange').val();
+  if (range !== "all") {
+    const now = new Date();
+    filtered = filtered.filter(item => {
+      if (!item.lastActivity) return false;
+      const last = new Date(item.lastActivity);
+      if (range === "24h") return (now - last) <= 24 * 60 * 60 * 1000;
+      if (range === "7d") return (now - last) <= 7 * 24 * 60 * 60 * 1000;
+      if (range === "30d") return (now - last) <= 30 * 24 * 60 * 60 * 1000;
+      return true;
+    });
+  }
+
+  renderTable(filtered);
+}
+
+// Bind filter events
+$('#searchIp, #riskLevel, #activityType, #timeRange').on('input change', applyFilters);
+
+
+
+        });
+    </script>
+
+    <a href="https://wa.me/919999999999" target="_blank">
+  <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" 
+       alt="WhatsApp" 
+       style="width: 40px; height: 40px; cursor: pointer;" />
+</a>
+
+</body>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<!-- Include SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+   
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+</html>

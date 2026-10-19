@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Created Salary Record</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <style>
+      body {
+        background-color: #f4f6f9;
+        color: #343a40;
+        font-family: "Source Sans Pro", sans-serif;
+      }
+
+      .content-wrapper {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #343a40;
+        margin-bottom: 20px;
+      }
+
+      .card {
+        background-color: #ffffff;
+        color: #343a40;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .form-control {
+        background-color: #ffffff;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        color: #495057;
+      }
+
+      .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+
+      .btn-primary {
+        background-color: #00807c;
+        border-color: #00807c;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        background-color: #4d49d7;
+        border-color: #4d49d7;
+      }
+
+      .table {
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .table th,
+      .table td {
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      tbody tr:nth-child(even) {
+        background: #fafafb !important;
+      }
+
+      tbody tr:nth-child(odd) {
+        background: #dff5f5 !important;
+      }
+
+      thead tr {
+        background-color: #00807c; /* Sets the background for the table header row */
+      }
+
+      thead th {
+        background-color: #00807c; /* Sets the background for individual header cells */
+        color: white; /* Optional: Set text color for better contrast */
+      }
+
+      .card-title {
+        color: #00807c;
+        font-size: 20px;
+        font-weight: bold;
+        margin: 10px;
+      }
+
+      .container1 {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .container1 {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+      }
+
+      .section {
+        width: 100%;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .form-section h2 {
+        margin-bottom: 20px;
+        font-size: 20px;
+        color: #333;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 20px;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        border-color: #00807c;
+        outline: none;
+      }
+
+      .form-submit {
+        display: inline-block;
+        background: linear-gradient(90deg, #5ccfcb, #00807c);
+        color: #fff;
+        padding: 5px 10px;
+        font-size: 20px;
+        border: none;
+        width: 100%;
+        height: 9vh;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+
+      .form-submit:hover {
+        background: linear-gradient(180deg, #5ccfcb, #00807c);
+      }
+
+      .box-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap; /* Allow wrapping for responsiveness */
+      }
+
+      .box {
+        flex: 1;
+        padding: 20px;
+        background: linear-gradient(90deg, #5ccfcb, #00807c);
+        border-radius: 8px;
+        text-align: center;
+        color: white;
+        height: 10rem;
+        margin-top: 20px; /* Adjusted margin for better spacing */
+        font-size: 18px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .box:hover {
+        transform: translateY(-10px);
+      }
+
+      @media (max-width: 768px) {
+        .box {
+          flex-basis: 100%; /* Full width on smaller screens */
+          margin-top: 10px; /* Adjust margin for smaller screens */
+        }
+      }
+
+      /* Pagination styles with new class names */
+      .custom-pagination {
+        display: flex !important;
+        padding-left: 0 !important;
+        list-style: none !important;
+        border-radius: 0.25rem !important;
+        justify-content: center !important; /* Center the pagination */
+        margin-top: 1.5rem !important; /* Add some top margin */
+      }
+
+      .custom-page-item .custom-page-link {
+        color: #00807c !important; /* Active color from your theme */
+        background-color: #fff !important;
+        border: 1px solid #dee2e6 !important;
+        margin: 0 4px !important;
+        border-radius: 0.25rem !important;
+        transition: all 0.3s ease-in-out !important;
+        min-width: 40px !important;
+        text-align: center !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-weight: 500 !important;
+        text-decoration: none !important; /* Remove underline */
+        cursor: pointer !important; /* Add pointer cursor for div-based links */
+      }
+
+      .custom-page-item.activee .custom-page-link {
+        background-color: #00807c !important;
+        border-color: #00807c !important;
+        color: #fff !important;
+        font-weight: 700 !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        transform: translateY(-2px) !important;
+        padding: 2px !important;
+      }
+
+      .custom-page-item .custom-page-link:hover {
+        background-color: #5ccfcb !important; /* Lighter shade of your theme color on hover */
+        border-color: #5ccfcb !important;
+        color: #fff !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15) !important;
+        transform: translateY(-1px) !important;
+        padding: 2px !important;
+      }
+
+      .custom-page-item.disabled .custom-page-link {
+        color: #6c757d !important;
+        pointer-events: none !important;
+        background-color: #e9ecef !important;
+        border-color: #dee2e6 !important;
+        opacity: 0.7 !important;
+      }
+    </style>
+  </head>
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <%- include('nav') %>
+      <div class="content-wrapper">
+        <section class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1
+                  class=""
+                  style="color: #00807c; font-size: 2rem; font-weight: bold"
+                >
+                  Created Salary Record
+                </h1>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="container1">
+          <div class="section form-section box-bg">
+            <h2 style="color: #00807c">Created Salary Record</h2>
+            <form id="salaryForm">
+              <div class="form-group">
+                <label for="phone">UID</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  placeholder="Enter UID"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="amount">Amount</label>
+                <input
+                  type="number"
+                  id="amount"
+                  name="amount"
+                  placeholder="Enter amount"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="type">Type</label>
+                <input
+                  type="text"
+                  id="type"
+                  name="type"
+                  placeholder="Enter text"
+                  required
+                />
+              </div>
+              <button type="submit" class="form-submit">Submit</button>
+            </form>
+          </div>
+        </div>
+
+        <section class="content">
+          <div class="card">
+            <div class="card-body p-0">
+              <h5 class="card-title">Salary Records Table</h5>
+              <div class="table-responsive">
+                <table class="table" id="tableget">
+                  <thead>
+                    <tr>
+                      <th class="text-center">Phone</th>
+                      <th class="text-center">Amount</th>
+                      <th class="text-center">Type</th>
+                      <th class="text-center">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <nav aria-label="Table pagination">
+                <ul
+                  class="custom-pagination justify-content-center mt-3"
+                  id="customSalaryPagination"
+                ></ul>
+              </nav>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Pagination variables
+        let currentPage = 1;
+        const rowsPerPage = 10; // Number of rows per page
+        let allTableData = []; // Store all fetched data
+
+        $("#salaryForm").on("submit", function (e) {
+          e.preventDefault();
+
+          let phoneNumber = $("#phone").val().trim();
+          let amount = $("#amount").val().trim();
+          let type = $("#type").val().trim();
+
+          //console.log("phone:", phoneNumber);
+          //console.log("amount", amount);
+          //console.log("type", type);
+
+          $.ajax({
+            type: "POST",
+            url: "/api/webapi/admin/CreatedSalary",
+            dataType: "JSON",
+            data: {
+              phone: phoneNumber,
+              amount: amount,
+              type: type,
+            },
+            success: function (response) {
+              //console.log("Response data success:", response.message);
+              Swal.fire({
+                title: "UPDATED SUCCESSFULLY",
+                icon: "success",
+              });
+              document.getElementById("salaryForm").reset();
+              // After successful submission, re-fetch and update the table for the current page
+              fetchAndUpdateTable(currentPage);
+            },
+            error: function (error) {
+              //console.log("Response data error:", JSON.stringify(error));
+              Swal.fire({
+                title: "Something went wrong!",
+                icon: "error",
+              });
+            },
+          });
+        });
+
+        // Function to fetch and update the table data
+        function fetchAndUpdateTable(pageNumber = 1) {
+          $.ajax({
+            type: "GET",
+            url: "/api/webapi/admin/getSalary",
+            dataType: "json",
+            success: function (response) {
+              if (response && Array.isArray(response.rows)) {
+                allTableData = response.rows; // Store all data
+                currentPage = pageNumber; // Set current page
+                setupPagination(allTableData); // Setup pagination based on all data
+                displayRows(
+                  allTableData,
+                  $("#tableget").find("tbody"),
+                  rowsPerPage,
+                  currentPage
+                ); // Display rows for the current page
+              } else {
+                //console.log("No data found or invalid response format");
+                $("#tableget")
+                  .find("tbody")
+                  .empty()
+                  .append(
+                    '<tr><td colspan="4" class="text-center">No records found.</td></tr>'
+                  );
+                $("#customSalaryPagination").empty(); // Clear pagination if no data
+              }
+            },
+            error: function (xhr, status, error) {
+              //console.log("Error fetching data:", error);
+              $("#tableget")
+                .find("tbody")
+                .empty()
+                .append(
+                  '<tr><td colspan="4" class="text-center">Error loading data.</td></tr>'
+                );
+              $("#customSalaryPagination").empty(); // Clear pagination on error
+            },
+          });
+        }
+
+        // Function to display rows for the current page
+        function displayRows(items, wrapper, rows_per_page, page) {
+          wrapper.empty();
+          page--; // Adjust page number to be 0-indexed for array slicing
+
+          let start = rows_per_page * page;
+          let end = start + rows_per_page;
+          let paginatedItems = items.slice(start, end);
+
+          if (paginatedItems.length === 0) {
+            wrapper.append(
+              '<tr><td colspan="4" class="text-center">No records found for this page.</td></tr>'
+            );
+            return;
+          }
+
+          paginatedItems.forEach(function (item) {
+            var row =
+              "<tr>" +
+              '<td class="text-center">' +
+              item.phone +
+              "</td>" +
+              '<td class="text-center">' +
+              item.amount +
+              "</td>" +
+              '<td class="text-center">' +
+              item.type +
+              "</td>" +
+              '<td class="text-center">' +
+              item.time +
+              "</td>" +
+              "</tr>";
+            wrapper.append(row);
+          });
+        }
+
+        // Function to set up pagination controls
+        function setupPagination(items) {
+          let paginationWrapper = $("#customSalaryPagination");
+          paginationWrapper.empty(); // Clear existing pagination
+
+          let totalPages = Math.ceil(items.length / rowsPerPage);
+
+          // Previous button
+          let prevDisabled = currentPage === 1 ? "disabled" : "";
+          paginationWrapper.append(`
+                    <li class="custom-page-item ${prevDisabled}">
+                        <div class="custom-page-link" data-page="${
+                          currentPage - 1
+                        }">Previous</div>
+                    </li>
+                `);
+
+          // Logic to show only 2 numeric buttons
+          let startPage = currentPage;
+          let endPage = currentPage + 1;
+
+          if (totalPages <= 2) {
+            startPage = 1;
+            endPage = totalPages;
+          } else if (currentPage === totalPages) {
+            startPage = totalPages - 1;
+            endPage = totalPages;
+          }
+
+          for (let i = startPage; i <= endPage; i++) {
+            if (i > 0 && i <= totalPages) {
+              // Ensure page number is valid
+              let activeClass = i === currentPage ? "activee" : "";
+              paginationWrapper.append(`
+                            <li class="custom-page-item ${activeClass}">
+                                <div class="custom-page-link" data-page="${i}">${i}</div>
+                            </li>
+                        `);
+            }
+          }
+
+          // Next button
+          let nextDisabled = currentPage === totalPages ? "disabled" : "";
+          paginationWrapper.append(`
+                    <li class="custom-page-item ${nextDisabled}">
+                        <div class="custom-page-link" data-page="${
+                          currentPage + 1
+                        }">Next</div>
+                    </li>
+                `);
+
+          // Event listener for pagination clicks
+          // The off().on() pattern is important to prevent multiple event handlers from being attached
+          paginationWrapper
+            .off("click", ".custom-page-link")
+            .on("click", ".custom-page-link", function (e) {
+              e.preventDefault();
+              let pageClicked = parseInt($(this).data("page"));
+
+              if (
+                !isNaN(pageClicked) &&
+                pageClicked >= 1 &&
+                pageClicked <= totalPages
+              ) {
+                currentPage = pageClicked;
+                displayRows(
+                  allTableData,
+                  $("#tableget").find("tbody"),
+                  rowsPerPage,
+                  currentPage
+                );
+                setupPagination(allTableData); // Re-render pagination to update active state
+              }
+            });
+        }
+
+        // Initial load of table data
+        fetchAndUpdateTable();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recharge List</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <style>
+        /* Base styles from your demo code */
+        body {
+            background-color: #f4f6f9;
+            color: #343a40;
+        }
+
+        a {
+            color: #00807c;
+            text-decoration: none;
+            background-color: transparent;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        a:hover {
+            background-color: #22baa6;
+            color: white;
+        }
+
+        /* AdminLTE overrides for light theme */
+        .content-wrapper {
+            background-color: #ffffff;
+            color: #333;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          
+        }
+
+        .card {
+            background-color: #ffffff;
+            color: #333;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid rgba(0, 0, 0, .125);
+            padding: 1.2rem 1.5rem; /* Increased padding */
+            position: relative;
+            border-top-left-radius: 8px; /* Match card border-radius */
+            border-top-right-radius: 8px; /* Match card border-radius */
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            color: #00807c;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 0; /* Remove default margin */
+        }
+
+        .btn-tool {
+            background-color: transparent;
+            color: #00807c;
+            font-size: .875rem;
+            margin: -.75rem 0;
+            padding: .25rem .5rem;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .btn-tool:hover {
+            color: #005653; /* Darker teal on hover */
+        }
+
+        /* Search input styling */
+        #search {
+            background-color: #ffffff;
+            outline: none;
+            border-color: #dee2e6;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            height: 60px;
+            border: 2px solid #ced4da;
+            font-size: 16px;
+            color: #343a40;
+            max-width: 500px; /* Limit max width for desktop */
+        }
+
+        #search:focus {
+            outline: none;
+            border-color: #00807c;
+            box-shadow: 0 0 4px rgba(0, 128, 124, 0.5);
+        }
+
+        /* Table styling */
+        .table {
+            width: 100%;
+            margin-bottom: 0; /* Remove default table margin */
+            color: #343a40;
+            background-color: #ffffff;
+            border-collapse: collapse; /* Ensure borders collapse properly */
+        }
+
+        tbody tr:nth-child(odd) {
+            background: #DFF5F5 !important;
+        }
+
+        thead tr,
+        thead th {
+            background-color: #00807c;
+            color: white;
+            padding: 15px;
+            border-bottom: 2px solid #006662;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        thead th:last-child {
+            border-right: none;
+        }
+
+        .table td,
+        .table th {
+            padding: 12px 15px;
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .table td b {
+            color: #00807c; /* Primary accent for bold text in table */
+        }
+
+        /* Badges for status */
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529; /* Darker text for contrast on yellow */
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+
+        /* Pagination styling */
+        .pagination {
+            gap: 5px;
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            border-radius: 0.25rem;
+        }
+
+        .page-link {
+            background-color: #ffffff;
+            border-color: #dee2e6;
+            color: #00807c;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px 18px;
+            text-decoration: none;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .page-link:hover {
+            background-color: #e2f0ff; /* Light blue on hover for better contrast */
+            border-color: #00807c;
+            color: #00807c;
+        }
+
+        .page-item.active .page-link {
+            background-color: #00807c !important;
+            color: white !important;
+            border-color: #00807c !important;
+        }
+
+        .page-item.previous, .page-item.next {
+            margin: 0 5px; /* Adjust spacing */
+        }
+
+        .block-click {
+            pointer-events: none;
+            opacity: 0.6; /* Indicate disabled state */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .content-header .col-sm-6 {
+                text-align: center;
+            }
+            .form-group {
+                padding: 0 10px;
+            }
+            #search {
+                width: 100% !important;
+                max-width: none !important;
+            }
+            .card-tools {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .table th, .table td {
+                padding: 8px 10px !important;
+                font-size: 0.85em;
+            }
+            .table .btn-sm {
+                padding: .2rem .5rem !important;
+                font-size: .75rem !important;
+                margin-bottom: 5px;
+            }
+            .pagination li {
+                margin: 0 2px !important;
+            }
+            .pagination .page-link {
+                padding: 6px 10px !important;
+                font-size: 0.85em;
+            }
+            .content-wrapper {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .content-header h1 {
+                font-size: 1.8rem !important;
+            }
+            .card-title {
+                font-size: 1.2rem !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <%- include('nav') %>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 style="color: #00807c; font-size: 2.2rem; font-weight: bold;">Recharge List</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="form-group" style="text-align: center; margin-bottom: 30px;">
+                <input type="text" id="searchRecharge" placeholder="Enter the account phone to search" class="form-control">
+            </div>
+
+            <section class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recharge Transactions</h3>
+                        
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped projects" id="rechargeTable" style="min-width: 700px;">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Account</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer clearfix">
+                        <nav aria-label="Page navigation example" style="display: flex; justify-content: center;">
+                            <ul class="pagination table1 mb-0">
+                                <li class="page-item previous" id="previousRecharge">
+                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                                </li>
+                                <div id="numbersRecharge" style="display: flex;">
+                                    <li class="page-item">
+                                        <a class="page-link " id="text-page-recharge"></a>
+                                    </li>
+                                </div>
+                                <li class="page-item next" id="nextRecharge">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script>
+        // Helper functions from your demo code
+        function formateT(params) {
+            let result = (params < 10) ? "0" + params : params;
+            return result;
+        }
+
+        function timerJoin(params = '', addHours = 0) {
+            let date = '';
+            if (params) {
+                date = new Date(Number(params));
+            } else {
+                date = new Date();
+            }
+            date.setHours(date.getHours() + addHours);
+            let years = formateT(date.getFullYear());
+            let months = formateT(date.getMonth() + 1);
+            let days = formateT(date.getDate());
+            let hours = date.getHours() % 12;
+            hours = hours === 0 ? 12 : hours;
+            let ampm = date.getHours() < 12 ? "AM" : "PM";
+            let minutes = formateT(date.getMinutes());
+            let seconds = formateT(date.getSeconds());
+            return years + '-' + months + '-' + days + ' ' + hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+        }
+
+        // Recharge List specific logic
+        let rechargePageNo = 0;
+        let rechargeLimit = 30;
+        let rechargeCurrentPage = 1;
+        let rechargeTotalPages = 1;
+
+        const renderRechargeTable = (datas) => {
+            let html = '';
+            if (datas && datas.length > 0) {
+                datas.map((data) => {
+                    html += `
+                        <tr class="text-center">
+                            <td>${data.id_order}</td>
+                            <td>
+                                <b>${data.phone}</b>
+                            </td>
+                            <td>
+                                <b>${data.type.toUpperCase()}</b>
+                            </td>
+                            <td>
+                                <b>${data.money}</b>
+                            </td>
+                            <td class="project-state">
+                                ${(data.status == 1) ? '<span class="badge badge-success">Success</span>' : '<span class="badge badge-warning">Pending</span>'}
+                            </td>
+                            <td>
+                                <b>${timerJoin(data.time)}</b>
+                            </td>
+                        </tr>`;
+                });
+            } else {
+                html = `<tr><td colspan="6" class="text-center py-4">No recharge records found.</td></tr>`;
+            }
+            $("#rechargeTable tbody").html(html);
+        }
+
+        function fetchRechargeList() {
+            $.ajax({
+                type: "POST",
+                url: "/manager/listRecharge", // Your API endpoint
+                data: {
+                    pageno: rechargePageNo,
+                    limit: rechargeLimit,
+                },
+                dataType: "json",
+                success: function (response) {
+                    if (response.status === true) {
+                        rechargeTotalPages = response.page_total || 1; // Ensure page_total is at least 1
+                        $('#text-page-recharge').text(`${rechargeCurrentPage} / ${rechargeTotalPages}`);
+                        renderRechargeTable(response.list_recharge_news);
+                        updatePaginationButtons('recharge');
+                    } else {
+                        renderRechargeTable([]);
+                        $('#text-page-recharge').text(`0 / 0`);
+                        updatePaginationButtons('recharge');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching recharge list:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Failed to load recharge data. Please try again later.',
+                    });
+                    renderRechargeTable([]);
+                    $('#text-page-recharge').text(`0 / 0`);
+                    updatePaginationButtons('recharge');
+                }
+            });
+        }
+
+        $('#searchRecharge').keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            var value = $(this).val().trim();
+            if (keycode == '13' && value) {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/webapi/searchRecharge", // Assuming a search API for recharge
+                    data: {
+                        phone: value,
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.status === true) {
+                            rechargeCurrentPage = 1; // Reset to first page on search
+                            rechargePageNo = 0;
+                            rechargeTotalPages = 1; // Assuming search results are on a single page or not paginated by default
+                            $('#text-page-recharge').text(`${rechargeCurrentPage} / ${rechargeTotalPages}`);
+                            renderRechargeTable(response.datas); // Assuming 'datas' key for search
+                            updatePaginationButtons('recharge');
+                        } else {
+                            renderRechargeTable([]);
+                            $('#text-page-recharge').text(`0 / 0`);
+                            updatePaginationButtons('recharge');
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'No Results',
+                                text: 'No recharge records found for the given account.',
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error searching recharge list:", error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Failed to search recharge data. Please try again later.',
+                        });
+                        renderRechargeTable([]);
+                        $('#text-page-recharge').text(`0 / 0`);
+                        updatePaginationButtons('recharge');
+                    }
+                });
+            } else if (keycode == '13' && !value) {
+                // If search box is cleared, fetch full list again
+                rechargePageNo = 0;
+                rechargeCurrentPage = 1;
+                fetchRechargeList();
+            }
+        });
+
+        $('#nextRecharge').click(function (e) {
+            e.preventDefault();
+            if (rechargeCurrentPage < rechargeTotalPages) {
+                rechargePageNo += rechargeLimit;
+                rechargeCurrentPage++;
+                fetchRechargeList();
+            }
+        });
+
+        $('#previousRecharge').click(function (e) {
+            e.preventDefault();
+            if (rechargeCurrentPage > 1) {
+                rechargePageNo -= rechargeLimit;
+                rechargeCurrentPage--;
+                fetchRechargeList();
+            }
+        });
+
+        function updatePaginationButtons(type) {
+            const prevButton = $(`#previous${type === 'recharge' ? 'Recharge' : 'Withdrawal'}`);
+            const nextButton = $(`#next${type === 'recharge' ? 'Recharge' : 'Withdrawal'}`);
+            const currentPage = type === 'recharge' ? rechargeCurrentPage : withdrawalCurrentPage;
+            const totalPages = type === 'recharge' ? rechargeTotalPages : withdrawalTotalPages;
+
+            if (currentPage <= 1) {
+                prevButton.addClass('block-click');
+            } else {
+                prevButton.removeClass('block-click');
+            }
+
+            if (currentPage >= totalPages) {
+                nextButton.addClass('block-click');
+            } else {
+                nextButton.removeClass('block-click');
+            }
+        }
+
+        // Initial load for Recharge List
+        $(document).ready(function () {
+            fetchRechargeList();
+        });
+    </script>
+</body>
+
+</html>

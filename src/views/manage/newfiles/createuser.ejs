@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300,400,500,600,700&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" xintegrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- SweetAlert2 CSS - Using default theme which is white, no need for dark theme -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Primary brand colors */
+            --primary-color-light: #5ccfcb; /* Your requested light turquoise */
+            --primary-color-dark: #00807c;  /* Your requested deeper teal */
+
+            /* Neutral colors */
+            --main-bg: #f5f8fc; /* Slightly warmer light grey background */
+            --card-bg: #fbfdff; /* Off-white for cards, very subtle */
+            --text-dark: #344760; /* Darker text for readability */
+            --text-medium: #627b87; /* Medium grey for secondary text */
+            --border-light: #d1e2eb; /* Light blue-grey border */
+            --input-bg-light: #eff4f8; /* Light background for inputs */
+
+            /* Shadows */
+            --shadow-subtle: rgba(0, 0, 0, 0.04);
+            --shadow-medium: rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            background-color: var(--main-bg);
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+        }
+
+        .content-wrapper {
+            background-color: var(--main-bg);
+           
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px var(--shadow-subtle);
+            border: 1px solid var(--border-light);
+            margin-bottom: 30px;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px var(--shadow-medium);
+        }
+
+        .card-header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-light);
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid var(--border-light);
+            padding: 12px 15px; /* Matches the button padding */
+            font-size: 1rem;
+            color: var(--text-dark);
+            background-color: var(--input-bg-light);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            height: calc(1.5em + 12px * 2 + 2px); /* Calculate height based on font-size + padding + border */
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color-light);
+            box-shadow: 0 0 0 0.2rem rgba(92, 207, 203, 0.25);
+            outline: none;
+            background-color: var(--card-bg);
+        }
+
+        .form-control-plaintext {
+            background-color: var(--input-bg-light);
+            border: 1px solid var(--border-light);
+            padding: 12px 15px;
+            border-radius: 5px;
+            color: var(--text-dark);
+            font-weight: 600;
+            height: calc(1.5em + 12px * 2 + 2px);
+        }
+
+        .input-group-append .btn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            background-color: var(--border-light);
+            border-color: var(--border-light);
+            color: var(--text-medium);
+            padding: 12px 15px;
+            height: calc(1.5em + 12px * 2 + 2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .input-group-append .btn:hover {
+            background-color: #c4d7e3;
+            border-color: #c4d7e3;
+            color: var(--text-dark);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color-light);
+            border-color: var(--primary-color-light);
+            padding: 10px 25px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 5px;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-color-dark);
+            border-color: var(--primary-color-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline-secondary {
+            color: var(--text-medium);
+            border-color: var(--border-light);
+            background-color: var(--card-bg);
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 5px;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: var(--input-bg-light);
+            color: var(--text-dark);
+            border-color: var(--text-medium);
+        }
+
+        .btn-outline-primary-light {
+            color: var(--primary-color-light);
+            border-color: var(--primary-color-light);
+            background-color: transparent;
+            padding: 10px 25px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 5px;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .btn-outline-primary-light:hover {
+            background-color: var(--primary-color-light);
+            color: var(--card-bg);
+            border-color: var(--primary-color-light);
+            transform: translateY(-1px);
+        }
+
+        .badge-danger-custom {
+            background-color: #e57373;
+            color: #fff;
+            padding: .5em .8em;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Custom badges for level status */
+        .badge-success-custom {
+            background-color: #66bb6a; /* Green for Active */
+            color: #fff;
+            padding: .5em .8em;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-secondary-custom {
+            background-color: #90a4ae; /* Grey for Inactive */
+            color: #fff;
+            padding: .5em .8em;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            padding: 15px 25px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .table tbody tr:nth-of-type(odd) {
+            background-color: #fcfdfe;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--border-light);
+            font-weight: 600;
+            color: var(--text-medium);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Material Symbols specific styling */
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+            vertical-align: middle;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+            .content-wrapper {
+                padding: 15px;
+            }
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px 20px;
+            }
+            .card-title {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+            .d-flex.justify-content-start {
+                flex-direction: column;
+            }
+            .d-flex.justify-content-start .btn {
+                width: 100%;
+                margin-bottom: 10px;
+                margin-right: 0 !important;
+            }
+            .content-header .col-sm-6 {
+                text-align: center !important;
+            }
+            .content-header .col-sm-6:first-child {
+                margin-bottom: 15px;
+            }
+            .table th, .table td {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* SweetAlert2 Custom Styling */
+        .swal2-popup {
+            border-radius: 10px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+            background: var(--card-bg) !important; /* White theme */
+        }
+
+        .swal2-title {
+            color: var(--text-dark) !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-html-container {
+            color: var(--text-medium) !important;
+        }
+
+        .swal2-styled.swal2-confirm {
+            background-color: var(--primary-color-dark) !important; /* Your requested color */
+            border: none !important;
+            border-radius: 5px !important;
+            font-weight: 600 !important;
+            transition: background-color 0.2s ease, transform 0.1s ease !important;
+        }
+
+        .swal2-styled.swal2-confirm:focus {
+            box-shadow: 0 0 0 3px rgba(0, 128, 124, 0.5) !important; /* Focus ring for your color */
+        }
+
+        .swal2-styled.swal2-cancel {
+            background-color: #dc3545 !important; /* Bootstrap danger color for cancel */
+            border: none !important;
+            border-radius: 5px !important;
+            font-weight: 600 !important;
+            transition: background-color 0.2s ease, transform 0.1s ease !important;
+        }
+
+        .swal2-styled.swal2-cancel:focus {
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.5) !important;
+        }
+
+        .swal2-icon.swal2-success [class^=swal2-success-line][class$=long] {
+            background-color: var(--primary-color-dark) !important;
+        }
+        .swal2-icon.swal2-success [class^=swal2-success-line][class$=tip] {
+            background-color: var(--primary-color-dark) !important;
+        }
+        .swal2-icon.swal2-success .swal2-success-ring {
+            border-color: rgba(0, 128, 124, 0.3) !important; /* Lighter ring for success */
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+     <%- include('../nav') %>
+
+    <div class="content-wrapper" style="min-height: 500px;">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-4 align-items-center">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">User Management</h1>
+                    </div>
+                    <div class="col-sm-6 text-sm-right mt-3 mt-sm-0">
+                        <button id="hideFormBtn" class="btn btn-outline-secondary">
+                            Hide Form <i class="material-symbols-outlined ml-1">keyboard_arrow_up</i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="card" id="userFormCard">
+                    <div class="card-header" style="color: white; background: #00807c;">
+                        <h3 class="card-title" style="color: white;" >Create New User</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="createUserForm">
+                            <div class="form-group">
+                                <label for="mobileNumber">Mobile Number</label>
+                                <input type="text" class="form-control" id="mobileNumber" value="1234567890" placeholder="Enter Mobile Number" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="password" placeholder="Enter Password" required>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <i class="material-symbols-outlined">visibility</i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="accountType">Account Type</label>
+                                <select class="form-control" id="accountType" required>
+                                    <option value="">Select Account Type</option>
+                                    <option value="1">Admin</option>
+                                    <option value="2">Manager</option>
+                                    <option value="3">Staff</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="userLevel">User Level</label>
+                                <select class="form-control" id="userLevel" required>
+                                    <option value="1">Active (0)</option>
+                                    <option value="0">Inactive (2)</option>
+                                </select>
+                            </div>
+                            <div class="d-flex flex-column flex-sm-row justify-content-start mt-4">
+                                <button type="submit" class="btn btn-primary mr-sm-3 mb-2 mb-sm-0">Create Role-Based User</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header" style="background: #00807c; color: white;">
+                        <h3 class="card-title" style="color: white;">Admin Users (<span id="userCount">0</span>)</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+    <th style="white-space: nowrap;">Username</th>
+    <th style="white-space: nowrap;">Mobile</th>
+    <th style="white-space: nowrap;">Account Type</th>
+    <th style="white-space: nowrap;">Invite Code</th>
+    <th style="white-space: nowrap;">Created At</th>
+    <th style="white-space: nowrap;">Level</th> 
+    <th style="white-space: nowrap;">Actions</th> 
+</tr>
+
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <!-- User rows will be dynamically inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap 4.6.2 (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+        crossorigin="anonymous"></script>
+
+<!-- AdminLTE 3.1 -->
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/js/adminlte.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+<!-- Axios (optional if used) -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<!-- Custom Admin Script -->
+<script src="/js/admin/admin.js"></script>
+
+
+<script>
+    $(document).ready(function() {
+        // Function to fetch all admin users
+        function fetchAdminUsers() {
+            $.ajax({
+                url: '/admin/users/list', // You'll need to create this endpoint
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status) {
+                        renderUsersTable(response.data);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message || 'Failed to fetch users',
+                            confirmButtonColor: '#00807c'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to fetch users: ' + error,
+                        confirmButtonColor: '#00807c'
+                    });
+                }
+            });
+        }
+
+       
+
+        // Toggle Form Visibility
+        $('#hideFormBtn').on('click', function() {
+            $('#userFormCard').slideToggle(function() {
+                const icon = $('#hideFormBtn i');
+                if ($(this).is(':visible')) {
+                    icon.text('keyboard_arrow_up');
+                    $('#hideFormBtn').html('Hide Form <i class="material-symbols-outlined ml-1">keyboard_arrow_up</i>');
+                } else {
+                    icon.text('keyboard_arrow_down');
+                    $('#hideFormBtn').html('Show Form <i class="material-symbols-outlined ml-1">keyboard_arrow_down</i>');
+                }
+            });
+        });
+
+        // Toggle Password Visibility
+        $('#togglePassword').on('click', function() {
+            const passwordField = $('#password');
+            const icon = $('#togglePassword i');
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.text('visibility_off');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.text('visibility');
+            }
+        });
+
+        // Handle Create User Form Submission
+        $('#createUserForm').on('submit', function(event) {
+            event.preventDefault();
+
+            const mobileNumber = $('#mobileNumber').val();
+            const password = $('#password').val();
+            const accountType = parseInt($('#accountType').val());
+            const userLevel = parseInt($('#userLevel').val());
+
+            if (!mobileNumber || !password || !accountType) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please fill in all required fields.',
+                    confirmButtonColor: '#00807c'
+                });
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = $(this).find('button[type="submit"]');
+            submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating...');
+
+            // Call the API
+            $.ajax({
+                url: '/admin/manager/create/ctv',
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    username: mobileNumber,
+                    pwd: password,
+                    level: accountType,
+                    status: userLevel
+                },
+                success: function(response) {
+                    submitBtn.prop('disabled', false).text('Create Role-Based User');
+                    
+                    if (response.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'User Created!',
+                            text: `Account has been created.`,
+                            confirmButtonColor: '#00807c'
+                        });
+                        
+                        // Clear the form
+                        $('#mobileNumber').val('');
+                        $('#password').val('');
+                        $('#accountType').val('0');
+                        $('#userLevel').val('0');
+                        
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message || 'Failed to create user',
+                            confirmButtonColor: '#00807c'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    submitBtn.prop('disabled', false).text('Create Role-Based User');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to create user: ' + error,
+                        confirmButtonColor: '#00807c'
+                    });
+                }
+            });
+        });
+
+
+        // Handle User Level Change
+        $('#usersTableBody').on('change', '.user-level-select', function() {
+            const userIdToUpdate = $(this).data('id');
+            const newLevel = parseInt($(this).val());
+
+            $.ajax({
+                url: '/admin/users/update-level/' + userIdToUpdate,
+                method: 'PUT',
+                dataType: 'json',
+                data: { level: newLevel },
+                success: function(response) {
+                    if (response.status) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Level Updated!',
+                            text: `User level changed to ${newLevel === 0 ? 'Active' : 'Inactive'}.`,
+                            confirmButtonColor: '#00807c'
+                        });
+                        fetchAdminUsers();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message || 'Failed to update user level',
+                            confirmButtonColor: '#00807c'
+                        });
+                        // Revert the select to previous value
+                        $(this).val(response.previousLevel || 0);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to update user level: ' + error,
+                        confirmButtonColor: '#00807c'
+                    });
+                    // Revert the select to previous value
+                    $(this).val($(this).data('previous-value') || 0);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

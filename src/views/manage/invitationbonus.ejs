@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Task Control</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css"
+    />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to bottom, #e0f7fa, #e3f2fd);
+        color: #444;
+      }
+      header {
+        padding: 20px;
+        color: #00807c;
+        border-radius: 0 0 20px 20px;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 2.5em;
+      }
+      .dashboard {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 20px;
+      }
+      .card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        flex: 1 1 calc(25% - 20px);
+        text-align: center;
+        padding: 20px;
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      }
+      .card i {
+        font-size: 36px;
+        color: #00807c;
+        margin-bottom: 10px;
+      }
+      .card h3 {
+        margin: 10px 0 5px;
+        font-size: 2em;
+      }
+      .card p {
+        color: #777;
+      }
+      .add-rule {
+        margin: 20px;
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+      }
+      .add-rule h2 {
+        color: #00807c;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #444;
+      }
+      .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+      }
+      .btn1 {
+        background: #00807c !important;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      .btn1:hover {
+        background: #00807c;
+      }
+      .rules-table {
+        margin: 20px;
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+      }
+      .rules-table h2 {
+        color: #00807c;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table th,
+      table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      table th {
+        background-color: #00807c;
+        color: white;
+        overflow-x: auto;
+      }
+      @media (max-width: 768px) {
+        .dashboard {
+          flex-direction: column;
+        }
+        .card {
+          flex: 1 1 100%;
+        }
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+      }
+
+      @media (max-width: 768px) {
+        .modal-content {
+          margin: 10% auto;
+          width: 95%;
+        }
+      }
+
+      .swal2-popup {
+        background: #ffffff !important; /* White background */
+        color: #2c3e50 !important; /* Dark text for contrast */
+        border-radius: 12px !important;
+        box-shadow: 0 0 12px rgba(0, 128, 124, 0.2) !important;
+      }
+
+      .swal2-title {
+        color: #00807c !important;
+        font-weight: bold !important;
+      }
+
+      .swal2-styled.swal2-confirm {
+        background-color: #00807c !important;
+        color: #fff !important;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 128, 124, 0.3) !important;
+      }
+
+      .swal2-styled.swal2-cancel {
+        background-color: #f44336 !important; /* Optional cancel button color */
+        color: #fff !important;
+      }
+
+      .swal2-icon.swal2-success {
+        border-color: #00807c;
+        color: #00807c;
+      }
+
+      .swal2-icon.swal2-error {
+        border-color: #f44336;
+        color: #f44336;
+      }
+    </style>
+  </head>
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <!-- Include navigation -->
+      <%- include('nav') %>
+      <div class="content-wrapper">
+        <div>
+          <header>
+            <h1>Invitation Bonus Dashboard</h1>
+          </header>
+
+          <section class="dashboard">
+            <div class="card">
+              <i class="fas fa-users"></i>
+              <h3 id="totalRule">0</h3>
+              <p>Total Rules</p>
+            </div>
+            <div class="card">
+              <i class="fas fa-money-bill-alt"></i>
+              <h3 id="highestBonus">0</h3>
+              <p>Highest Bonus</p>
+            </div>
+            <div class="card">
+              <i class="fas fa-coins"></i>
+              <h3 id="avgDepositReq">0</h3>
+              <p>Avg Deposit Req</p>
+            </div>
+            <div class="card">
+              <i class="fas fa-gift"></i>
+              <h3 id="totalBonusTypes">0</h3>
+              <p>Total Bonus Types</p>
+            </div>
+          </section>
+          <section class="add-rule">
+            <h2>Add New Bonus Rule</h2>
+            <div class="form-group">
+              <label for="rules">Rules</label>
+              <input type="text" id="rules" placeholder="Enter Rules Name" />
+            </div>
+            <div class="form-group">
+              <label for="min-subordinates">Minimum Subordinates</label>
+              <input
+                type="number"
+                id="min-subordinates"
+                placeholder="Enter number of subordinates"
+              />
+            </div>
+            <div class="form-group">
+              <label for="min-deposit">Minimum Deposit Amount</label>
+              <input
+                type="number"
+                id="min-deposit"
+                placeholder="Enter deposit amount"
+              />
+            </div>
+            <div class="form-group">
+              <label for="bonus-amount">Bonus Amount</label>
+              <input
+                type="number"
+                id="bonus-amount"
+                placeholder="Enter bonus amount"
+              />
+            </div>
+            <button class="btn1" onclick="addRule()">Add Rule</button>
+          </section>
+
+          <section class="rules-table">
+            <h2>Existing Bonus Rules</h2>
+            <div style="overflow-x: auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sr No</th>
+                    <th>Min Subordinates</th>
+                    <th>Min Deposit</th>
+                    <th>Bonus Amount</th>
+                    <th class="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="rules-body">
+                  <!-- Existing rules will be populated here -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Modal for editing rules -->
+          <div id="editModal" class="modal">
+            <div class="modal-content">
+              <span class="close" onclick="closeModal()">&times;</span>
+              <h2>Edit Bonus Rule</h2>
+              <div class="form-group">
+                <label for="edit-min-subordinates">Minimum Subordinates</label>
+                <input type="number" id="edit-min-subordinates" />
+              </div>
+              <div class="form-group">
+                <label for="edit-min-deposit">Minimum Deposit Amount</label>
+                <input type="number" id="edit-min-deposit" />
+              </div>
+              <div class="form-group">
+                <label for="edit-bonus-amount">Bonus Amount</label>
+                <input type="number" id="edit-bonus-amount" />
+              </div>
+              <button class="btn1" onclick="updateRule()">Update Rule</button>
+            </div>
+          </div>
+
+          <script>
+            let ruleCount = 0; // To keep track of the number of rules
+            let currentRow; // To keep track of the row being edited
+
+            // Load rules from the API on page load
+            document.addEventListener("DOMContentLoaded", () => {
+              fetchRules();
+            });
+
+            function fetchRules() {
+              $.ajax({
+                url: "/api/webapi/get-invitation-bonus", // Ensure the correct API endpoint
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                  //console.log("responce11", response);
+                  $("#totalRule").text(response.totalRules || 0);
+                  $("#highestBonus").text(`₹${response.hightBonus || 0}`);
+                  $("#avgDepositReq").text(`₹${response.AvgDeposit || 0}`);
+                  $("#totalBonusTypes").text(response.totalRules || 0);
+                  if (response.success && Array.isArray(response.data)) {
+                    response.data.forEach((rule) => addRuleToTable(rule));
+                  } else {
+                    console.error("Invalid response format:", response);
+                  }
+                },
+                error: function (xhr, status, error) {
+                  console.error("Error fetching rules:", xhr.responseText);
+                },
+              });
+            }
+
+            function addRule() {
+              const rule = document.getElementById("rules").value.trim();
+              const minSubordinates = document
+                .getElementById("min-subordinates")
+                .value.trim();
+              const minDeposit = document
+                .getElementById("min-deposit")
+                .value.trim();
+              const bonusAmount = document
+                .getElementById("bonus-amount")
+                .value.trim();
+
+              // Validate fields
+              if (!rule || !minSubordinates || !minDeposit || !bonusAmount) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Please fill out all fields!",
+                });
+                return;
+              }
+
+              // Prepare data for the API
+              const data = {
+                rule: rule,
+                amount: parseFloat(minDeposit) || 0, // Convert to number (fallback to 0)
+                bonus: parseFloat(bonusAmount) || 0, // Convert to number (fallback to 0)
+                count: parseInt(minSubordinates) || 0, // Convert to integer (fallback to 0)
+              };
+
+              // Send data to the API
+              $.ajax({
+                url: "/api/webapi/set-invitation-bonus", // Fixed API endpoint
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                  // Add the new rule to the table
+                  // addRuleToTable({ ...data, id: response.id }); // Assuming response contains the new rule id
+                  Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: "New bonus rule added successfully!",
+                  });
+                },
+                error: function (xhr, status, error) {
+                  console.error("Error sending data to API:", xhr.responseText);
+                  Swal.fire({
+                    icon: "error",
+                    title: "Error!",
+                    text: "Failed to add rule to the database.",
+                  });
+                },
+              });
+            }
+
+            function addRuleToTable(rule) {
+              //console.log("Rule Data:", rule);
+
+              // Ensure ruleCount is initialized (if it's a global variable)
+              if (typeof ruleCount === "undefined") {
+                window.ruleCount = 0;
+              }
+
+              ruleCount++;
+              const tableBody = document.getElementById("rules-body");
+              const newRow = document.createElement("tr");
+
+              newRow.innerHTML = `
+    <td>${ruleCount}</td>
+    <td>${rule.count}</td>
+    <td>₹${rule.amount}</td>
+    <td>₹${rule.bonus}</td>
+    <td class="text-center">
+      <button class="btn bg-info btn-success btn-sm edit-btn" onclick="openModal(this, ${rule.id})">
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </button>
+      <button class="btn btn-danger btn-sm delete-btn" onclick="deleteRule(this, ${rule.id})">
+        <i class="fa-solid fa-trash-can"></i>
+      </button>
+    </td>
+  `;
+
+              tableBody.appendChild(newRow);
+            }
+
+            function openModal(button, id) {
+              currentRow = button.closest("tr");
+              const cells = currentRow.getElementsByTagName("td");
+
+              document.getElementById("edit-min-subordinates").value =
+                cells[1].innerText;
+              document.getElementById("edit-min-deposit").value =
+                cells[2].innerText.replace("₹", "");
+              document.getElementById("edit-bonus-amount").value =
+                cells[3].innerText.replace("₹", "");
+
+              document.getElementById("editModal").style.display = "block";
+              document.getElementById("editModal").setAttribute("data-id", id); // Store the id in the modal
+            }
+
+            function closeModal() {
+              document.getElementById("editModal").style.display = "none";
+            }
+
+            function updateRule() {
+              const id = document
+                .getElementById("editModal")
+                .getAttribute("data-id");
+              const minSubordinates = document.getElementById(
+                "edit-min-subordinates"
+              ).value;
+              const minDeposit =
+                document.getElementById("edit-min-deposit").value;
+              const bonusAmount =
+                document.getElementById("edit-bonus-amount").value;
+
+              if (!minSubordinates || !minDeposit || !bonusAmount) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Please fill out all fields!",
+                });
+                return;
+              }
+
+              const data = {
+                id: id,
+                rule: `Rule${id}`, // Assuming you want to keep the same rule name
+                amount: parseFloat(minDeposit) || 0,
+                bonus: parseFloat(bonusAmount) || 0,
+                count: parseInt(minSubordinates) || 0,
+              };
+
+              //console.log("data111", data);
+
+              $.ajax({
+                url: "/api/webapi/update-inviaion-bonus", // Fixed API endpoint
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                  currentRow.cells[1].innerText = minSubordinates;
+                  currentRow.cells[1].innerText = minSubordinates;
+                  currentRow.cells[2].innerText = `₹${minDeposit}`;
+                  currentRow.cells[3].innerText = `₹${bonusAmount}`;
+
+                  Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: "Bonus rule updated successfully!",
+                  });
+                  closeModal();
+                },
+                error: function (xhr, status, error) {
+                  console.error("Error updating rule:", xhr.responseText);
+                  Swal.fire({
+                    icon: "error",
+                    title: "Error!",
+                    text: "Failed to update rule.",
+                  });
+                },
+              });
+            }
+
+            function deleteRule(button, id) {
+              //console.log("delete id", id);
+              $.ajax({
+                url: "/api/webapi/delete-inviaion-bonus", // Fixed API endpoint
+                type: "DELETE",
+                contentType: "application/json",
+                data: JSON.stringify({ id: id }), // Send the id in the request body
+                success: function (response) {
+                  const row = button.closest("tr");
+                  row.remove();
+
+                  Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: "Rule deleted successfully!",
+                  });
+                },
+                error: function (xhr, status, error) {
+                  console.error("Error deleting rule:", xhr.responseText);
+                  Swal.fire({
+                    icon: "error",
+                    title: "Error!",
+                    text: "Failed to delete rule.",
+                  });
+                },
+              });
+            }
+          </script>
+        </div>
+
+        <a
+          id="back-to-tops"
+          href="#"
+          class="btn1 back-to-top"
+          role="button"
+          aria-label="Scroll to top"
+        >
+          <i class="fas fa-chevron-up"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Include scripts -->
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  </body>
+</html>

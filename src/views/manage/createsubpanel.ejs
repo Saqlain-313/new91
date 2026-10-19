@@ -1,0 +1,1069 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manage Activity Reward Settings</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+     <!-- jQuery -->
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
+     <style>
+        :root {
+            --primary-color: #00807c;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --background-color: #f0f4f8;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --info-color: #17a2b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .sub-panel {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+
+        .panel-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        .input-group input {
+            width: 95%;
+            padding: 0.875rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .create-account-btn {
+            background: linear-gradient(135deg, #5ccfcb, #00807c);
+            color: white;
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        .create-account-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(96, 91, 255, 0.25);
+            background: linear-gradient(135deg, #5ccfcb, #00807c);
+        }
+
+        .grid-container {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-top: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .box {
+            background: #fafafb;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .box:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-shadow);
+            border-color: var(--primary-color);
+        }
+
+        .box i {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.75rem;
+        }
+
+        .box p {
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e9ecef;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        .status-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--danger-color);
+        }
+
+        input:checked ~ .status-text {
+            color: var(--success-color);
+        }
+
+        /* Tab Styling */
+        .tab-header {
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background-color: #f0f4f8;
+            margin: 0 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .tab-header.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tab-header:hover:not(.active) {
+            background-color: #DFF5F5;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .container {
+    width: 100%;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+/* Table Wrapper */
+.table-wrapper {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+/* Table Styling */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+}
+
+tr:hover {
+    background-color: var(--bg-light);
+}
+
+/* Status Styling */
+.status {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status.active {
+    background-color: #28a745;
+    color: white;
+}
+
+.status.inactive {
+    background-color: #ffc107;
+    color: black;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-buttons button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.edit-btn {
+    background-color: var(--info-color);
+    color: white;
+}
+
+.delete-btn {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.action-buttons button:hover {
+    opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    th, td {
+        padding: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .action-buttons button {
+        width: 100%;
+        padding: 5px 10px;
+    }
+}.container {
+    width: 100%;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+/* Table Wrapper */
+.table-wrapper {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+/* Table Styling */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+}
+
+tr:hover {
+    background-color: var(--bg-light);
+}
+
+/* Status Styling */
+.status {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status.active {
+    background-color: #28a745;
+    color: white;
+}
+
+.status.inactive {
+    background-color: #ffc107;
+    color: black;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-buttons button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.edit-btn {
+    background-color: var(--info-color);
+    color: white;
+}
+
+.delete-btn {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.action-buttons button:hover {
+    opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    th, td {
+        padding: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .action-buttons button {
+        width: 100%;
+        padding: 5px 10px;
+    }
+}
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+
+            .sub-panel,
+            .grid-container {
+                padding: 1.5rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .box {
+                padding: 1rem;
+            }
+
+            .panel-header {
+                font-size: 1.25rem;
+            }
+
+            
+        }
+
+        @media (max-width: 480px) {
+            .create-account-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .box p {
+                font-size: 1rem;
+            }
+
+            .tab-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .headingSec {
+            display: flex;
+            justify-content: space-between;
+        }
+
+
+
+        /* SweetAlert2 White Theme with Main Color */
+.swal2-popup {
+  background-color: #ffffff !important;
+  color: #2c3e50 !important;
+  border-radius: 12px;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 0 10px rgba(0, 128, 124, 0.15);
+}
+
+.swal2-title {
+  color: #00807c !important;
+}
+
+.swal2-styled.swal2-confirm {
+  background-color: #00807c !important;
+  color: #ffffff !important;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+}
+
+.swal2-styled.swal2-cancel {
+  background-color: #d33 !important;
+  color: #ffffff !important;
+  border: none;
+  border-radius: 6px;
+}
+
+.swal2-icon.swal2-success {
+  border-color: #00807c !important;
+  color: #00807c !important;
+}
+
+.swal2-icon.swal2-error {
+  border-color: #d33 !important;
+  color: #d33 !important;
+}
+    </style>
+    
+  </head>
+
+  
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <!-- Include navigation -->
+      
+      <div class="wrapper">
+        <!-- Include navigation -->
+        <%- include('nav') %>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 style="color: #00807c; font-size: 2rem; font-weight: bold;">Admin Control Panel</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- <section>
+                <div class="wrapper">
+                    <div class="content-wrapper">
+                        <section class="content-header">
+                            <div class="container-fluid">
+                                <div class="row mb-2">
+                                    <div class="col-sm-6">
+                                        <h1 style="color: #00807c; font-size: 2rem; font-weight: bold;">Admin Control Panel</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                    </div>
+                </div>
+            </section> -->
+
+            <section>
+                <div class="container">
+                    <div class="sub-panel">
+                        <div class="panel-header headingSec">
+                            <div class="tab-header active" data-target="create-account">
+                                <i class="fas fa-user-plus"></i>
+                                <h2>Create Account</h2>
+                            </div>
+                            <div class="tab-header" data-target="show-admin">
+                                <i class="fas fa-user-plus"></i>
+                                <h2>Show Admin</h2>
+                            </div>
+                        </div>
+
+                        <!-- Create Account Content -->
+                        <div id="create-account-content" class="tab-content active"
+                        style="background: white !important;">
+                            <div class="input-group">
+                                <input type="text" placeholder="Phone Number" id="phone">
+                            </div>
+                            <div class="input-group">
+                                <input type="password" placeholder="Password" id="password">
+                            </div>
+                            <button class="create-account-btn" id="createAccountBtn">Create Account</button>
+
+                            <div class="grid-container">
+                                <div class="panel-header">
+                                    <i class="fas fa-cog"></i>
+                                    <h2>System Settings</h2>
+                                </div>
+                                <button id="check-all-btn" style="
+    background-color: #00807c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: block;
+    width: 100%;
+    text-align: center;
+">
+    Check All
+</button>
+
+                                <div class="grid" id="settings-grid">
+                                    <!-- Dynamic boxes will be generated here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Show Admin Content -->
+<div id="show-admin-content" class="tab-content" style="background: white !important">
+    <div class="container">
+        <div class="table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Date Created</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Sample Data -->
+                    <tr>
+                        <td>1</td>
+                        <td>Arjun</td>
+                        <td>2024-03-20</td>
+                        <td>Super Admin</td>
+                        <td><span class="status active">Active</span></td>
+                        <td class="action-buttons">
+                            <button class="edit-btn">Edit</button>
+                            <button class="delete-btn">Delete</button>
+                        </td>
+                    </tr>
+                    <!-- More rows can be added -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+                    </div>
+                </div>
+            </section>
+        
+            <script>
+document.getElementById('check-all-btn').addEventListener('click', function () {
+  const checkboxes = document.querySelectorAll('#settings-grid input[type="checkbox"]');
+  const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = !allChecked;
+    checkbox.dispatchEvent(new Event('change'));
+  });
+
+  this.textContent = allChecked ? 'Check All' : 'Uncheck All';
+});
+
+document.addEventListener("click", async (event) => {
+  if (event.target.classList.contains("edit-btn")) {
+    const row = event.target.closest("tr");
+    const userId = row.querySelector("td:nth-child(2)").textContent;
+
+    try {
+      const response = await fetch(`/webapi/getuserpermissions?userId=${userId}`);
+      const result = await response.json();
+
+      if (result.status && result.data) {
+        const permissions = result.data;
+
+        const permissionsForm = `
+          <h3>Edit Permissions for User ${userId}</h3>
+          ${permissions.map(permission => `
+            <div style="margin: 10px 0;">
+              <label>${permission.name}</label>
+              <input type="checkbox" ${permission.status == "1" ? "checked" : ""} data-key="${permission.name}" style="margin-left: 10px;">
+            </div>`).join("")}
+        `;
+
+        Swal.fire({
+          title: "Edit Permissions",
+          html: permissionsForm,
+          showCancelButton: true,
+          confirmButtonText: "Save",
+          cancelButtonText: "Cancel",
+          focusConfirm: false,
+          preConfirm: () => {
+            const updatedPermissions = [];
+            document.querySelectorAll(".swal2-popup input[type='checkbox']").forEach(checkbox => {
+              updatedPermissions.push({
+                name: checkbox.dataset.key,
+                status: checkbox.checked ? "1" : "0"
+              });
+            });
+            return updatedPermissions;
+          }
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            try {
+              const saveResponse = await fetch("/webapi/edituserpermissions", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  userId: userId,
+                  permissions: result.value
+                })
+              });
+
+              const saveResult = await saveResponse.json();
+
+              if (saveResult.status) {
+                Swal.fire("Success!", "Permissions updated successfully!", "success");
+                fetchAdmins();
+              } else {
+                Swal.fire("Error", saveResult.message || "Failed to update permissions", "error");
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              Swal.fire("Error", "Failed to update permissions", "error");
+            }
+          }
+        });
+      } else {
+        Swal.fire("Error", result.message || "Failed to fetch permissions", "error");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire("Error", "Failed to fetch permissions", "error");
+    }
+  }
+});
+
+document.addEventListener("click", async (event) => {
+  if (event.target.classList.contains("delete-btn")) {
+    const row = event.target.closest("tr");
+    const userId = row.querySelector("td:nth-child(2)").textContent;
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You are about to delete this admin.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch("/webapi/deleteadmin", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: userId })
+          });
+
+          const result = await response.json();
+
+          if (result.status) {
+            Swal.fire("Deleted!", "Admin deleted successfully!", "success");
+            fetchAdmins();
+          } else {
+            Swal.fire("Error", result.message || "Failed to delete admin.", "error");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          Swal.fire("Error", "Failed to delete admin.", "error");
+        }
+      }
+    });
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const tabHeaders = document.querySelectorAll('.tab-header');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabHeaders.forEach(header => {
+    header.addEventListener('click', function () {
+      const target = this.dataset.target;
+      tabHeaders.forEach(h => h.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById(`${target}-content`).classList.add('active');
+    });
+  });
+
+  document.querySelector('[data-target="create-account"]').click();
+});
+
+const settings = [
+  { name: "Home", icon: "fa-solid fa-house" },
+  { name: "First Deposit Bonus", icon: "fa-solid fa-money-bill-transfer" },
+  { name: "Invitation Bonus", icon: "fa-solid fa-money-bill-transfer" },
+  { name: "Live Chat", icon: "fas fa-comments" },
+  { name: "Wingo", icon: "fas fa-gamepad" },
+  { name: "TRX", icon: "fas fa-coins" },
+  { name: "5D", icon: "fas fa-dice-five" },
+  { name: "K3", icon: "fas fa-dice-three" },
+  { name: "Support Tickets", icon: "fas fa-headset" },
+  { name: "Spin Wheel", icon: "fas fa-spinner" },
+  { name: "Illegal Trade", icon: "fas fa-ban" },
+  { name: "Profit & Loss", icon: "fas fa-chart-pie" },
+  { name: "Member", icon: "fas fa-users" },
+  { name: "User Level", icon: "fas fa-layer-group" },
+  { name: "Agents", icon: "fas fa-users" },
+  { name: "Created Salary", icon: "fas fa-money-check-alt" },
+  { name: "Level Setting", icon: "fas fa-sliders-h" },
+  { name: "Business Manage", icon: "fas fa-chart-line" },
+  { name: "Pending Recharge", icon: "fas fa-wallet" },
+  { name: "Pending Withdrawal", icon: "fas fa-university" },
+  { name: "Recharge (Approved)", icon: "fas fa-history" },
+  { name: "Withdrawal (Approved)", icon: "fas fa-file-alt" },
+  { name: "Turnover Report", icon: "fas fa-chart-bar" },
+  { name: "Betting History", icon: "fas fa-dice" },
+  { name: "Today Report", icon: "fas fa-calendar-day" },
+  { name: "Create Giftcode", icon: "fas fa-gift" },
+  { name: "Settings", icon: "fas fa-cog" },
+  { name: "Banner", icon: "fas fa-image" },
+  { name: "Activity Banner", icon: "fas fa-bullhorn" },
+  { name: "Logo Setting", icon: "fas fa-pen-nib" },
+  { name: "Channel Setting", icon: "fas fa-network-wired" },
+  { name: "Notification", icon: "fas fa-bell" },
+  { name: "Vip Section", icon: "fa-solid fa-star" },
+  { name: "Activity Settings", icon: "fa-solid fa-star" },
+];
+
+const settingsGrid = document.getElementById('settings-grid');
+
+settings.forEach(setting => {
+  const box = document.createElement('div');
+  box.className = 'box';
+  box.innerHTML = `
+    <i class="${setting.icon}"></i>
+    <p style="color: #5ccfcb;">${setting.name}</p>
+    <div class="switch-container">
+      <label class="switch">
+        <input type="checkbox">
+        <span class="slider"></span>
+      </label>
+      <span class="status-text">Inactive</span>
+    </div>`;
+
+  const toggleInput = box.querySelector('input');
+  const statusText = box.querySelector('.status-text');
+
+  toggleInput.addEventListener('change', () => {
+    const status = toggleInput.checked ? 'Active' : 'Inactive';
+    statusText.textContent = status;
+    statusText.style.color = toggleInput.checked ? 'var(--success-color)' : 'var(--danger-color)';
+    box.style.backgroundColor = toggleInput.checked ? '#DFF5F5' : '#ffffff';
+  });
+
+  settingsGrid.appendChild(box);
+});
+
+document.getElementById('createAccountBtn').addEventListener('click', async () => {
+  const phone = document.getElementById('phone').value.trim();
+  const password = document.getElementById('password').value.trim();
+
+  if (!phone || !password) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Please fill in both fields!'
+    });
+    return;
+  }
+
+  const activeTab = document.querySelector('.tab-header.active')?.dataset.target || '';
+
+  const settingsValues = [];
+  document.querySelectorAll('#settings-grid .box').forEach(box => {
+    const settingName = box.querySelector('p').innerText;
+    const isActive = box.querySelector('input').checked ? '1' : '0';
+    settingsValues.push({ name: settingName, status: isActive });
+  });
+
+  const requestData = {
+    phone: phone,
+    password: password,
+    activeTab: activeTab,
+    settings: settingsValues
+  };
+
+  try {
+    const response = await fetch('/webapi/createsubadmin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestData)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Sub-admin created successfully!'
+      });
+      document.getElementById('phone').value = '';
+      document.getElementById('password').value = '';
+    } else {
+      Swal.fire('Error', result.message || 'Failed to create sub-admin', 'error');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    Swal.fire('Error', 'Failed to connect to the server.', 'error');
+  }
+});
+
+async function fetchAdmins() {
+  try {
+    const response = await fetch("/webapi/getAllAdmins");
+    const result = await response.json();
+
+    if (result.status && result.data) {
+      const tableBody = document.getElementById("userTableBody");
+      tableBody.innerHTML = "";
+
+      result.data.forEach((admin) => {
+        const row = `
+          <tr style="color: #5ccfcb;">
+            <td>${admin.id}</td>
+            <td>${admin.name}</td>
+            <td>${admin.dateCreated}</td>
+            <td>${admin.role}</td>
+            <td><span class="status ${admin.status.toLowerCase()}">${admin.status}</span></td>
+            <td class="action-buttons">
+              <button class="edit-btn">Edit</button>
+              <button class="delete-btn">Delete</button>
+            </td>
+          </tr>`;
+        tableBody.insertAdjacentHTML("beforeend", row);
+      });
+    } else {
+      console.error("Failed to fetch admins:", result.message);
+    }
+  } catch (error) {
+    console.error("Error fetching admins:", error);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", fetchAdmins);
+</script>
+
+            
+        </div>
+    </div>
+        
+   
+         <a id="back-to-tops" href="#" class="btn1 back-to-top" role="button" aria-label="Scroll to top">
+           <i class="fas fa-chevron-up"></i>
+         </a>
+    </div>
+   
+    </div>
+
+    
+
+    <!-- Include scripts -->
+    <script>
+      const tasks = [];
+      const sections = Array(8)
+        .fill(null)
+        .map((_, i) => ({
+          id: i + 1,
+          value: i === 7 ? "NA" : (i + 1) * 10,
+        }));
+
+      function toggleDropdown() {
+        const dropdown = document.getElementById("instructionsDropdown");
+        dropdown.style.display =
+          dropdown.style.display === "none" ? "block" : "none";
+      }
+
+      function addTask() {
+        const taskNumber = document.getElementById("taskNumber").value;
+        const spins = document.getElementById("spins").value;
+
+        if (taskNumber && spins) {
+          tasks.push({ id: tasks.length + 1, taskNumber, spins });
+          renderTasks();
+        } else {
+          alert("Please enter both Task Number and Number of Spins.");
+        }
+      }
+
+      function renderTasks() {
+        const taskList = document.getElementById("taskList");
+        taskList.innerHTML = tasks
+          .map(
+            (task) =>
+              `<div class="task-item">
+                <span>Task: ${task.taskNumber}</span>
+                <span>Spins: ${task.spins}</span>
+                <button onclick="deleteTask(${task.id})" class="button button-danger">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>`
+          )
+          .join("");
+      }
+
+      function deleteTask(id) {
+        const index = tasks.findIndex((task) => task.id === id);
+        if (index > -1) {
+          tasks.splice(index, 1);
+          renderTasks();
+        }
+      }
+
+      function renderSections() {
+        const sectionsContainer = document.getElementById("sections");
+        sectionsContainer.innerHTML = sections
+          .map(
+            (section) =>
+              `<div class="section-item">
+                <span>Section ${section.id}</span>
+                <input type="text" value="${section.value}" />
+              </div>`
+          )
+          .join("");
+      }
+
+      renderSections();
+      // Edit Permissions Functionality
+      
+      
+    </script>
+    <!-- Include SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<!-- Include SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    
+  </body>
+</html>

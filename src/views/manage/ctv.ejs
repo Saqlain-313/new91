@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>List of Collaborators</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css"
+    />
+  </head>
+
+  <style>
+    body {
+      background-color: #f4f6f9;
+      color: #343a40;
+      font-family: "Source Sans Pro", sans-serif;
+    }
+
+    a {
+      color: #00807c;
+      text-decoration: none;
+      background-color: #192434;
+      padding: 8px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    a:hover {
+      background-color: #22baa6;
+      color: white;
+    }
+
+    .content-wrapper {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .card {
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      background-color: #ffffff;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+      padding: 1rem;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+
+    .btn-tool {
+      color: #00807c;
+    }
+
+    .form-group {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #search {
+      width: 300px;
+      padding: 10px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      transition: border-color 0.3s ease;
+    }
+
+    #search:focus {
+      border: 2px solid #00807c;
+      outline: none;
+      box-shadow: 4px rgba(0, 123, 255, 0.25);
+    }
+
+    .Transfer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      background: #00807c;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .Transfer:hover {
+      background: #4d49d7;
+    }
+
+    /* Table styles */
+    .table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    .table th,
+    .table td {
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafafb !important;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #dff5f5 !important;
+    }
+
+    thead tr {
+      background-color: #00807c;
+    }
+
+    thead th {
+      background-color: #00807c; /* Sets the background for individual header cells */
+      color: white; /* Optional: Set text color for better contrast */
+    }
+
+    .card-title {
+      color: #00807c;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .badge {
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .badge-success {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .badge-warning {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .overflow-x-auto {
+      overflow-x: auto; /* Enable horizontal scrolling */
+      -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
+    }
+
+    .form-submit {
+      display: inline-block;
+      background: linear-gradient(90deg, #5ccfcb, #00807c);
+      color: #fff;
+      padding: 10px 15px;
+      font-size: 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .section {
+      width: 100%;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .page-link {
+      background: #00807c !important;
+      color: #ffffff !important;
+    }
+
+    .page-link:hover {
+      background: #014a47 !important;
+      color: #ffffff !important;
+    }
+
+    .text-info {
+      color: white !important;
+      border-color: #00807c !important;
+    }
+
+    .form-section h2 {
+      margin-bottom: 20px;
+      font-size: 20px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      display: flex;
+      gap: 2px;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #555;
+      text-align: left;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 20px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #00807c;
+      outline: none;
+    }
+
+    .form-submit:hover {
+      background: linear-gradient(360deg, #5ccfcb, #00807c);
+    }
+
+    .form-outer {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      padding: 1rem;
+    }
+  </style>
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <%- include('nav') %>
+      <div class="content-wrapper">
+        <section class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-12">
+                <h1
+                  class=""
+                  style="color: #00807c; font-size: 2rem; font-weight: bold"
+                >
+                  List of Collaborators
+                </h1>
+              </div>
+            </div>
+          </div>
+        </section>
+        <div class="settings-grid">
+          <div class="section form-section box-bg">
+            <h2 style="color: black; font-weight: bold">convert agent</h2>
+
+            <form>
+              <div class="form-group">
+                <label for="uid">uid</label>
+                <input
+                  type="number"
+                  id="userid1"
+                  name="uid"
+                  placeholder="Enter uid"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="number">Number 2=>agent and 0=>user</label>
+                <input
+                  type="number"
+                  id="value1"
+                  name="number"
+                  placeholder="Enter number"
+                  required
+                />
+              </div>
+            </form>
+            <button
+              type="submit"
+              class="form-submit"
+              style="width: 100%"
+              id="create_ctv2"
+            >
+              Submit
+            </button>
+          </div>
+
+          <div class="section form-section box-bg">
+            <div class="form-group" style="width: 100%">
+              <div class="text-center">
+                <label
+                  for="telegram"
+                  style="color: black; font-weight: bold !important"
+                  >Create Partner Account</label
+                >
+              </div>
+              <label for="username" style="">Username</label>
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                placeholder="Enter username"
+                value=""
+              /><br />
+              <label for="password" style="">Password</label>
+              <input
+                type="text"
+                class="form-control"
+                id="password"
+                placeholder="Enter password"
+                value=""
+              /><br />
+              <button type="submit" class="form-submit create_ctv">
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group search-container">
+          <input
+            type="text"
+            id="search"
+            class="search"
+            placeholder="Enter the member you are looking for"
+          />
+        </div>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title text-dark">List of Collaborators</h3>
+              <div class="card-tools">
+                <button
+                  type="button"
+                  class="btn btn-tool"
+                  data-card-widget="collapse"
+                  title="Collapse"
+                >
+                  <i class="fas fa-minus"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-tool"
+                  data-card-widget="remove"
+                  title="Remove"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="overflow-x-auto">
+                <table class="table w-full min-w-max" id="table1">
+                  <thead>
+                    <tr>
+                      <th class="text-center">#</th>
+                      <th class="text-center">Account</th>
+                      <th class="text-center">Level</th>
+                      <th class="text-center">Balance</th>
+                      <th class="text-center">Total Betting</th>
+                      <th class="text-center">Status</th>
+                      <th class="text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="tbody">
+                    <!-- Rows go here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <nav
+              aria-label="Page navigation example"
+              class="pagination-container"
+            >
+              <ul class="pagination table1">
+                <li class="page-item previous">
+                  <a class="page-link" href="#" tabindex="-1">Previous</a>
+                </li>
+                <div id="numbers"></div>
+                <li class="page-item next">
+                  <a class="page-link" href="#">Next</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </section>
+
+        <section class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2 align-items-center">
+              <div class="col-sm-6">
+                <h1 class="text-dark">Agent Commission</h1>
+              </div>
+              <button class="Transfer">
+                <i class="fas fa-exchange-alt"></i> Transfer Commission
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title text-dark">List of Agent Commission</h3>
+              <div class="card-tools">
+                <button
+                  type="button"
+                  class="btn btn-tool"
+                  data-card-widget="collapse"
+                  title="Collapse"
+                >
+                  <i class="fas fa-minus"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-tool"
+                  data-card-widget="remove"
+                  title="Remove"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <div class="card-body p-0 overflow-x-auto">
+              <table class="table w-full min-w-max" id="table2">
+                <thead>
+                  <tr>
+                    <th class="text-center px-4 py-2">#</th>
+                    <th class="text-center px-4 py-2">Account</th>
+                    <th class="text-center px-4 py-2">Level</th>
+                    <th class="text-center px-4 py-2">Balance</th>
+                  </tr>
+                </thead>
+                <tbody class="tbody2">
+                  <!-- Rows go here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <style>
+        /* General styles */
+        .content-wrapper {
+          padding: 10px;
+        }
+
+        .form-group {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 20px;
+        }
+
+        .search {
+          width: 800px;
+          height: 60px;
+          border: 2px solid #ced4da;
+          border-radius: 10px;
+          font-size: 16px;
+          color: #343a40;
+        }
+        .search:focus {
+          outline: none;
+          border-color: #00807c;
+          box-shadow: #4d49d7;
+          box-shadow: 0 0 4px rgba(0, 123, 255);
+        }
+
+        table {
+          width: 100%;
+          table-layout: auto;
+        }
+
+        table th,
+        table td {
+          text-align: center;
+          padding: 10px;
+        }
+
+        .pagination-container {
+          display: flex;
+          justify-content: center;
+          margin: 20px 0;
+        }
+
+        .pagination {
+          gap: 10px;
+        }
+
+        .row {
+          flex-wrap: wrap;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+          .row.mb-2 {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .search-input {
+            width: 90%;
+          }
+
+          .Transfer {
+            margin-top: 10px;
+            width: 100%;
+            display: block;
+          }
+        }
+
+        @media (max-width: 480px) {
+          table th,
+          table td {
+            font-size: 10px;
+          }
+
+          .card-title {
+            font-size: 16px;
+          }
+        }
+      </style>
+    </div>
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script>
+      $("#search").on("keyup", function () {
+        var value = $(this).val().toLowerCase();
+        $("tbody tr").filter(function () {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+      });
+    </script>
+    <script>
+      var pageno = 0;
+      var pageto = 30;
+      var page = 1;
+
+      const Render = (datas) => {
+        let html = "";
+        datas.map((data) => {
+          html += `
+          <tr class="text-center" style="">
+            <td>${data.id_user}</td>
+            <td>
+              <b style="color: #00807c">${data.phone}</b>
+            </td>
+            <td>
+              <b>${
+                data.level == 1 ? "ADMIN" : data.level == 2 ? "CTV" : "USER"
+              }</b>
+            </td>
+            <td>
+              <b>${data.money}</b>
+            </td>
+            <td>
+              <b>${data.total_betting}</b>
+            </td>
+            <td class="project-state">
+              ${
+                data.status == 1
+                  ? '<span class="badge badge-success">Online</span>'
+                  : '<span class="badge badge-warning">Banned</span>'
+              }
+            </td>
+            <td class="project-actions text-center" style="min-width: 100px">
+              <a class="btn btn-primary btn-sm confirm-btn text-light" href="/admin/manager/ctv/profile/${
+                data.phone
+              }">
+                <i class="fas fa-folder"></i> Profile
+              </a>
+              ${
+                data.status == 1
+                  ? `<a class="btn btn-info text-danger btn-sm btn-danger" id="${data.id}" href="#">
+                <i class="fas fa-pencil-alt"></i> Lock
+              </a>`
+                  : ""
+              }
+              ${
+                data.status == 2
+                  ? `<a class="btn btn-info btn-sm  btn-info1" id="${data.id}" href="#">
+                <i class="fas fa-pencil-alt"></i> Unlock
+              </a>`
+                  : ""
+              }
+            </td>
+          </tr>`;
+          $(".tbody").html(html);
+        });
+        $(".btn-danger").click(function (e) {
+          e.preventDefault();
+          let check = confirm("Are you sure you want to lock this account?");
+          let id = $(this).attr("id");
+          if (check) {
+            $.ajax({
+              type: "POST",
+              url: "/api/webapi/admin/banned",
+              data: {
+                id: id,
+                type: "close",
+              },
+              dataType: "json",
+              success: function (response) {
+                alert(response.message);
+                location.reload();
+              },
+            });
+          }
+        });
+
+        $(".btn-info1").click(function (e) {
+          e.preventDefault();
+          let check = confirm("Are you sure you want to unlock this account?");
+          let id = $(this).attr("id");
+          if (check) {
+            $.ajax({
+              type: "POST",
+              url: "/api/webapi/admin/banned",
+              data: {
+                id: id,
+                type: "open",
+              },
+              dataType: "json",
+              success: function (response) {
+                alert(response.message);
+                location.reload();
+              },
+            });
+          }
+        });
+      };
+
+      $("#search").keypress(function (event) {
+        var keycode = event.keyCode ? event.keyCode : event.which;
+        var value = $("#search").val().trim();
+        if (keycode == "13") {
+          $.ajax({
+            type: "POST",
+            url: "/api/webapi/search",
+            data: {
+              phone: value,
+            },
+            dataType: "json",
+            success: function (response) {
+              if (response.status === true) return Render(response.datas);
+            },
+          });
+        }
+      });
+      $.ajax({
+        type: "POST",
+        url: "/api/webapi/admin/listctv",
+        data: {
+          typeid: "1",
+          pageno: pageno,
+          pageto: pageto,
+          language: "vi",
+        },
+        dataType: "json",
+        success: function (response) {
+          if (response.status === true) return Render(response.datas);
+        },
+      });
+
+      $(".Transfer").click(function (e) {
+        $.ajax({
+          type: "GET",
+          url: "/api/webapi/admin/update-commission", // Ensure this endpoint is correct
+          dataType: "json", // Expected data type
+          success: function (response) {
+            if (response.status === true) {
+              alert(response.message);
+              location.reload();
+            } else {
+              console.error("Error in response:", response);
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error("AJAX request failed:", status, error);
+            console.error("Response text:", xhr.responseText);
+          },
+        });
+      });
+
+      $.ajax({
+        type: "GET",
+        url: "/api/webapi/admin/get-commission", // Ensure this endpoint is correct
+        dataType: "json", // Expected data type
+        success: function (response) {
+          //console.log("response", response.data);
+          if (response.status === true) {
+            Render2(response.data);
+          } else {
+            console.error("Error in response:", response);
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error("AJAX request failed:", status, error);
+          console.error("Response text:", xhr.responseText);
+        },
+      });
+
+      const Render2 = (datas) => {
+        //console.log("dataaaa", datas);
+        let html = "";
+        datas?.map((data) => {
+          html += `
+          <tr class="text-center" style="">
+            <td>${data.id_user}</td>
+            <td>
+              <b style="color: #00807c">${data.phone}</b>
+            </td>
+            <td>
+              <b>${
+                data.level == 1 ? "ADMIN" : data.level == 2 ? "CTV" : "USER"
+              }</b>
+            </td>
+            <td>
+              <b>${data.pending_commission}</b>
+            </td>
+         
+          </tr>`;
+          $(".tbody2").html(html);
+        });
+      };
+
+      $(".create_ctv").click(function (e) {
+        e.preventDefault();
+        let username = $("#username").val().trim();
+        let password = $("#password").val().trim();
+        //console.log("username", username);
+        //console.log("password", password);
+        if (username && password) {
+          $.ajax({
+            type: "POST",
+            url: "/admin/manager/create/ctv",
+            data: {
+              username: username,
+              password: password,
+            },
+            dataType: "json",
+            success: function (response) {
+              if (response.status == true) {
+                Swal.fire({
+                  icon: "success",
+                  title: `${response.message}`,
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: `${response.message}`,
+                });
+              }
+            },
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Please enter complete information",
+          });
+        }
+      });
+
+      $("#create_ctv2").click(function (e) {
+        e.preventDefault();
+        let userid = $("#userid1").val().trim();
+        let value = $("#value1").val().trim();
+
+        if (userid && value) {
+          $.ajax({
+            type: "POST",
+            url: "/api/webapi/convertAgent",
+            data: {
+              user_id: userid,
+              value: value,
+            },
+            dataType: "json",
+            success: function (response) {
+              if (response.status == true) {
+                Swal.fire({
+                  icon: "success",
+                  title: `${response.message}`,
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: `${response.message}`,
+                });
+              }
+            },
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Please enter complete information",
+          });
+        }
+      });
+    </script>
+    <script src="/js/admin/tables.js"></script>
+  </body>
+</html>

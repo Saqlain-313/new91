@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Member List</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+    <style>
+        :root {
+            --primary-teal: #5ccfcb;
+            --dark-teal: #00807c;
+            --card-blue: #3b82f6;
+            --card-green: #22c55e;
+            --card-purple: #8b5cf6;
+            --card-orange: #f97316;
+            --card-red: #ef4444;
+            --text-light: #ffffff;
+            --bg-light: #f3f4f6;
+            --border-radius-lg: 1rem;
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container-fluid {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        .content-header {
+            background-color: var(--dark-teal);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius-lg);
+            margin-bottom: 2rem;
+        }
+
+        .content-header h1 {
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .dashboard-card {
+        background-color: var(--text-light);
+        border-radius: var(--border-radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-md);
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        text-align: left;
+        border: 1px solid var(--border-light);
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .dashboard-card .icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        align-self: flex-start;
+        color: var(--primary-teal);
+    }
+
+    .dashboard-card .label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        color: #666;
+    }
+
+    .dashboard-card .value {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-top: 0.25rem;
+        color: var(--text-dark);
+    }
+
+    .action-button {
+        width: 100%;
+        border-radius: var(--border-radius-lg);
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--text-light);
+        border: none;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .action-button:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-lg);
+        opacity: 0.9;
+    }
+
+    .action-button .icon {
+        margin-right: 0.75rem;
+        font-size: 1.2rem;
+    }
+
+    .btn-teal { 
+        background-color: var(--primary-teal); 
+        border: 1px solid var(--primary-teal);
+    }
+    .btn-teal:hover {
+        background-color: var(--dark-teal);
+        border-color: var(--dark-teal);
+    }
+    
+    .btn-dark-teal { 
+        background-color: var(--dark-teal);
+        border: 1px solid var(--dark-teal);
+    }
+    .btn-dark-teal:hover {
+        background-color: #00504d;
+        border-color: #00504d;
+    }
+    
+    .btn-red { 
+        background-color: var(--card-red);
+        border: 1px solid var(--card-red);
+    }
+    .btn-red:hover {
+        background-color: #dc2626;
+        border-color: #dc2626;
+    }
+    
+    .btn-green { 
+        background-color: var(--card-green);
+        border: 1px solid var(--card-green);
+    }
+    .btn-green:hover {
+        background-color: #16a34a;
+        border-color: #16a34a;
+    }
+
+        .card-username { border-left: 5px solid var(--card-blue); }
+        .card-wallet { border-left: 5px solid var(--card-green); }
+        .card-uid { border-left: 5px solid var(--card-purple); }
+        .card-mobile { border-left: 5px solid var(--card-orange); }
+
+        .card-teal {
+            background-color: var(--primary-teal);
+            color: var(--text-light);
+        }
+        
+        .card-teal .label,
+        .card-teal .value {
+            color: var(--text-light);
+        }
+
+        .card-dark-teal {
+            background-color: var(--dark-teal);
+            color: var(--text-light);
+        }
+        
+        .card-dark-teal .label,
+        .card-dark-teal .value {
+            color: var(--text-light);
+        }
+
+        .action-button {
+            width: 100%;
+            border-radius: var(--border-radius-lg);
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-light);
+            border: none;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            opacity: 0.9;
+            color: var(--text-light);
+        }
+
+        .action-button .icon {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+
+        .btn-teal { background-color: var(--primary-teal); }
+        .btn-dark-teal { background-color: var(--dark-teal); }
+        .btn-red { background-color: var(--card-red); }
+        .btn-blue { background-color: var(--card-blue); }
+        .btn-green { background-color: var(--card-green); }
+        .btn-orange { background-color: var(--card-orange); }
+
+        .subordinate-card {
+            background-color: var(--text-light);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: none;
+        }
+
+        .subordinate-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .subordinate-card h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .subordinate-card h3 .icon {
+            font-size: 1.8rem;
+            margin-right: 0.75rem;
+        }
+
+        .subordinate-card .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 576px) {
+            .subordinate-card .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .subordinate-card .metric-item {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+
+        .subordinate-card .metric-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
+
+        .subordinate-card .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .subordinate-card-blue { background-color: var(--card-blue); color: white; }
+        .subordinate-card-purple { background-color: var(--card-purple); color: white; }
+        .subordinate-card-teal { background-color: var(--primary-teal); color: white; }
+        .subordinate-card-dark-teal { background-color: var(--dark-teal); color: white; }
+
+        .profile-card {
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--primary-teal), var(--dark-teal));
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            color: white;
+            overflow: hidden;
+        }
+
+        .profile-card .profile-user-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .profile-card .list-group-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 15px 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .profile-card .list-group-item:nth-child(even) {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-card .list-group-item a {
+            color: #ffeb3b;
+            font-weight: bold;
+            background: transparent !important;
+        }
+
+        .bank-card {
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--dark-teal), #006663);
+            color: white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .bank-card .card-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .bank-card .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 10px;
+        }
+
+        .bank-card .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .data-table {
+            background-color: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .data-table .table-header {
+            background-color: var(--dark-teal);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+        }
+
+        .data-table .table-header h3 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .data-table thead {
+            background-color: var(--dark-teal);
+            color: white;
+        }
+
+        .data-table th {
+            font-weight: 500;
+        }
+
+        .data-table .badge {
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+        }
+
+        .row.g-3 {
+            --bs-gutter-x: 1rem;
+            --bs-gutter-y: 1rem;
+        }
+
+        @media (min-width: 992px) {
+            .row.g-3 {
+                --bs-gutter-x: 1.5rem;
+                --bs-gutter-y: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-card .value {
+                font-size: 1.5rem;
+            }
+            
+            .subordinate-card h3 {
+                font-size: 1.5rem;
+            }
+            
+            .action-button {
+                padding: 0.8rem 1rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <%- include('nav') %>
+        <div class="content-wrapper">
+            <section class="">
+                <div class="container-fluid">
+                    <div class="row ">
+                        <div class="col-sm-6">
+                            <h1>Member Information</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="container-fluid">
+                <!-- Row 1: User Info Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="dashboard-card card-username">
+                            <i class="fas fa-user icon"></i>
+                            <div class="label">Username</div>
+                            <div class="value" id="username-value">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="dashboard-card card-wallet">
+                            <i class="fas fa-wallet icon"></i>
+                            <div class="label">Wallet Amount</div>
+                            <div class="value" id="wallet-value">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="dashboard-card card-uid">
+                            <i class="fas fa-fingerprint icon"></i>
+                            <div class="label">UID</div>
+                            <div class="value" id="uid-value">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="dashboard-card card-mobile">
+                            <i class="fas fa-phone icon"></i>
+                            <div class="label">Mobile Number</div>
+                            <div class="value" id="mobile-value">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+               <!-- Row 2: Action Buttons -->
+<div class="row g-3 mb-4">
+    
+    <div class="col-12 col-sm-6 col-lg-3">
+        <button class="action-button btn-dark-teal" id="active-withdraw">
+            <i class="fas fa-money-bill-wave icon"></i>Active Withdraw
+        </button>
+    </div> 
+     <div class="col-12 col-sm-6 col-lg-3">
+        <button class="action-button btn-red" id="disabled-withdraw">
+            <i class="fas fa-money-bill-wave icon"></i>Disabled Withdraw
+        </button>
+    </div> 
+    
+    <div class="col-12 col-sm-6 col-lg-3">
+        <button class="action-button btn-green" id="wallet-update">
+            <i class="fas fa-sync-alt icon"></i>Wallet Update
+        </button>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <button class="action-button btn-red" id="ban-user">
+            <i class="fas fa-ban icon"></i>Ban User
+        </button>
+    </div>
+</div>
+
+
+
+                <!-- Profile and Bank Information -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card profile-card">
+                            <div class="card-body box-profile">
+                                <div class="text-center">
+                                    <img class="profile-user-img img-fluid img-circle" src="/images/facebook.png" alt="User profile picture">
+                                </div>
+                        
+                                <h3 class="profile-username text-center" id="member-name">Loading...</h3>
+                        
+                                <p class="text-center" id="id_user">ID: Loading...</p>
+                        
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <b>Surplus</b> <a id="money">0</a>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <b>Total Recharge</b> <a id="total_money">0</a>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <b>Total Withdrawal</b> <a id="total_withdraw">0</a>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <b>General Invitation</b> <a id="total_mem">0</a>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <b>IP</b> <a id="ip">Loading...</a>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <b>Inviter</b> <a id="invite">Loading...</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card bank-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Bank Information</h3>
+                            </div>
+                            <div class="card-body">
+                                <form method="post" action="/admin/member/editbank" id="bank-form">
+                                    <input name="phone" type="hidden" id="phoneban">
+
+                                    <div class="mb-3">
+                                        <strong>
+                                            <i class="fas fa-pencil-alt mr-1"></i>
+                                            <span>Bank Name</span>
+                                        </strong>
+                                        <input type="text" class="form-control mt-1" id="bank_name" name="bank_name" placeholder="Enter Bank Name">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <strong>
+                                            <i class="fas fa-pencil-alt mr-1"></i>
+                                            <span>Account Name</span>
+                                        </strong>
+                                        <input type="text" class="form-control mt-1" id="name" name="names" placeholder="Enter Account Name">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <strong>
+                                            <i class="far fa-file-alt mr-1"></i>
+                                            <span>Account Number</span>
+                                        </strong>
+                                        <input type="text" class="form-control mt-1" id="stk" name="stk" placeholder="Enter Account Number">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <strong>
+                                            <i class="fas fa-map-marker-alt mr-1"></i>
+                                            <span>IFSC Code</span>
+                                        </strong>
+                                        <input type="text" class="form-control mt-1" id="ifsc" name="ifsc" placeholder="Enter IFSC Code">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <strong>
+                                            <i class="fas fa-map-marker-alt mr-1"></i>
+                                            <span>USDT</span>
+                                        </strong>
+                                        <input type="text" class="form-control mt-1" id="upi" name="upi" placeholder="Enter UPI">
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-block" style="background: var(--primary-teal); border: none; padding: 12px 20px; font-size: 16px; font-weight: bold; color: white; border-radius: 30px;">
+                                        <b style="text-transform: uppercase;">Edit</b>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tables Section -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <!-- Recharge Table -->
+                        <div class="data-table">
+                            <div class="table-header">
+                                <h3><i class="fas fa-credit-card mr-2"></i>Recharge History</h3>
+                            </div>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Transaction ID</th>
+                                        <th>Amount</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-recharge">
+                                    <tr>
+                                        <td colspan="5" class="text-center">Loading data...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="pagination-controls">
+                                <button id="previousRecharge" class="btn btn-sm btn-dark-teal" disabled>Previous</button>
+                                <span id="text-recharge">1 / 1</span>
+                                <button id="nextRecharge" class="btn btn-sm btn-dark-teal" disabled>Next</button>
+                            </div>
+                        </div>
+
+                        <!-- Withdraw Table -->
+                        <div class="data-table">
+                            <div class="table-header">
+                                <h3><i class="fas fa-money-bill-wave mr-2"></i>Withdrawal History</h3>
+                            </div>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Amount</th>
+                                        <th>Bank</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-withdraw">
+                                    <tr>
+                                        <td colspan="5" class="text-center">Loading data...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="pagination-controls">
+                                <button id="previousWithdraw" class="btn btn-sm btn-dark-teal" disabled>Previous</button>
+                                <span id="text-withdraw">1 / 1</span>
+                                <button id="nextWithdraw" class="btn btn-sm btn-dark-teal" disabled>Next</button>
+                            </div>
+                        </div>
+
+                        <!-- Red Envelope Table -->
+                        <div class="data-table">
+                            <div class="table-header">
+                                <h3><i class="fas fa-gift mr-2"></i>Red Envelope History</h3>
+                            </div>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Phone</th>
+                                        <th>Amount</th>
+                                        <th>ID</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-redenvelope">
+                                    <tr>
+                                        <td colspan="5" class="text-center">Loading data...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="pagination-controls">
+                                <button id="previousRedenvelope" class="btn btn-sm btn-dark-teal" disabled>Previous</button>
+                                <span id="text-redenvelope">1 / 1</span>
+                                <button id="nextRedenvelope" class="btn btn-sm btn-dark-teal" disabled>Next</button>
+                            </div>
+                        </div>
+
+                        <!-- Bet Table -->
+                        <div class="data-table">
+                            <div class="table-header">
+                                <h3><i class="fas fa-dice mr-2"></i>Bet History</h3>
+                            </div>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Stage</th>
+                                        <th>Amount</th>
+                                        <th>Game</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="list-bet">
+                                    <tr>
+                                        <td colspan="5" class="text-center">Loading data...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="pagination-controls">
+                                <button id="previousBet" class="btn btn-sm btn-dark-teal" disabled>Previous</button>
+                                <span id="text-bet">1 / 1</span>
+                                <button id="nextBet" class="btn btn-sm btn-dark-teal" disabled>Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Add this to your head section -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    $(document).ready(function() {
+        // Login as User button
+        $('#login-as-user').click(function() {
+            Swal.fire({
+                title: 'Login as User',
+                text: 'Are you sure you want to login as this user?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#00807c',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, login',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire(
+                        'Success!',
+                        'You are now logged in as this user.',
+                        'success'
+                    );
+                }
+            });
+        });
+
+        // Active Withdraw button
+        $('#active-withdraw').click(function() {
+            Swal.fire({
+                title: 'Active Withdraw',
+                text: 'Do you want to activate withdrawals for this user?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#00807c',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Activate',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                
+                 const id = $('#mobile-value').text();
+
+                        $.post(
+                          "/api/admin/enableWithdraw",
+                          { phone:id, enable: 1 },
+                          function (response) {
+                            //location.reload();
+                          }
+                        );
+                        
+                
+                    Swal.fire(
+                        'Activated!',
+                        'Withdrawals have been enabled for this user.',
+                        'success'
+                    );
+                }
+            });
+        });
+        
+        // disabled Withdraw button
+        $('#disabled-withdraw').click(function() {
+            Swal.fire({
+                title: 'Disabled Withdraw',
+                text: 'Do you want to disabled withdrawals for this user?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#00807c',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Activate',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                
+                 const id = $('#mobile-value').text();
+
+                        $.post(
+                          "/api/admin/enableWithdraw",
+                          { phone:id, enable: 0 },
+                          function (response) {
+                            //location.reload();
+                          }
+                        );
+                        
+                
+                    Swal.fire(
+                        'Activated!',
+                        'Withdrawals have been enabled for this user.',
+                        'success'
+                    );
+                }
+            });
+        });
+
+        // Wallet Update button
+        $('#wallet-update').click(function() {
+            Swal.fire({
+                title: 'Wallet Update',
+                html: `
+                    <div class="text-left">
+                        <div class="mb-3">
+                            <label class="form-label">Amount</label>
+                            <input type="number" id="wallet-amount" class="form-control" placeholder="Enter amount">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Action</label>
+                            <select id="wallet-action" class="form-select">
+                                <option value="add">Add Funds</option>
+                                <option value="subtract">Subtract Funds</option>
+                            </select>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#00807c',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Update',
+                cancelButtonText: 'Cancel',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const amount = document.getElementById('wallet-amount').value;
+                    const action = document.getElementById('wallet-action').value;
+                    const id = $('#uid-value').text();
+
+                    if (!amount || isNaN(amount)) {
+                        Swal.showValidationMessage('Please enter a valid amount');
+                        return false;
+                    }
+                   
+                   let buff_acc
+                   if(action==="add"){
+                   buff_acc=1
+                   }else{
+                   buff_acc=2
+                   }
+                    
+                    
+                    
+                    $.ajax({
+            type: "POST",
+            url: "/admin/manager/settings/buff",
+            data: {
+              id_user:id,
+              buff_acc: buff_acc,
+              money_value: amount,
+            },
+            dataType: "json",
+           
+          });
+          
+                    
+                    return { amount: amount, action: action }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire(
+                        'Updated!',
+                        `Wallet has been ${result.value.action === 'add' ? 'credited' : 'debited'} with ₹${result.value.amount}`,
+                        'success'
+                    );
+                }
+            });
+        });
+
+        // Ban User button
+        $('#ban-user').click(function() {
+            Swal.fire({
+                title: 'Ban User',
+                html: `
+                    <div class="text-left">
+                        <div class="mb-3">
+                            <label class="form-label">Reason</label>
+                            <select id="ban-reason" class="form-select">
+                                <option value="violation">Terms Violation</option>
+                                <option value="fraud">Suspected Fraud</option>
+                                <option value="inactive">Inactive Account</option>
+                                <option value="other">Other Reason</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="other-reason-container" style="display:none">
+                            <label class="form-label">Specify Reason</label>
+                            <input type="text" id="other-reason" class="form-control" placeholder="Enter reason">
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ban User',
+                cancelButtonText: 'Cancel',
+                didOpen: () => {
+                    document.getElementById('ban-reason').addEventListener('change', (e) => {
+                        const otherContainer = document.getElementById('other-reason-container');
+                        otherContainer.style.display = e.target.value === 'other' ? 'block' : 'none';
+                    });
+                },
+                preConfirm: () => {
+                    const reason = document.getElementById('ban-reason').value;
+                    let fullReason = reason;
+                   const id = $('#uid-value').text();
+
+                        $.post(
+                          "/api/webapi/admin/banned",
+                          { id, type: "close" },
+                          function (response) {
+                            //location.reload();
+                          }
+                        );
+                    
+                    
+                    return { reason: fullReason }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire(
+                        'Banned!',
+                        `User has been banned. Reason: ${result.value.reason}`,
+                        'success'
+                    );
+                }
+            });
+        });
+    });
+</script>
+    
+    <script>
+        // Utility functions
+        function formatDate(timestamp) {
+            if (!timestamp) return "N/A";
+            const date = new Date(Number(timestamp));
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatCurrency(amount) {
+            if (!amount) return "0.00";
+            return parseFloat(amount).toFixed(2);
+        }
+
+        // Get member ID from URL
+        function getMemberIdFromUrl() {
+            const pathParts = window.location.pathname.split('/');
+            return pathParts[pathParts.length - 1];
+        }
+
+        const memberId = getMemberIdFromUrl();
+
+        // API endpoints
+        const API_BASE = '/api/webapi/admin/member';
+        const endpoints = {
+            info: `${API_BASE}/info`,
+            withdraw: `/admin/member/listWithdraw/${memberId}`,
+            recharge: `/admin/member/listRecharge/${memberId}`,
+            redenvelope: `/admin/member/redenvelope/${memberId}`,
+            bet: `/admin/member/bet/${memberId}`
+        };
+
+        // Fetch member info
+        function fetchMemberInfo() {
+            $.ajax({
+                type: "POST",
+                url: endpoints.info,
+                data: { phone: memberId },
+                dataType: "json",
+                success: function(response) {
+                    if (response.status === false) {
+                        console.error("Failed to fetch member info");
+                        return;
+                    }
+                    console.log(response)
+                    
+                    const user = response.datas[0];
+                    
+                    // Update basic info cards
+                    $("#username-value").text(user.name_user || "N/A");
+                    $("#wallet-value").text(`₹${formatCurrency(user.money)}`);
+                    $("#uid-value").text(user.id_user || "N/A");
+                    $("#mobile-value").text(user.phone || "N/A");
+                    
+                    // Update profile card
+                    $(".profile-username").text(user.name_user || "N/A");
+                    $("#id_user").text(`ID: ${user.id_user || "N/A"}`);
+                    $("#money").text(formatCurrency(user.money));
+                    $("#total_mem").text((response.f1 + response.f2 + response.f3 + response.f4) || "0");
+                    $("#ip").text(user.ip_address || "N/A");
+                    $("#invite").text(response?.ng_moi?.phone || "N/A");
+                    
+                    $("#level").text(
+                        user.level == 1 ? "ADMIN" : 
+                        user.level == 2 ? "CTV" : "USER"
+                    );
+                    $("#total_money").text(formatCurrency(response.total_r[0]?.total));
+                    $("#total_withdraw").text(formatCurrency(response.total_w[0]?.total));
+                    
+                    // Update subordinate cards
+                    $("#direct-registrations").text(response.f1 || "0");
+                    $("#team-registrations").text((response.f1 + response.f2 + response.f3 + response.f4) || "0");
+                    
+                    // Update bank info if available
+                    if (response.bank_user[0]) {
+                        $("#phoneban").val(response.bank_user[0].id);
+                        $("#bank_name").val(response.bank_user[0].name_bank || "");
+                        $("#name").val(response.bank_user[0].name_user || "");
+                        $("#stk").val(response.bank_user[0].stk || "");
+                        $("#upi").val(response.bank_user[0].sdt || "");
+                        $("#ifsc").val(response.bank_user[0].email || "");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching member info:", error);
+                }
+            });
+        }
+
+        // Table rendering functions
+        function renderWithdrawTable(data) {
+            if (!data || data.length === 0) {
+                $("#list-withdraw").html(`
+                    <tr class="text-center">
+                        <td colspan="5">No withdrawal records found</td>
+                    </tr>
+                `);
+                return;
+            }
+            
+            let html = '';
+            data.forEach(item => {
+                html += `
+                    <tr class="text-center">
+                        <td style="color: #e74c3c;font-weight: 600;">${item.id_order || "N/A"}</td>
+                        <td><b style="color: #3498db">₹${formatCurrency(item.money)}</b></td>
+                        <td><b>${item.name_bank || "N/A"}</b></td>
+                        <td>
+                            <span class="badge ${item.status == "1" ? "bg-success" : "bg-danger"}">
+                                ${item.status == "1" ? "Success" : "Failed"}
+                            </span>
+                        </td>
+                        <td><b>${item.today}</b></td>
+                    </tr>
+                `;
+            });
+            $("#list-withdraw").html(html);
+        }
+
+        function renderRechargeTable(data) {
+            if (!data || data.length === 0) {
+                $("#list-recharge").html(`
+                    <tr class="text-center">
+                        <td colspan="5">No recharge records found</td>
+                    </tr>
+                `);
+                return;
+            }
+            
+            let html = '';
+            data.forEach(item => {
+                html += `
+                    <tr class="text-center">
+                        <td style="color: #e74c3c;font-weight: 600;">${item.transaction_id || "N/A"}</td>
+                        <td><b style="color: #3498db">₹${formatCurrency(item.money)}</b></td>
+                        <td><b>${item.type === "bank" ? "Bank Transfer" : "Mobile Payment"}</b></td>
+                        <td>
+                            <span class="badge ${item.status == "1" ? "bg-success" : "bg-warning"}">
+                                ${item.status == "1" ? "Success" : "Pending"}
+                            </span>
+                        </td>
+                        <td><b>${item.today}</b></td>
+                    </tr>
+                `;
+            });
+            $("#list-recharge").html(html);
+        }
+
+        function renderRedEnvelopeTable(data) {
+            if (!data || data.length === 0) {
+                $("#list-redenvelope").html(`
+                    <tr class="text-center">
+                        <td colspan="5">No red envelope records found</td>
+                    </tr>
+                `);
+                return;
+            }
+            
+            let html = '';
+            data.forEach(item => {
+                html += `
+                    <tr class="text-center">
+                        <td style="color: #e74c3c;font-weight: 600;">${item.phone || "N/A"}</td>
+                        <td><b style="color: #3498db">₹${formatCurrency(item.money)}</b></td>
+                        <td><b>${item.id_redenvelops || "N/A"}</b></td>
+                        <td><span class="badge bg-success">Success</span></td>
+                        <td><b>${item.time}</b></td>
+                    </tr>
+                `;
+            });
+            $("#list-redenvelope").html(html);
+        }
+
+        function renderBetTable(data) {
+            if (!data || data.length === 0) {
+                $("#list-bet").html(`
+                    <tr class="text-center">
+                        <td colspan="5">No bet records found</td>
+                    </tr>
+                `);
+                return;
+            }
+            
+            let html = '';
+            data.forEach(item => {
+                html += `
+                    <tr class="text-center">
+                        <td style="color: #e74c3c;font-weight: 600;">${item.stage || "N/A"}</td>
+                        <td><b style="color: ${item.status == 1 ? "#2ecc71" : "#e74c3c"}">
+                            ${item.status == 1 ? "+" : "-"} ₹${formatCurrency(item.money)}
+                        </b></td>
+                        <td><b>${item.game ? item.game.toUpperCase() : "N/A"} - ${item.source ? item.source.toUpperCase() : "N/A"}</b></td>
+                        <td>
+                            <span class="badge ${item.status == "1" ? "bg-success" : "bg-danger"}">
+                                ${item.status == "1" ? "Win" : "Loss"}
+                            </span>
+                        </td>
+                        <td><b>${item.date}</b></td>
+                    </tr>
+                `;
+            });
+            $("#list-bet").html(html);
+        }
+
+        // Pagination variables
+        const pagination = {
+            withdraw: { page: 1, limit: 15, totalPages: 1 },
+            recharge: { page: 1, limit: 15, totalPages: 1 },
+            redenvelope: { page: 1, limit: 15, totalPages: 1 },
+            bet: { page: 1, limit: 30, totalPages: 1 }
+        };
+
+        // Fetch data with pagination
+        function fetchWithdrawData() {
+            $.ajax({
+                type: "POST",
+                url: endpoints.withdraw,
+                data: {
+                    typeid: "1",
+                    pageno: (pagination.withdraw.page - 1) * pagination.withdraw.limit,
+                    limit: pagination.withdraw.limit,
+                    language: "vi"
+                },
+                dataType: "json",
+                success: function(response) {
+                    if (response.status === true) {
+                        pagination.withdraw.totalPages = response.page_total;
+                        $("#text-withdraw").text(`${pagination.withdraw.page} / ${pagination.withdraw.totalPages}`);
+                        renderWithdrawTable(response.datas);
+                        
+                        // Enable/disable pagination buttons
+                        $("#previousWithdraw").prop("disabled", pagination.withdraw.page <= 1);
+                        $("#nextWithdraw").prop("disabled", pagination.withdraw.page >= pagination.withdraw.totalPages);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching withdraw data:", error);
+                }
+            });
+        }
+
+        function fetchRechargeData() {
+            $.ajax({
+                type: "POST",
+                url: endpoints.recharge,
+                data: {
+                    typeid: "1",
+                    pageno: (pagination.recharge.page - 1) * pagination.recharge.limit,
+                    limit: pagination.recharge.limit,
+                    language: "vi"
+                },
+                dataType: "json",
+                success: function(response) {
+                    if (response.status === true) {
+                        pagination.recharge.totalPages = response.page_total;
+                        $("#text-recharge").text(`${pagination.recharge.page} / ${pagination.recharge.totalPages}`);
+                        renderRechargeTable(response.datas);
+                        
+                        // Enable/disable pagination buttons
+                        $("#previousRecharge").prop("disabled", pagination.recharge.page <= 1);
+                        $("#nextRecharge").prop("disabled", pagination.recharge.page >= pagination.recharge.totalPages);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching recharge data:", error);
+                }
+            });
+        }
+
+        function fetchRedEnvelopeData() {
+            $.ajax({
+                type: "POST",
+                url: endpoints.redenvelope,
+                data: {
+                    typeid: "1",
+                    pageno: (pagination.redenvelope.page - 1) * pagination.redenvelope.limit,
+                    limit: pagination.redenvelope.limit,
+                    language: "vi"
+                },
+                dataType: "json",
+                success: function(response) {
+                    if (response.status === true) {
+                        pagination.redenvelope.totalPages = response.page_total;
+                        $("#text-redenvelope").text(`${pagination.redenvelope.page} / ${pagination.redenvelope.totalPages}`);
+                        renderRedEnvelopeTable(response.datas);
+                        
+                        // Enable/disable pagination buttons
+                        $("#previousRedenvelope").prop("disabled", pagination.redenvelope.page <= 1);
+                        $("#nextRedenvelope").prop("disabled", pagination.redenvelope.page >= pagination.redenvelope.totalPages);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching red envelope data:", error);
+                }
+            });
+        }
+
+        function fetchBetData() {
+            $.ajax({
+                type: "POST",
+                url: endpoints.bet,
+                data: {
+                    typeid: "1",
+                    pageno: "1",
+                    limit: pagination.bet.limit,
+                    language: "vi"
+                },
+                dataType: "json",
+                success: function(response) {
+                    if (response.status === true) {
+                        pagination.bet.totalPages = response.page_total;
+                        $("#text-bet").text(`${pagination.bet.page} / ${pagination.bet.totalPages}`);
+                        renderBetTable(response.datas);
+                        
+                        // Enable/disable pagination buttons
+                        $("#previousBet").prop("disabled", pagination.bet.page <= 1);
+                        $("#nextBet").prop("disabled", pagination.bet.page >= pagination.bet.totalPages);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching bet data:", error);
+                }
+            });
+        }
+
+        // Pagination event handlers
+        $("#nextWithdraw").click(function() {
+            if (pagination.withdraw.page < pagination.withdraw.totalPages) {
+                pagination.withdraw.page++;
+                fetchWithdrawData();
+            }
+        });
+
+        $("#previousWithdraw").click(function() {
+            if (pagination.withdraw.page > 1) {
+                pagination.withdraw.page--;
+                fetchWithdrawData();
+            }
+        });
+
+        $("#nextRecharge").click(function() {
+            if (pagination.recharge.page < pagination.recharge.totalPages) {
+                pagination.recharge.page++;
+                fetchRechargeData();
+            }
+        });
+
+        $("#previousRecharge").click(function() {
+            if (pagination.recharge.page > 1) {
+                pagination.recharge.page--;
+                fetchRechargeData();
+            }
+        });
+
+        $("#nextRedenvelope").click(function() {
+            if (pagination.redenvelope.page < pagination.redenvelope.totalPages) {
+                pagination.redenvelope.page++;
+                fetchRedEnvelopeData();
+            }
+        });
+
+        $("#previousRedenvelope").click(function() {
+            if (pagination.redenvelope.page > 1) {
+                pagination.redenvelope.page--;
+                fetchRedEnvelopeData();
+            }
+        });
+
+        $("#nextBet").click(function() {
+            if (pagination.bet.page < pagination.bet.totalPages) {
+                pagination.bet.page++;
+                fetchBetData();
+            }
+        });
+
+        $("#previousBet").click(function() {
+            if (pagination.bet.page > 1) {
+                pagination.bet.page--;
+                fetchBetData();
+            }
+        });
+
+        // Initialize all data on page load
+        $(document).ready(function() {
+            fetchMemberInfo();
+            fetchWithdrawData();
+            fetchRechargeData();
+            fetchRedEnvelopeData();
+            fetchBetData();
+        });
+    </script>
+</body>
+</html>

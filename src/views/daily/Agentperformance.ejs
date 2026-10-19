@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Task Control</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="//cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+
+     <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+     <!-- jQuery -->
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+      :root {
+        --primary-color: #5ccfcb;
+        --secondary-color: #00807c;
+        --light-bg: #f8f9fa;
+        --card-bg: #ffffff;
+        --text-dark: #015956;
+        --text-light: #6c757d;
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--light-bg);
+        color: var(--text-dark);
+      }
+
+
+      .header-section {
+        background-color: var(--card-bg);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .dashboard-card {
+        background-color: var(--card-bg);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease-in-out;
+      }
+
+      .dashboard-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .card-title {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        margin-bottom: 10px;
+      }
+
+      .card-value {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: var(--secondary-color);
+        margin-bottom: 5px;
+      }
+
+
+      .card-subtitle {
+        font-size: 0.9rem;
+        color: var(--text-light);
+      }
+
+      .btn-primary-custom {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border: none;
+        color: #ffffff;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+      }
+      
+
+      .btn-primary-custom:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+      }
+
+      .form-control-custom {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 10px 15px;
+      }
+
+      .table-responsive {
+        border-radius: 15px;
+        overflow: hidden;
+      }
+
+      .table-custom {
+        background-color: var(--card-bg);
+        border-radius: 15px;
+      }
+
+      .table-custom thead {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+      }
+
+      .table-custom th {
+        border-bottom: none;
+        padding: 15px;
+      }
+
+      .table-custom td {
+        padding: 15px;
+        vertical-align: middle;
+      }
+
+      .table-custom tbody tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      .chart-container {
+        background-color: var(--card-bg);
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .header-section {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .header-section .d-flex {
+          width: 100%;
+          margin-top: 15px;
+          justify-content: space-between;
+        }
+        .header-section .d-flex .form-control {
+          flex-grow: 1;
+          margin-right: 10px;
+        }
+        .dashboard-card {
+          padding: 20px;
+        }
+        .card-value {
+          font-size: 1.8rem;
+        }
+      }
+
+      .table-container::-webkit-scrollbar {
+        height: 8px;
+      }
+      .table-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+      .table-container::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+      }
+      .table-container::-webkit-scrollbar-thumb:hover {
+        background: #015956;
+      }
+
+      /* Styles for Deposit Overview section - Bootstrap classes */
+      .deposit-box {
+        background-color: var(--card-bg); /* Using existing card background */
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem; /* Equivalent to p-6 */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        color: var(--secondary-color); /* Using the defined secondary color */
+      }
+
+      .deposit-box h2 {
+        font-size: 1.75rem; /* Equivalent to text-3xl */
+        font-weight: 600; /* Equivalent to font-semibold */
+        margin-bottom: 1.5rem; /* Equivalent to mb-6 */
+      }
+
+      .deposit-box ul {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 0;
+      }
+
+      .deposit-box ul li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: rgba(0, 128, 124, 0.1); 
+        padding: 0.75rem; /* Equivalent to p-3 */
+        border-radius: 0.375rem; /* Equivalent to rounded-md */
+        margin-bottom: 0.75rem; /* space-y-3 equivalent for list items */
+      }
+
+      .deposit-box ul li:last-child {
+        margin-bottom: 0;
+      }
+
+      .deposit-box ul li span strong {
+        font-weight: 500; /* Equivalent to font-medium */
+      }
+
+      .deposit-box .see-more-btn {
+        width: 100%;
+        padding: 0.75rem 1.5rem; /* py-3 px-6 */
+        background-color: var(--secondary-color);
+        color: white;
+        font-weight: 600; /* font-semibold */
+        border-radius: 0.5rem; /* rounded-lg */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* shadow-md */
+        transition: background-color 0.3s ease-in-out; /* transition-colors duration-300 */
+        border: none;
+      }
+
+      .deposit-box .see-more-btn:hover {
+        background-color: var(--primary-color);
+      }
+
+      .deposit-box .see-more-btn i {
+        margin-left: 0.5rem; /* ml-2 */
+      }
+
+      /* Global Search Section */
+      .global-search-section {
+        background-color: #e6f7f7; /* A light teal for the search bar background */
+        border-radius: 0.75rem; /* rounded-lg */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* shadow-sm */
+        padding: 1.5rem; /* p-6 */
+        margin-bottom: 2rem; /* mb-8 */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem; /* gap-4 */
+      }
+
+      @media (min-width: 768px) {
+        .global-search-section {
+          flex-direction: row;
+        }
+      }
+
+      .global-search-section .form-label {
+        color: #006666; /* A darker teal for label */
+        font-weight: 500; /* font-medium */
+      }
+
+      .global-search-section .input-group-text {
+        background-color: white;
+        border-right: none;
+      }
+
+      .global-search-section .form-control {
+        padding-left: 2.5rem; /* pl-10 */
+        padding-right: 1rem; /* pr-4 */
+        padding-top: 0.75rem; /* py-3 */
+        padding-bottom: 0.75rem; /* py-3 */
+        border-radius: 0.5rem; /* rounded-lg */
+        border: 1px solid #ced4da; /* border border-gray-300 */
+        color: #495057; /* text-gray-700 */
+      }
+
+      .global-search-section .form-control:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.25rem rgba(0, 128, 124, 0.25); /* focus:ring-2 focus:ring-blue-500 */
+        border-color: transparent; /* focus:border-transparent */
+      }
+
+      .global-search-section .btn-danger-custom {
+        background-color: #dc3545; /* Red-500 */
+        color: white;
+        padding: 0.75rem 1.5rem; /* px-6 py-3 */
+        border-radius: 0.5rem; /* rounded-lg */
+        transition: background-color 0.3s ease-in-out; /* transition-colors duration-300 */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* shadow-md */
+        border: none;
+      }
+
+      .global-search-section .btn-danger-custom:hover {
+        background-color: #bd2130; /* Red-600 */
+      }
+
+      /* Shared Table Container */
+      #sharedDepositTableContainer {
+        background-color: var(--card-bg);
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem; /* p-6 */
+        margin-top: 2rem; /* mt-8 */
+      }
+
+      #sharedDepositTableContainer h2 {
+        font-size: 1.5rem; /* text-2xl */
+        font-weight: 600; /* font-semibold */
+        color: var(--text-dark); /* text-gray-800 */
+        margin-bottom: 1rem; /* mb-4 */
+      }
+
+      .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .shared-table-custom {
+        min-width: 100%; /* min-w-full */
+        background-color: var(--card-bg);
+        border-radius: 0.75rem; /* rounded-lg */
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05); /* shadow-inner */
+        color: var(--text-dark);
+        width: 100%;
+      }
+
+      .shared-table-custom thead {
+        background-color: #f8f9fa; /* bg-gray-100 */
+      }
+
+      .shared-table-custom th {
+        padding: 0.75rem 1rem; /* py-3 px-4 */
+        text-align: left;
+        font-size: 0.875rem; /* text-sm */
+        font-weight: 500; /* font-medium */
+        text-transform: uppercase; /* uppercase */
+        letter-spacing: 0.05em; /* tracking-wider */
+      }
+
+      .shared-table-custom tbody tr {
+        border-top: 1px solid #e2e8f0; /* divide-y divide-gray-200 */
+      }
+
+      .shared-table-custom tbody tr:hover {
+        background-color: #f8f9fa; /* hover:bg-gray-50 */
+        transition: background-color 0.2s ease-in-out; /* transition-colors duration-200 */
+      }
+
+      .shared-table-custom td {
+        padding: 0.75rem 1rem; /* py-3 px-4 */
+        white-space: nowrap; /* whitespace-nowrap */
+      }
+      
+      /* Dropdown styles for tier levels */
+      .tier-dropdown {
+        position: relative;
+        display: inline-block;
+        margin-right: 10px;
+      }
+      
+      .tier-dropdown-btn {
+        background-color: #f8f9fa;
+        color: #015956;
+        padding: 8px 15px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        cursor: pointer;
+        min-width: 120px;
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .tier-dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      
+      .tier-dropdown-content a {
+        color: #015956;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+      }
+      
+      .tier-dropdown-content a:hover {
+        background-color: #e6f7f7;
+      }
+      
+      .tier-dropdown:hover .tier-dropdown-content {
+        display: block;
+      }
+      
+      .tier-dropdown:hover .tier-dropdown-btn {
+        background-color: #e6f7f7;
+      }
+      
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .tier-dropdown {
+          width: 100%;
+          margin-bottom: 10px;
+        }
+        
+        .tier-dropdown-btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <%- include('nav') %>
+
+      <div class="content-wrapper">
+        <div class="container mt-4">
+          <div class="header-section" style="margin-bottom: 20px;">
+            <h1 class="h3 mb-3 mb-md-0">Agent Performance Dashboard</h1>              
+
+            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2">
+              <!-- Tier Dropdown -->
+
+              
+              <div class="tier-dropdown">
+                <button class="tier-dropdown-btn">
+                  <span id="selectedTier">All Tiers</span>
+                  <i class="fas fa-chevron-down ms-2"></i>
+                </button>
+                <div class="tier-dropdown-content">
+                  <a href="#" onclick="selectTier('All Tiers')">All Tiers</a>
+                  <a href="#" onclick="selectTier('Tier 1')">Tier 1</a>
+                  <a href="#" onclick="selectTier('Tier 2')">Tier 2</a>
+                  <a href="#" onclick="selectTier('Tier 3')">Tier 3</a>
+                  <a href="#" onclick="selectTier('Tier 4')">Tier 4</a>
+                  <a href="#" onclick="selectTier('Tier 5')">Tier 5</a>
+                </div>
+              </div>
+              
+              <!-- Label -->
+              <label for="userId" class="form-label mb-0 text-muted" style="min-width: 60px;">
+                User ID
+              </label>
+
+              <!-- Input -->
+              <input
+                type="text"
+                class="form-control form-control-custom"
+                id="userId"
+                value="10003"
+                style="width: 120px; min-width: 100px;"
+              />
+
+              <!-- Button -->
+              <button
+                class="btn btn-primary-custom"
+                id="analyzeBtn"
+                style="white-space: nowrap;"
+              >
+                <i class="fas fa-chart-line me-2"></i>Analyze Performance
+              </button>
+            </div>
+          </div>
+
+          <div class="row" style="margin: 0 -10px;">
+            <!-- Total Network Size -->
+            <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px;">
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; height: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;">
+                <div style="font-weight: 600; color: #015956; font-size: 14px;">Total Network Size</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #00807c;" id="networkSize">1</div>
+                <div style="color: #5ccfcb; font-size: 13px;" class="card-subtitle">
+                  Active across <span id="networkLevels">1</span> levels
+                </div>
+              </div>
+            </div>
+
+            <!-- Net Deposits -->
+            <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px;">
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; height: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;">
+                <div style="font-weight: 600; color: #015956; font-size: 14px;">Net Deposits</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #00807c;" id="netDeposits">₹4,500</div>
+                <div style="color: #5ccfcb; font-size: 13px;" class="card-subtitle">
+                  <span id="retentionRate">90.0</span>% retention rate
+                </div>
+              </div>
+            </div>
+
+            <!-- Net Profit -->
+            <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px;">
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; height: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;">
+                <div style="font-weight: 600; color: #015956; font-size: 14px;">Net Profit</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #00807c;" id="netProfit">₹93</div>
+                <div style="color: #5ccfcb; font-size: 13px;" class="card-subtitle">
+                  <span id="winRate">95.8</span>% win rate
+                </div>
+              </div>
+            </div>
+
+            <!-- net withdrwal   -->
+            <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px;">
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; height: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;">
+                <div style="font-weight: 600; color: #015956; font-size: 14px;">Net Withdrawal</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #00807c;" id="commissionEarned">₹0</div>
+                <div style="color: #5ccfcb; font-size: 13px;" class="card-subtitle">
+                  <span id="commissionRate">0.0</span>% of total bets
+                </div>
+              </div>
+            </div>
+
+            <!-- Commission Earned -->
+            <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px;">
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; height: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;">
+                <div style="font-weight: 600; color: #015956; font-size: 14px;">Commission Earned</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #00807c;" id="commissionEarned">₹0</div>
+                <div style="color: #5ccfcb; font-size: 13px;" class="card-subtitle">
+                  <span id="commissionRate">0.0</span>% of total bets
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h2 class="h4 mt-4 mb-3">Level-Wise Performance Breakdown</h2>
+          <div class="chart-container" style="height: 300px">
+            <canvas id="performanceChart"></canvas>
+          </div>
+
+          <h2 class="h4 mt-4 mb-3">Level-wise Performance Details</h2>
+          <div class="table-responsive table-container">
+            <table
+              class="table table-custom table-borderless align-middle"
+              id="performanceTable"
+            >
+              <thead>
+                <tr>
+                  <th>Level</th>
+                  <th>Users</th>
+                  <th>Deposits</th>
+                  <th>Withdrawals</th>
+                  <th>Bet Amount</th>
+                  <th>Win Amount</th>
+                  <th>Profit/Loss</th>
+                </tr>
+              </thead>
+              <tbody>
+                </tbody>
+            </table>
+          </div>
+
+          <h2 class="h4 mt-4 mb-3" style="font-weight: bold; color: #015956;">Agent Information</h2>
+          <div class="row">
+
+            <!-- Card Template -->
+            <div class="col-md-4 col-sm-6 mb-3">
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; height: 100%;">
+                <div style="font-weight: 600; color: #015956; font-size: 14px;">User ID</div>
+                <div style="font-size: 1.5rem; color: #00807c;" id="agentId">10003</div>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3">
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; height: 100%;">
+                <div style="font-weight: 600; color: #015956; font-size: 14px;">Username</div>
+                <div style="font-size: 1.5rem; color: #00807c;" id="agentUsername">MEMBER7876DFJ</div>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3">
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; height: 100%;">
+                <div style="font-weight: 600; color: #015956; font-size: 14px;">Mobile</div>
+                <div style="font-size: 1.5rem; color: #00807c;" id="agentMobile">7029934287</div>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3">
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; height: 100%;">
+                <div style="font-weight: 600; color: #015956; font-size: 14px;">Wallet Balance</div>
+                <div style="font-size: 1.5rem; color: #00807c;" id="agentBalance">₹ 4,500.00</div>
+              </div>
+            </div> 
+
+            <div class="col-md-4 col-sm-6 mb-3">
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; height: 100%;">
+                <div style="font-weight: 600; color: #015956; font-size: 14px;">Account Type</div>
+                <div style="font-size: 1.5rem; color: #00807c;" id="agentAccountType">Agent</div>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3">
+              <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; height: 100%;">
+                <div style="font-weight: 600; color: #015956; font-size: 14px;">Created At</div>
+                <div style="font-size: 1.5rem; color: #00807c;" id="agentCreatedAt">2024-03-25</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class=" ">
+          <div class="   p-3">
+            <h1 class="text-start mb-4  fs-4 fw-bold">
+              Deposit Overview
+            </h1>
+            <div
+              class="global-search-section mb-4 d-flex flex-column flex-md-row align-items-center justify-content-between gap-3"
+            >
+              <label for="searchId" class="form-label mb-0 sr-only"
+                >Search by ID:</label
+              >
+              <div class="input-group w-100 w-md-50">
+                <span class="input-group-text"
+                  ><i class="fas fa-search text-secondary"></i
+                ></span>
+                <input
+                  type="text"
+                  id="searchId"
+                  placeholder="Search deposit by ID..."
+                  class="form-control form-control-lg"
+                  style="border: 1px solid rgb(8, 138, 145) !important;"
+                />
+              </div>
+              <button
+                id="clearSearchBtn"
+                class="btn btn-danger-custom mt-3 mt-md-0"
+              >
+                <!-- <i class="fas fa-times "></i> --> Clear
+              </button>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+              <div class="col">
+                <div class="deposit-box">
+                  <div>
+                    <h2>First Deposit</h2>
+                    <ul id="firstDepositList">
+                      </ul>
+                    <p
+                      id="firstDepositNoData"
+                      class="text-center mt-3 text-muted"
+                      style="display: none"
+                    >
+                      No matching data found.
+                    </p>
+                  </div>
+                  <button
+                    data-deposit-type="first"
+                    class="see-more-btn mt-4 btn"
+                  >
+                    See More <i class="fas fa-chevron-down ms-2"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="col">
+                <div class="deposit-box">
+                  <div>
+                    <h2>Second Deposit</h2>
+                    <ul id="secondDepositList">
+                      </ul>
+                    <p
+                      id="secondDepositNoData"
+                      class="text-center mt-3 text-muted"
+                      style="display: none"
+                    >
+                      No matching data found.
+                    </p>
+                  </div>
+                  <button
+                    data-deposit-type="second"
+                    class="see-more-btn mt-4 btn"
+                  >
+                    See More <i class="fas fa-chevron-down ms-2"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="col">
+                <div class="deposit-box">
+                  <div>
+                    <h2>Third Deposit</h2>
+                    <ul id="thirdDepositList">
+                      </ul>
+                    <p
+                      id="thirdDepositNoData"
+                      class="text-center mt-3 text-muted"
+                      style="display: none"
+                    >
+                      No matching data found.
+                    </p>
+                  </div>
+                  <button
+                    data-deposit-type="third"
+                    class="see-more-btn mt-4 btn"
+                  >
+                    See More <i class="fas fa-chevron-down ms-2"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              id="sharedDepositTableContainer"
+              class="card p-4 shadow-lg"
+              style="display: none"
+            >
+              <h2 id="sharedTableTitle" class="h5 mb-4 text-dark">
+                All Deposits
+              </h2>
+              <div class="table-responsive table-container">
+                <table class="table table-hover shared-table-custom">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sharedDepositTableBody">
+                    </tbody>
+                </table>
+                <p
+                  id="sharedDepositTableNoData"
+                  class="text-center mt-4 text-muted"
+                  style="display: none"
+                >
+                  No matching data found in full list.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+
+    <script>
+      // Tier selection function
+      function selectTier(tier) {
+        document.getElementById('selectedTier').textContent = tier;
+        // Here you would typically filter your data based on the selected tier
+        // For now, we'll just log the selection
+        console.log('Selected tier:', tier);
+        
+        // You would call your data loading function here with the tier filter
+        // loadAgentData($('#userId').val().trim(), tier);
+      }
+      
+      // Sample Data for Deposits
+      const allDeposits = {
+        first: [
+          { id: 'FD001', amount: 150.00 },
+          { id: 'FD002', amount: 200.50 },
+          { id: 'FD003', amount: 75.25 },
+          { id: 'FD004', amount: 300.00 },
+          { id: 'FD005', amount: 120.75 },
+          { id: 'FD006', amount: 50.00 },
+          { id: 'FD007', amount: 450.00 },
+          { id: 'FD008', amount: 90.00 },
+          { id: 'FD009', amount: 210.00 },
+          { id: 'FD010', amount: 180.50 },
+          { id: 'FD011', amount: 600.00 },
+          { id: 'FD012', amount: 25.00 },
+        ],
+        second: [
+          { id: 'SD001', amount: 250.00 },
+          { id: 'SD002', amount: 350.75 },
+          { id: 'SD003', amount: 100.00 },
+          { id: 'SD004', amount: 500.00 },
+          { id: 'SD005', amount: 180.20 },
+          { id: 'SD006', amount: 75.00 },
+          { id: 'SD007', amount: 620.00 },
+          { id: 'SD008', amount: 110.00 },
+        ],
+        third: [
+          { id: 'TD001', amount: 500.00 },
+          { id: 'TD002', amount: 750.00 },
+          { id: 'TD003', amount: 200.00 },
+          { id: 'TD004', amount: 1000.00 },
+          { id: 'TD005', amount: 300.00 },
+          { id: 'TD006', amount: 150.00 },
+        ],
+      };
+
+      let currentActiveDepositType = null; // To keep track of which deposit type's table is currently shown
+
+      /**
+       * Renders the initial 5 deposits or all deposits if fewer than 5,
+       * and manages the visibility of the "See More" button and "No Data" messages.
+       * @param {string} type - The deposit type ('first', 'second', 'third').
+       * @param {Array<Object>} data - The array of deposit objects to display.
+       */
+      function renderInitialDeposits(type, data) {
+        const listElement = document.getElementById(`${type}DepositList`);
+        const noDataElement = document.getElementById(`${type}DepositNoData`);
+        const seeMoreBtn = document.querySelector(
+          `.see-more-btn[data-deposit-type="${type}"]`
+        );
+
+        listElement.innerHTML = ''; // Clear previous list items
+        noDataElement.style.display = 'none'; // Hide no data message by default
+        seeMoreBtn.style.display = 'block'; // Show button by default
+
+        const displayData = data.slice(0, 5); // Get first 5 items
+
+        if (displayData.length === 0) {
+          noDataElement.style.display = 'block';
+          seeMoreBtn.style.display = 'none'; // Hide button if no data
+        } else {
+          displayData.forEach((deposit) => {
+            const listItem = document.createElement('li');
+            listItem.className = 'd-flex justify-content-between align-items-center bg-opacity-25 bg-info p-3 rounded';
+            listItem.innerHTML = `
+                        <span>ID: <strong class="fw-medium">${deposit.id}</strong></span>
+                        <span>Amount: <strong class="fw-medium">$${deposit.amount.toFixed(
+                          2
+                        )}</strong></span>
+                    `;
+            listElement.appendChild(listItem);
+          });
+
+          // Hide "See More" button if there are 5 or fewer items
+          if (data.length <= 5) {
+            seeMoreBtn.style.display = 'none';
+          } else {
+            seeMoreBtn.innerHTML = `See More <i class="fas fa-chevron-down ms-2"></i>`;
+            seeMoreBtn.classList.remove('active'); // Ensure button is not in 'active' state
+          }
+        }
+      }
+
+      /**
+       * Renders all deposits into the shared full table.
+       * @param {Array<Object>} data - The array of deposit objects to display.
+       */
+      function renderSharedTable(data) {
+        const tableBody = document.getElementById('sharedDepositTableBody');
+        const tableNoData = document.getElementById('sharedDepositTableNoData');
+        tableBody.innerHTML = ''; // Clear previous table rows
+        tableNoData.style.display = 'none'; // Hide no data message by default
+
+        if (data.length === 0) {
+          tableNoData.style.display = 'block';
+        } else {
+          data.forEach((deposit) => {
+            const row = document.createElement('tr');
+            row.className = 'table-light'; // Bootstrap class for light row hover
+            row.innerHTML = `
+                        <td class="py-3 px-4 text-nowrap">${deposit.id}</td>
+                        <td class="py-3 px-4 text-nowrap">$${deposit.amount.toFixed(
+                          2
+                        )}</td>
+                    `;
+            tableBody.appendChild(row);
+          });
+        }
+      }
+
+      /**
+       * Handles the click event for "See More" buttons.
+       * Manages visibility of the shared table and updates button states.
+       * @param {string} type - The deposit type ('first', 'second', 'third').
+       * @param {HTMLElement} clickedButton - The button that was clicked.
+       */
+      function handleSeeMoreClick(type, clickedButton) {
+        const sharedTableContainer = document.getElementById(
+          'sharedDepositTableContainer'
+        );
+        const sharedTableTitle = document.getElementById('sharedTableTitle');
+
+        // Reset all "See More" buttons to default state
+        document.querySelectorAll('.see-more-btn').forEach((btn) => {
+          btn.innerHTML = `See More <i class="fas fa-chevron-down ms-2"></i>`;
+          btn.classList.remove('active');
+        });
+
+        if (currentActiveDepositType === type) {
+          // If the same button is clicked again, hide the shared table
+          sharedTableContainer.style.display = 'none';
+          currentActiveDepositType = null;
+        } else {
+          // Show the shared table and populate it with the selected data
+          sharedTableContainer.style.display = 'block';
+          currentActiveDepositType = type;
+
+          // Update the title of the shared table
+          const titleMap = {
+            first: 'All First Deposits',
+            second: 'All Second Deposits',
+            third: 'All Third Deposits',
+          };
+          sharedTableTitle.textContent = titleMap[type];
+
+          // Render the shared table with filtered data
+          const searchTerm = document
+            .getElementById('searchId')
+            .value.toLowerCase();
+          const filteredData = searchTerm
+            ? allDeposits[type].filter((d) =>
+                d.id.toLowerCase().includes(searchTerm)
+              )
+            : allDeposits[type];
+          renderSharedTable(filteredData);
+
+          // Update the clicked button's text to "Hide"
+          clickedButton.innerHTML = `Hide <i class="fas fa-chevron-up ms-2"></i>`;
+          clickedButton.classList.add('active');
+        }
+      }
+
+      /**
+       * Filters the deposit data based on the search term and re-renders the lists/tables.
+       */
+      function filterDeposits() {
+        const searchTerm = document
+          .getElementById('searchId')
+          .value.toLowerCase();
+
+        // Always update the initial 5 lists in the boxes
+        ['first', 'second', 'third'].forEach((type) => {
+          const filteredData = allDeposits[type].filter((deposit) =>
+            deposit.id.toLowerCase().includes(searchTerm)
+          );
+          renderInitialDeposits(type, filteredData);
+        });
+
+        // If the shared table is currently visible, update its content based on the active type
+        if (currentActiveDepositType) {
+          const filteredSharedData = allDeposits[
+            currentActiveDepositType
+          ].filter((deposit) => deposit.id.toLowerCase().includes(searchTerm));
+          renderSharedTable(filteredSharedData);
+        }
+      }
+
+      // Event Listeners
+      document.addEventListener('DOMContentLoaded', () => {
+        // Initial render of all deposit types
+        renderInitialDeposits('first', allDeposits.first);
+        renderInitialDeposits('second', allDeposits.second);
+        renderInitialDeposits('third', allDeposits.third);
+
+        // Attach event listeners to "See More" buttons
+        document.querySelectorAll('.see-more-btn').forEach((button) => {
+          button.addEventListener('click', (event) => {
+            const type = event.target.dataset.depositType;
+            handleSeeMoreClick(type, event.target);
+          });
+        });
+
+        // Attach event listener for global search input
+        document.getElementById('searchId').addEventListener('keyup', filterDeposits);
+
+        // Attach event listener for clear search button
+        document.getElementById('clearSearchBtn').addEventListener('click', () => {
+          document.getElementById('searchId').value = ''; // Clear input
+          filterDeposits(); // Re-run filter to show all data
+        });
+      });
+
+      $(document).ready(function () {
+        // Initialize Chart
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Level 1'],
+            datasets: [
+              {
+                label: 'Deposits',
+                data: [5000],
+                backgroundColor: '#5ccfcb',
+              },
+              {
+                label: 'Withdrawals',
+                data: [500],
+                backgroundColor: '#00807c',
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+
+        // Load initial data
+        loadAgentData();
+
+        // Analyze button click handler
+        $('#analyzeBtn').click(function () {
+          const userId = $('#userId').val().trim();
+
+          if (!userId) {
+            Swal.fire({
+              title: 'Error!',
+              text: 'Please enter a valid User ID',
+              icon: 'error',
+              confirmButtonText: 'OK',
+            });
+            return;
+          }
+
+          Swal.fire({
+            title: 'Loading Data',
+            html: 'Please wait while we fetch agent performance data...',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
+          // Simulate API call (replace with actual API call)
+          setTimeout(() => {
+            Swal.close();
+            loadAgentData(userId);
+          }, 1500);
+        });
+
+        function loadAgentData(userId = '10003') {
+          // Sample data - replace with actual API call
+          const sampleData = {
+            networkSize: 1,
+            networkLevels: 1,
+            netDeposits: '₹4,500',
+            retentionRate: '90.0',
+            netProfit: '₹93',
+            winRate: '95.8',
+            commissionEarned: '₹0',
+            commissionRate: '0.0',
+            agentInfo: {
+              id: userId,
+              username: 'MEMBER7876DFJ',
+              mobile: '7029934287',
+            },
+            levelDetails: [
+              {
+                level: 'Level 1',
+                users: 1,
+                deposits: '₹5,000',
+                withdrawals: '₹500',
+                betAmount: '₹2,200',
+                winAmount: '₹2,107',
+                profitLoss: '₹93',
+              },
+            ],
+          };
+
+          // Update metrics
+          $('#networkSize').text(sampleData.networkSize);
+          $('#networkLevels').text(sampleData.networkLevels);
+          $('#netDeposits').text(sampleData.netDeposits);
+          $('#retentionRate').text(sampleData.retentionRate);
+          $('#netProfit').text(sampleData.netProfit);
+          $('#winRate').text(sampleData.winRate);
+          $('#commissionEarned').text(sampleData.commissionEarned);
+          $('#commissionRate').text(sampleData.commissionRate);
+
+          // Update agent info
+          $('#agentId').text(sampleData.agentInfo.id);
+          $('#agentUsername').text(sampleData.agentInfo.username);
+          $('#agentMobile').text(sampleData.agentInfo.mobile);
+
+          // Update table
+          const tableBody = $('#performanceTable tbody');
+          tableBody.empty();
+
+          sampleData.levelDetails.forEach((level) => {
+            tableBody.append(`
+                        <tr>
+                            <td>${level.level}</td>
+                            <td>${level.users}</td>
+                            <td>${level.deposits}</td>
+                            <td>${level.withdrawals}</td>
+                            <td>${level.betAmount}</td>
+                            <td>${level.winAmount}</td>
+                            <td><span class="text-success">${level.profitLoss}</span></td>
+                        </tr>
+                    `);
+          });
+
+          // Update chart
+          performanceChart.data.labels = sampleData.levelDetails.map(
+            (level) => level.level
+          );
+          performanceChart.data.datasets[0].data = sampleData.levelDetails.map(
+            (level) => parseInt(level.deposits.replace(/[^0-9]/g, ''))
+          );
+          performanceChart.data.datasets[1].data = sampleData.levelDetails.map(
+            (level) => parseInt(level.withdrawals.replace(/[^0-9]/g, ''))
+          );
+          performanceChart.update();
+        }
+      });
+    </script>
+  </body>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<!-- Include SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+</html>

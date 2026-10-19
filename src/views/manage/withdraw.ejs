@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Approved Withdrawals</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+
+  <style>
+    :root {
+      --primary-color: #00807c;
+      --secondary-color: #4d49d7;
+      --background-light: #f4f6f9;
+      --card-background: #ffffff;
+      --text-color-dark: #343a40;
+      --border-color: #ced4da;
+      --table-stripe: #dff5f5;
+    }
+
+    body {
+      background-color: var(--background-light);
+      color: var(--text-color-dark);
+      font-family: "Source Sans Pro", sans-serif;
+    }
+
+    .content-wrapper {
+      background-color: var(--background-light);
+      padding: 5px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      margin-top: 20px;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 25px;
+      font-size: 2.2rem;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .card {
+      background-color: var(--card-background);
+      color: var(--text-color-dark);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      overflow: hidden; /* Ensures border-radius applies to children */
+    }
+
+    .card-header {
+      background-color: var(--card-background);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      color: var(--primary-color);
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .form-control {
+      background-color: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      color: var(--text-color-dark);
+      padding: 10px 15px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(0, 128, 124, 0.25);
+      outline: none;
+    }
+
+    .btn {
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-weight: 500;
+      transition: background-color 0.3s ease, border-color 0.3s ease,
+        color 0.3s ease;
+      white-space: nowrap; /* Prevent text wrapping on buttons */
+    }
+
+    .btn i {
+      margin-right: 5px;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      border-color: var(--secondary-color);
+    }
+
+    .btn-info {
+      background-color: #17a2b8;
+      border-color: #17a2b8;
+      color: white;
+    }
+
+    .btn-info:hover {
+      background-color: #138496;
+      border-color: #138496;
+    }
+
+    .btn-success {
+      background-color: #28a745;
+      border-color: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: #218838;
+      border-color: #218838;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      border-color: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #c82333;
+      border-color: #c82333;
+    }
+
+    .table {
+      width: 100%;
+      margin-bottom: 0;
+      color: var(--text-color-dark);
+    }
+
+    .table th,
+    .table td {
+      padding: 12px 15px;
+      text-align: center;
+      vertical-align: middle;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .table thead th {
+      background-color: var(--primary-color);
+      color: white;
+      border-bottom: none;
+      font-weight: 600;
+    }
+
+    .table tbody tr:nth-child(odd) {
+      background: var(--table-stripe);
+    }
+
+    .table tbody tr:hover {
+      background-color: rgba(0, 128, 124, 0.05);
+    }
+
+    .project-actions .btn {
+      margin: 3px 2px; /* Adjusted margin for better spacing between buttons */
+      font-size: 0.85rem; /* Slightly smaller font for actions */
+    }
+
+    .search-container {
+      margin-bottom: 25px;
+      padding: 0 15px;
+      max-width: 600px; /* Limit search input width */
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+
+    .search-container label {
+      color: var(--primary-color);
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 45px;
+      font-size: 1rem;
+    }
+
+    .badge {
+      padding: 0.5em 0.75em;
+      border-radius: 0.25rem;
+      font-weight: 600;
+    }
+
+    .badge-warning {
+      background-color: #ffc107;
+      color: #343a40;
+    }
+
+    /* SweetAlert2 custom styles */
+    .swal2-popup {
+      background-color: var(--card-background) !important;
+      color: var(--text-color-dark) !important;
+      border-radius: 10px !important;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .swal2-title {
+      color: var(--primary-color) !important;
+      font-size: 1.8em !important;
+    }
+
+    .swal2-content {
+      color: var(--text-color-dark) !important;
+      font-size: 1.1em !important;
+    }
+
+    .swal2-styled.swal2-confirm {
+      background-color: var(--primary-color) !important;
+      border-color: var(--primary-color) !important;
+      color: white !important;
+    }
+
+    .swal2-styled.swal2-cancel {
+      background-color: #6c757d !important;
+      border-color: #6c757d !important;
+      color: white !important;
+    }
+
+    .swal2-styled.swal2-confirm:focus,
+    .swal2-styled.swal2-cancel:focus {
+      box-shadow: 0 0 0 3px rgba(0, 128, 124, 0.5) !important;
+    }
+  </style>
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <%- include('nav') %>
+      <div class="content-wrapper">
+        <section class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-12">
+                <h1>Approved Withdrawal</h1>
+              </div>
+            </div>
+          </div>
+          </section>
+
+        <div class="search-container">
+          <label for="remark" class="form-label"
+            >Remark (for rejection/notes)</label
+          >
+          <input
+            type="text"
+            class="form-control search-input"
+            id="remark"
+            name="remark"
+            placeholder="Enter a remark here, especially if rejecting a withdrawal"
+          />
+        </div>
+
+        <section class="content">
+          <div class="card">
+           <div class="card-header" style="display: flex; align-items: center; justify-content: space-between;">
+    <h3 class="card-title" style="white-space: nowrap;">Approve Withdrawal Requests</h3>
+    
+</div>
+            <div class="card-body p-0" style="overflow-x: auto">
+              <table class="table table-striped projects">
+                <thead>
+                  <tr style="white-space: nowrap;">
+                    <th class="text-center">#</th>
+                    <th class="text-center">Order ID</th>
+                    <th class="text-center">Type</th>
+                    <th class="text-center">USDT Address</th>
+                    <th class="text-center">Account</th>
+                    <th class="text-center">Bank</th>
+                    <th class="text-center">Account Number</th>
+                    <th class="text-center">IFSC Code</th>
+                    <th class="text-center">Cardholder Name</th>
+                    <th class="text-center">Amount</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Date</th>
+                    <th class="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody style="white-space: nowrap;">
+                  </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script>
+      function show(params) {
+        if (params.length === 0) {
+          $("tbody").html(`
+            <tr class="text-center">
+              <td colspan="13">No more data available...</td>
+            </tr>
+          `);
+          return;
+        }
+
+        let html = "";
+        params.forEach((data) => {
+          html += `<tr class="text-center">
+              <td id="row-id-${data.id}">
+                ${data.id}
+              </td>
+              <td id="row-orderid-${data.id}">
+                ${data.id_order}
+              </td>
+              <td id="row-type-${data.id}">
+                <b>${data.type}</b>
+              </td>
+              <td id="row-usdt-address-${data.id}">
+                <b>${data.sdt}</b>
+              </td>
+              <td id="row-phone-${data.id}">
+                <b>${data.phone}</b>
+              </td>
+              <td id="row-name-bank-${data.id}">
+                <b>${data.name_bank}</b>
+              </td>
+              <td id="row-stk-${data.id}" style="min-width: 150px;">
+                <b>${data.stk}</b>
+              </td>
+              <td id="row-ifsc-${data.id}" style="min-width: 120px;">
+                <b>${data.ifsc !== "" && data.ifsc !== null ? data.ifsc : ""}</b>
+              </td>
+              <td id="row-name-user-${data.id}" style="min-width: 150px;">
+                <b>${data.name_user}</b>
+              </td>
+              <td id="row-money-${data.id}">
+                <b>${data.type === "USDT" ? "$" + Number(data.money / 94).toFixed(2) : "₹" + data.money}</b>
+              </td>
+              <td class="project-state">
+                <span class="badge badge-warning">Waiting...</span>
+              </td>
+              <td id="row-today-${data.id}" style="min-width: 120px;">
+                <b>${data.today}</b>
+              </td>
+              <td class="project-actions text-center" style="min-width: 250px;">
+  <a 
+    class="btn btn-primary btn-sm" 
+    href="/admin/member/info/${data.phone}" 
+    style="background-color: #00807C !important; color: #fff !important;"
+  >
+    <i class="fa-solid fa-street-view"></i> View
+  </a>
+
+  <a 
+    class="btn btn-info btn-sm copy-data" 
+    href="javascript:void(0)" 
+    data-id="${data.id}" 
+    style="background-color: #17a2b8 !important; color: #fff !important;"
+  >
+    <i class="fa fa-copy"></i> Copy
+  </a>
+
+  <a 
+    class="btn btn-success btn-sm confirm-btn" 
+    href="javascript:void(0)" 
+    data="${data.id}" 
+    style="background-color: #28a745 !important; color: #fff !important;"
+  >
+    <i class="fa fa-check"></i> Approve
+  </a>
+
+  <a 
+    class="btn btn-danger btn-sm delete-btn" 
+    href="javascript:void(0)" 
+    data="${data.id}" 
+    style="background-color: #dc3545 !important; color: #fff !important;"
+  >
+    <i class="fas fa-times"></i> Reject
+  </a>
+</td>
+
+            </tr>`;
+        });
+
+        $("tbody").html(html);
+
+        // Event listener for Approve button
+        $(".confirm-btn").click(function (e) {
+          e.preventDefault();
+          let id = $(this).attr("data");
+          Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to approve this withdrawal?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "var(--primary-color)",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Yes, approve it!",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              $.ajax({
+                type: "POST",
+                url: "/api/webapi/admin/withdraw",
+                data: {
+                  id: id,
+                  type: "confirm",
+                },
+                dataType: "json",
+                success: function (response) {
+                  if (response.status) {
+                    Swal.fire(
+                      "Approved!",
+                      "The withdrawal has been approved.",
+                      "success"
+                    ).then(() => {
+                      location.reload();
+                    });
+                  } else {
+                    Swal.fire(
+                      "Error!",
+                      response.message || "Failed to approve withdrawal.",
+                      "error"
+                    );
+                  }
+                },
+                error: function () {
+                  Swal.fire(
+                    "Error!",
+                    "An error occurred while approving the withdrawal.",
+                    "error"
+                  );
+                },
+              });
+            }
+          });
+        });
+
+        // Event listener for Reject button
+        $(".delete-btn").click(function (e) {
+          e.preventDefault();
+          let id = $(this).attr("data");
+          let remark = $("#remark").val().trim(); // Get remark and trim whitespace
+
+          if (!remark) {
+            Swal.fire({
+              title: "Remark Required",
+              text: "Please enter a remark in the text field above before rejecting this withdrawal.",
+              icon: "info",
+              confirmButtonColor: "var(--primary-color)",
+            });
+            return; // Stop the function if remark is empty
+          }
+
+          Swal.fire({
+            title: "Are you sure?",
+            text: `Do you want to reject this withdrawal? Remark: "${remark}"`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc3545",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Yes, reject it!",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              $.ajax({
+                type: "POST",
+                url: "/api/webapi/admin/withdraw",
+                data: {
+                  id: id,
+                  type: "delete", // Assuming 'delete' is still the type for rejection
+                  remark: remark,
+                },
+                dataType: "json",
+                success: function (response) {
+                  if (response.status) {
+                    Swal.fire(
+                      "Rejected!",
+                      "The withdrawal has been rejected.",
+                      "success"
+                    ).then(() => {
+                      location.reload();
+                    });
+                  } else {
+                    Swal.fire(
+                      "Error!",
+                      response.message || "Failed to reject withdrawal.",
+                      "error"
+                    );
+                  }
+                },
+                error: function () {
+                  Swal.fire(
+                    "Error!",
+                    "An error occurred while rejecting the withdrawal.",
+                    "error"
+                  );
+                },
+              });
+            }
+          });
+        });
+      }
+
+      // Initial data load
+      $.ajax({
+        type: "POST",
+        url: "/api/webapi/admin/recharge",
+        data: {},
+        dataType: "json",
+        success: function (response) {
+          show(response.datas3); // Display initial data
+        },
+        error: function () {
+          Swal.fire("Error", "Could not load withdrawal data.", "error");
+        },
+      });
+
+      // Event listener for the search input (remark field doubles as search)
+     
+//  $("#remark").on("input", function () {
+//         let value = $(this).val().toLowerCase();
+//         // You might want a dedicated search input if 'remark' is truly for rejection notes only
+//         // For now, assuming it doubles as a search field as in your original code
+//         $.ajax({
+//           type: "POST",
+//           url: "/api/webapi/admin/recharge",
+//           dataType: "json",
+//           success: function (response) {
+//             // Filter datas3 (as that's what's initially displayed)
+//             show(
+//               response.datas3.filter(
+//                 (data) =>
+//                   data.id_order.toString().toLowerCase().includes(value) ||
+//                   data.phone.toLowerCase().includes(value) ||
+//                   data.name_user.toLowerCase().includes(value) ||
+//                   data.stk.toLowerCase().includes(value) ||
+//                   data.sdt.toLowerCase().includes(value) // Also search USDT address
+//               )
+//             );
+//           },
+//         });
+//       });
+
+      // Copy data to clipboard
+      document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("click", function (event) {
+          if (event.target.closest(".copy-data")) {
+            const button = event.target.closest(".copy-data");
+            const id = button.getAttribute("data-id");
+
+            // Extract all relevant data from the row using their IDs
+            const type = document.getElementById(`row-type-${id}`).innerText.trim();
+            const usdtAddress = document.getElementById(`row-usdt-address-${id}`).innerText.trim();
+            const phone = document.getElementById(`row-phone-${id}`).innerText.trim();
+            const nameBank = document.getElementById(`row-name-bank-${id}`).innerText.trim();
+            const stk = document.getElementById(`row-stk-${id}`).innerText.trim();
+            const ifsc = document.getElementById(`row-ifsc-${id}`).innerText.trim();
+            const nameUser = document.getElementById(`row-name-user-${id}`).innerText.trim();
+            const money = document.getElementById(`row-money-${id}`).innerText.trim();
+            const today = document.getElementById(`row-today-${id}`).innerText.trim();
+            const orderId = document.getElementById(`row-orderid-${id}`).innerText.trim();
+
+            // Concatenate all data into a well-formatted string
+            const dataToCopy = `Order ID: ${orderId}\nType: ${type}\nUSDT Address: ${usdtAddress}\nPhone: ${phone}\nBank Name: ${nameBank}\nAccount Number: ${stk}\nIFSC: ${ifsc}\nCardholder Name: ${nameUser}\nAmount: ${money}\nDate: ${today}`;
+
+            navigator.clipboard
+              .writeText(dataToCopy)
+              .then(() => {
+                Swal.fire({
+                  icon: "success",
+                  title: "Copied!",
+                  text: "Withdrawal data copied to clipboard.",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              })
+              .catch((err) => {
+                console.error("Failed to copy data: ", err);
+                Swal.fire({
+                  icon: "error",
+                  title: "Copy Failed!",
+                  text: "Could not copy data to clipboard. Please try manually.",
+                });
+              });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

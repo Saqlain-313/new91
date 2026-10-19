@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Member List</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css"
+    />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <style>
+      .block-click {
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <style>
+    body {
+      background-color: #f4f6f9;
+      color: #343a40;
+    }
+
+    a {
+      color: #00807c;
+      text-decoration: none;
+      background-color: #192434;
+      padding: 8px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    [class*="sidebar-dark-"] .sidebar a {
+      color: #9cc6ff;
+    }
+
+    a:hover {
+      background-color: #22baa6;
+      color: white;
+    }
+
+    .bg-primary {
+      background-color: #374992 !important;
+    }
+
+    .dark-mode .nav-pills .nav-link {
+      color: #9cc6ff;
+    }
+
+    .nav-pills .nav-link {
+      color: #00807c;
+    }
+
+    .navbar-light {
+      background-color: #e3f2fd;
+      border-color: #dee2e6;
+    }
+
+    .active {
+      background-color: #71b1f5 !important;
+    }
+
+    button,
+    input,
+    optgroup,
+    select,
+    textarea {
+      margin: 4px;
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+    }
+
+    .content-wrapper {
+      background-color: #f8f9fa;
+    }
+
+    .table td,
+    .table th {
+      padding: 0.75rem;
+      vertical-align: top;
+      border-top: 1px solid #dee2e6;
+      background: #00807c;
+      color: #ffffff;
+    }
+
+    .card-header {
+      background-color: #ffffff;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+      padding: 0.75rem 1.25rem;
+      position: relative;
+      border-top-left-radius: 0.25rem;
+      border-top-right-radius: 0.25rem;
+    }
+
+    .navbar-dark {
+      background-color: #ffffff;
+      border-color: #dee2e6;
+    }
+
+    .content .card {
+      background-color: #ffffff !important;
+    }
+
+    .dashboard-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      width: 100%;
+      text-align: center;
+      color: #343a40;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-item h2 {
+      font-size: 2rem;
+      margin-bottom: 5px;
+    }
+
+    .dashboard-item p {
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+    .dashboard-item {
+      background: linear-gradient(
+        90deg,
+        #5ccfcb,
+        #00807c
+      ); /* Soft gradient background */
+      height: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center; /* Center content vertically */
+      border-radius: 12px; /* Slightly rounded corners for modern look */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.15); /* Softer, larger shadow for depth */
+      padding: 15px;
+      transition: all 0.3s ease; /* Smooth transition for hover effects */
+      margin: 10px; /* Spacing between dashboard items */
+    }
+
+    .dashboard-item:hover {
+      transform: translateY(-5px); /* Lift the item slightly on hover */
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 16px 32px rgba(0, 0, 0, 0.25); /* Darker shadow on hover for more depth */
+    }
+
+    .dashboard-item .icon {
+      font-size: 3rem; /* Make the icon large and prominent */
+      color: #192434; /* Darker color for the icon */
+      margin-bottom: 10px; /* Space between icon and text */
+      transition: transform 0.3s ease;
+    }
+
+    .dashboard-item:hover .icon {
+      transform: scale(1.1); /* Slightly enlarge the icon on hover */
+    }
+
+    .dashboard-item .text {
+      font-size: 1.1rem; /* Slightly larger text */
+      color: #192434; /* Dark text color for contrast */
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .dashboard-item .text span {
+      font-size: 1.2rem; /* Make the number or key text stand out */
+      color: #374992; /* Highlight the key text with a distinct color */
+    }
+
+    .form-group {
+      text-align: center;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group .d-flex {
+      display: flex;
+
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .form-control {
+      padding: 10px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 16px;
+      color: #343a40;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #00807c;
+      box-shadow: 0 0 4px rgba(0, 123, 255, 0.25);
+    }
+
+    #search {
+      width: 800px;
+      height: 60px;
+      border: 2px solid #ced4da;
+      border-radius: 10px;
+      font-size: 16px;
+      color: #343a40;
+    }
+    #search:focus {
+      outline: none;
+      border-color: #00807c;
+      box-shadow: 0 0 4px rgba(0, 123, 255);
+    }
+
+    #searchBtn {
+      background-color: #00807c;
+      color: white;
+      width: 15rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 10px;
+    }
+
+    .btn-primary {
+      padding: 10px 20px;
+      background-color: #00807c;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #4d49d7;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #dff5f5 !important;
+    }
+
+    thead tr {
+      background-color: #00807c;
+    }
+
+    thead tr th {
+      background-color: #00807c; /* Sets the background for individual header cells */
+      color: white; /* Optional: Set text color for better contrast */
+    }
+
+    .card-title {
+      color: #00807c;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+  </style>
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <%- include('nav') %>
+      <div class="content-wrapper">
+        <section class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1
+                  class=""
+                  style="color: #00807c; font-size: 2rem; font-weight: bold"
+                >
+                  User Promotion List
+                </h1>
+              </div>
+            </div>
+          </div>
+          <!-- /.container-fluid -->
+        </section>
+
+        <div class="form-group">
+          <div class="d-flex">
+            <input
+              type="text"
+              id="search"
+              placeholder="Enter the member you are looking for"
+              class="form-control"
+            />
+          </div>
+          <button id="searchBtn" class="btn btn-primary">Search</button>
+        </div>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px">
+              <div
+                style="
+                  background: #f8f9fa;
+                  padding: 20px;
+                  border-radius: 10px;
+                  height: 100%;
+                  text-align: center;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                "
+              >
+                <h2
+                  id="deposit-number"
+                  style="color: #00807c; font-size: 1.8rem; font-weight: bold"
+                >
+                  0
+                </h2>
+                <p style="color: #015956; font-size: 14px">
+                  <i class="fas fa-money-bill-wave"></i> Deposit Number
+                </p>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px">
+              <div
+                style="
+                  background: #f8f9fa;
+                  padding: 20px;
+                  border-radius: 10px;
+                  height: 100%;
+                  text-align: center;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                "
+              >
+                <h2
+                  id="deposit-amount"
+                  style="color: #00807c; font-size: 1.8rem; font-weight: bold"
+                >
+                  0
+                </h2>
+                <p style="color: #015956; font-size: 14px">
+                  <i class="fas fa-dollar-sign"></i> Deposit Amount
+                </p>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px">
+              <div
+                style="
+                  background: #f8f9fa;
+                  padding: 20px;
+                  border-radius: 10px;
+                  height: 100%;
+                  text-align: center;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                "
+              >
+                <h2
+                  id="number-bettor"
+                  style="color: #00807c; font-size: 1.8rem; font-weight: bold"
+                >
+                  0
+                </h2>
+                <p style="color: #015956; font-size: 14px">
+                  <i class="fas fa-users"></i> Number of Bettors
+                </p>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px">
+              <div
+                style="
+                  background: #f8f9fa;
+                  padding: 20px;
+                  border-radius: 10px;
+                  height: 100%;
+                  text-align: center;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                "
+              >
+                <h2
+                  id="total-bet-amount"
+                  style="color: #00807c; font-size: 1.8rem; font-weight: bold"
+                >
+                  0
+                </h2>
+                <p style="color: #015956; font-size: 14px">
+                  <i class="fas fa-chart-line"></i> Total Bet Amount
+                </p>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px">
+              <div
+                style="
+                  background: #f8f9fa;
+                  padding: 20px;
+                  border-radius: 10px;
+                  height: 100%;
+                  text-align: center;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                "
+              >
+                <h2
+                  id="first-deposit"
+                  style="color: #00807c; font-size: 1.8rem; font-weight: bold"
+                >
+                  0
+                </h2>
+                <p style="color: #015956; font-size: 14px">
+                  <i class="fas fa-user-plus"></i> First Time Depositors
+                </p>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px">
+              <div
+                style="
+                  background: #f8f9fa;
+                  padding: 20px;
+                  border-radius: 10px;
+                  height: 100%;
+                  text-align: center;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                "
+              >
+                <h2
+                  id="total-bet"
+                  style="color: #00807c; font-size: 1.8rem; font-weight: bold"
+                >
+                  0
+                </h2>
+                <p style="color: #015956; font-size: 14px">
+                  <i class="fas fa-gavel"></i> Total Bet
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Member List</h3>
+              <div class="card-tools">
+                <button
+                  type="button"
+                  class="btn btn-tool"
+                  data-card-widget="collapse"
+                  title="Collapse"
+                >
+                  <i class="fas fa-minus"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-tool"
+                  data-card-widget="remove"
+                  title="Remove"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="card-body p-0" style="overflow-y: hidden">
+              <table class="table table-striped projects" id="table1">
+                <thead>
+                  <tr>
+                    <th class="text-center">#</th>
+                    <th class="text-center">User Level</th>
+                    <th class="text-center">Total Recharge Amount</th>
+                    <th class="text-center">Total Commissions Amount</th>
+                    <th class="text-center">Total Bet Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- #region -->
+                </tbody>
+              </table>
+            </div>
+
+            <nav
+              aria-label="Page navigation example"
+              style="
+                margin-top: 20px;
+                display: flex;
+                justify-content: center;
+                background-color: #ffffff;
+              "
+            >
+              <ul class="pagination" id="paginationContainer">
+                <!-- Pagination will be dynamically generated here -->
+              </ul>
+            </nav>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+
+    <script>
+      const Render = (datas) => {
+        let html = "";
+        datas.map((data) => {
+          html += `
+        <tr class="text-center" style="">
+          <td>${data.userId}</td>
+          
+          <td>${data.userLevel}</td>
+
+         
+          <td>
+            <b >${data.totalRechargeAmount}</b>
+          </td>
+          <td>
+            <b >${data.totalCommsionsAmount}</b>
+          </td>
+          <td>
+            <b>${data.totalBetAmount}</b>
+          </td>
+        
+        
+       
+        </tr>`;
+          $("tbody").html(html);
+        });
+      };
+
+      // Search button click event
+      $("#searchBtn").click(function () {
+        fetchData();
+      });
+
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const formattedDate = yesterday.toISOString().split("T")[0];
+
+      //console.log("this is yesterday date",formattedDate);
+
+      const fetchData = () => {
+        let value = $("#search").val().toLowerCase();
+
+        $.ajax({
+          type: "POST",
+          url: "/api/webapi/admin/manager/user-data",
+          data: {
+            id_user: value,
+            date: formattedDate,
+          },
+
+          dataType: "json",
+          success: function (response) {
+            if (response.status === true) {
+              Render(response.datas);
+
+              //console.log("response to see its structure",response); // Log the response to see its structure
+
+              $("#deposit-number").text(response?.total_recharge_count);
+              $("#deposit-amount").text(response?.total_recharge_amount);
+
+              $("#number-bettor").text(response?.better_number);
+              $("#total-bet-amount").text(response?.total_bet_amount);
+              $("#first-deposit").text(response?.total_first_recharge_count);
+              $("#total-bet").text(response?.total_bet_count);
+            }
+          },
+        });
+      };
+    </script>
+    <script
+      src="https://kit.fontawesome.com/5c9f82cc45.js"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

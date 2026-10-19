@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Signup Bonus Configuration</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@5/bootstrap-4.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css">
+    
+
+    <style>
+        :root {
+            --primary-color: #00807c;
+            --secondary-color: #5ccfcb;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: var(--light-bg);
+            color: #333;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            padding: 20px;
+            background-color: var(--light-bg);
+        }
+
+        .main-container {
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            /* Added max-width for better form centering */
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 10px;
+            /* padding: 25px; This was commented out, so keeping it commented. */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 25px; /* Added padding for better spacing inside the form container */
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.25rem rgba(92, 207, 203, 0.25);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 128, 124, 0.3);
+        }
+
+        .status-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .swal2-popup {
+    border-radius: 12px !important;
+    font-family: 'Segoe UI', sans-serif !important;
+    color: #333 !important;
+    background-color: #ffffff !important;
+  }
+
+  .swal2-title {
+    color: #00807c !important;
+    font-weight: 700 !important;
+  }
+
+  .swal2-styled.swal2-confirm {
+    background-color: #00807c !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    border-radius: 8px !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .swal2-styled.swal2-cancel {
+    background-color: #e0e0e0 !important;
+    color: #333 !important;
+    font-weight: bold !important;
+    border-radius: 8px !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .swal2-icon.swal2-success {
+    border-color: #00807c !important;
+    color: #00807c !important;
+  }
+
+  .swal2-icon.swal2-error {
+    border-color: #e74c3c !important;
+    color: #e74c3c !important;
+  }
+
+  .swal2-icon.swal2-warning {
+    border-color: #f39c12 !important;
+    color: #f39c12 !important;
+  }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <%- include('../nav') %>
+
+        <div class="content-wrapper">
+            <div class="container-fluid">
+                <div class="main-container">
+                    <div class="header">
+                        <h1>Signup Bonus Configuration</h1>
+                        <p>Set the bonus amount for new user signups</p>
+                    </div>
+
+                    <div class="form-container">
+                        <form id="signupBonusForm">
+                            <div class="mb-3">
+                                <label for="signupBonus" class="form-label">Signup Bonus Amount</label>
+                                <input type="number" step="0.01" class="form-control" id="signupBonus"
+                                    placeholder="Enter bonus amount" required>
+                            </div>
+
+                            <button type="submit" class="submit-btn" id="saveBonusBtn">
+                                Save Signup Bonus
+                            </button>
+                        </form>
+
+                        <div class="status-message" id="statusMessage"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery (choose only one source) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- SweetAlert2 (use one source) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+<!-- AdminLTE -->
+<script src="/dist/js/adminlte.min.js"></script>
+
+<!-- Custom Admin Script -->
+<script src="/js/admin/admin.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize AdminLTE sidebar
+            $('[data-widget="pushmenu"]').PushMenu('init');
+
+            // Fetch current signup bonus
+            fetchSignupBonus();
+
+            // Form submission handler
+            $('#signupBonusForm').submit(function(e) {
+                e.preventDefault();
+                saveSignupBonus();
+            });
+        });
+
+        function fetchSignupBonus(showAlert = false) {
+    $.ajax({
+        url: "/api/webapi/get-signup-bonus",
+        method: "GET",
+        success: function(response) {
+            if (response.status && response.amount !== undefined) {
+                $('#signupBonus').val(response.amount);
+            } else if (showAlert) {
+                showError("Failed to load current bonus amount");
+            }
+        },
+        error: function() {
+            if (showAlert) {
+                showError("Network error occurred while fetching data");
+            }
+        }
+    });
+}
+
+
+        function saveSignupBonus() {
+            const amount = $('#signupBonus').val().trim();
+
+            if (!amount || isNaN(amount) || parseFloat(amount) < 0) {
+                Swal.fire({
+                    title: 'Invalid Amount',
+                    text: 'Please enter a valid positive number',
+                    icon: 'error',
+                    confirmButtonColor: '#00807c' // Set the main color for the confirm button
+                });
+                return;
+            }
+
+            // Show loading state
+            $('#saveBonusBtn').html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+            $('#saveBonusBtn').prop('disabled', true);
+
+            // Send data to server
+            $.ajax({
+                url: "/api/webapi/set-sinup-bonus",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ amount: parseFloat(amount) }),
+                success: function(response) {
+                    $('#saveBonusBtn').html('Save Signup Bonus');
+                    $('#saveBonusBtn').prop('disabled', false);
+
+                    if (response.status) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Signup bonus updated successfully',
+                            icon: 'success',
+                            confirmButtonColor: '#00807c' // Set the main color for the confirm button
+                        });
+                    } else {
+                        showError(response.message || "Update failed");
+                    }
+                },
+                error: function() {
+                    $('#saveBonusBtn').html('Save Signup Bonus');
+                    $('#saveBonusBtn').prop('disabled', false);
+                    showError("Network error occurred");
+                }
+            });
+        }
+
+        function showError(message) {
+            Swal.fire({
+                title: 'Error!',
+                text: message,
+                icon: 'error',
+                confirmButtonColor: '#00807c' // Set the main color for the confirm button
+            });
+            // Removed the div-based status message as SweetAlert2 handles errors more gracefully
+        }
+    </script>
+</body>
+</html>

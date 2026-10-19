@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vip section</title>
+    
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome (single CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- SweetAlert2 -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <style>
+        :root {
+            --primary-blue: #00807c; /* Consistent blue for accents, adjusted back to standard */
+            --light-blue: #e6f2ff; /* Very light blue for subtle backgrounds/hovers */
+            --text-dark: #333; /* Dark text for readability */
+            --text-medium: #666; /* Medium grey for secondary text */
+            --border-light: #e0e0e0; /* Light grey for borders */
+            --bg-white: #ffffff; /* Pure white background */
+            --bg-light-grey: #f8f9fa; /* Off-white for body background */
+            --success-green: #28a745;
+            --hover-green: #218838;
+            --danger-color: #dc3545; /* Red for errors */
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08); /* Softer, modern shadow */
+            --shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light-grey);
+            color: var(--text-dark);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        
+
+        
+
+        .container {
+            max-width: 1200px;
+           
+            padding: 30px;
+            background: var(--bg-white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            color: var(--primary-blue);
+            font-size: 2.8rem;
+            font-weight: 700;
+           
+        }
+
+        .page-header p {
+            color: var(--text-medium);
+            font-size: 1.1rem;
+        }
+
+        /* Tabs Styling */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background-color: var(--bg-light-grey); /* Subtle background for tab container */
+            border-radius: 8px;
+            padding: 5px;
+            box-shadow: var(--shadow-inset);
+        }
+
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            text-align: center;
+            color: var(--text-medium);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            flex-grow: 1; /* Make tabs fill available space */
+            margin: 0 5px; /* Spacing between tabs */
+        }
+
+        .tab:hover {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .tab.active {
+            background-color: var(--primary-blue);
+            color: var(--bg-white);
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+            transform: translateY(-2px); /* Slight lift for active tab */
+        }
+
+        .tab-content {
+            display: none;
+            
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h2 {
+            font-size: 2rem;
+            color: var(--primary-blue);
+            margin-bottom: 25px;
+            text-align: left;
+            padding-left: 8px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 15px;
+        }
+
+        /* Table Styling */
+        .table-responsive {
+            overflow-x: auto; /* Enable horizontal scrolling */
+            width: 100%;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+
+        table {
+            width: 100%;
+            min-width: 800px; /* Ensure table is wide enough to prevent unwanted wrapping */
+            border-collapse: separate; /* For rounded corners */
+            border-spacing: 0;
+            margin-top: 20px;
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            overflow: hidden; /* Important for rounded corners with separate border */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-dark);
+            white-space: nowrap; /* Keep content on a single line */
+        }
+
+        th {
+            background-color: var(--primary-blue);
+            color: var(--bg-white);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none; /* No border for the last row */
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--bg-light-grey); /* Subtle zebra striping */
+        }
+
+        /* Input Fields */
+        td input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: var(--bg-white);
+        }
+
+        td input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15); /* Soft focus ring */
+        }
+
+        /* Update Button */
+        .update-btn {
+            padding: 10px 20px;
+            background-color: var(--success-green);
+            color: var(--bg-white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .update-btn:hover {
+            background-color: var(--hover-green);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+        }
+
+        .update-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        
+    </style>
+ 
+     
+  </head>
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <!-- Include navigation -->
+      
+      <div class="wrapper">
+        <!-- Include navigation -->
+        <%- include('nav') %>
+        <div class="">
+          
+  
+          <!-- Main content -->
+          <div class="content-wrapper">
+            
+  <section class="content-header" >
+    <div class="page-header" style="display: flex; align-items: center; justify-content: flex-start;">
+      <h2 style="margin: 0; font-size: 24px; font-weight: bold; color: #00807c;">Manage VIP Levels</h2>
+    </div>
+  </section>
+
+
+
+            <section class="content">
+                <div class="container">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="edit-levels">
+                            <i class="fas fa-edit"></i> Edit Levels
+                        </div>
+                        <div class="tab" data-tab="view-levels">
+                            <i class="fas fa-eye"></i> View Current
+                        </div>
+                    </div>
+
+                    <div id="edit-levels" class="tab-content active">
+                        <h2>Edit VIP Level Data</h2>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Level</th>
+                                        <th>Min. Deposit</th>
+                                        <th>One-Time Bonus</th>
+                                        <th>Awarded On</th>
+                                        <th>Monthly Bonus</th>
+                                        <th>Rebate %</th>
+                                        <th>Safety %</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="levels-edit-table-body">
+                                    <tr><td colspan="8" style="text-align: center; color: var(--text-medium);">Loading VIP data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="view-levels" class="tab-content">
+                        <h2>Current VIP Level Configuration</h2>
+                        <!-- <p style=" margin-bottom: 20px; padding-left:10px;">This table shows the current active VIP level settings. These values are read-only here.</p> -->
+                        <div id="levels-view-display" class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Level</th>
+                                        <th>Min. Deposit</th>
+                                        <th>One-Time Bonus</th>
+                                        <th>Awarded On</th> <th>Monthly Bonus</th>
+                                        <th>Rebate %</th>
+                                        <th>Safety %</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="levels-view-table-body">
+                                    <tr><td colspan="7" style="text-align: center; color: var(--text-medium);">Load current levels by clicking this tab.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+
+
+
+        </div>
+      </div>
+
+
+      
+        
+  
+     
+      
+      
+   
+         <a id="back-to-tops" href="#" class="btn1 back-to-top" role="button" aria-label="Scroll to top">
+           <i class="fas fa-chevron-up"></i>
+         </a>
+    </div>
+   
+    </div>
+
+     <!-- ========== CORRECTED SCRIPT SECTION ========== -->
+  <!-- jQuery (ONLY ONCE) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- Bootstrap Bundle with Popper (CHOOSE ONE VERSION) -->
+  <!-- Option 1: Use CDN version -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- OR Option 2: Use local version (comment out the CDN version above) -->
+  <!-- <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script> -->
+  
+  <!-- SweetAlert2 (ONLY ONCE) -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  
+  <!-- AdminLTE (ONLY ONCE) -->
+  <script src="/dist/js/adminlte.min.js"></script>
+  
+  <!-- Your custom admin script (ONLY ONCE) -->
+  <script src="/js/admin/admin.js"></script>
+
+    <script>
+        // Helper function for SweetAlert2 messages
+        const showAlert = (icon, title, text, timer = 2500) => {
+            Swal.fire({
+                icon: icon,
+                title: title,
+                text: text,
+                showConfirmButton: false,
+                timer: timer,
+                timerProgressBar: true
+            });
+        };
+
+        /**
+         * Fetches VIP data from the API and populates the "Edit Levels" table.
+         */
+        async function fetchAndPopulateEditLevels() {
+            const tableBody = document.getElementById('levels-edit-table-body');
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-medium);">Loading VIP data...</td></tr>'; // Loading state
+
+            try {
+                const response = await axios.get('/api/webapi/vip-data');
+                const responseData = response.data;
+
+                if (responseData.success && responseData.data.length > 0) {
+                    tableBody.innerHTML = ''; // Clear loading state
+
+                    responseData.data.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.level}</td>
+                            <td><input type="number" value="${item.amount}" class="form-control amount"></td>
+                            <td><input type="number" value="${item.onetime}" class="form-control onetime"></td>
+                            <td>${item.level}</td> <td><input type="number" value="${item.monthstime}" class="form-control monthstime"></td>
+                            <td><input type="number" step="0.01" value="${item.rebet}" class="form-control rebet"></td>
+                            <td><input type="number" step="0.01" value="${item.sefe}" class="form-control sefe"></td>
+                            <td>
+                                <button class="update-btn" data-id="${item.id}">
+                                    <i class="fas fa-save"></i> Update
+                                </button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--danger-color);">No VIP data found or an error occurred.</td></tr>';
+                    showAlert('warning', 'No Data', responseData.message || 'Could not load VIP data.');
+                }
+            } catch (error) {
+                console.error('Error fetching VIP data for edit:', error);
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--danger-color);">Failed to load VIP data. Please check network.</td></tr>';
+                showAlert('error', 'Network Error', 'Failed to fetch VIP data. Please try again.');
+            }
+        }
+
+        /**
+         * Handles the update action when an "Update" button is clicked.
+         */
+        document.getElementById('levels-edit-table-body').addEventListener('click', async (e) => {
+            if (e.target.closest('.update-btn')) {
+                const button = e.target.closest('.update-btn');
+                const originalButtonContent = button.innerHTML; // Store original content including icon
+                button.disabled = true; // Disable button
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...'; // Feedback
+
+                const row = button.closest('tr');
+                // Use Array.from for robust conversion from HTMLCollection to Array for find
+                const cells = Array.from(row.querySelectorAll('td'));
+                // Find the level based on its position or a specific class/attribute if available
+                // Assuming 'Level' is the first cell based on your table structure
+                const level = cells[0].textContent; // Get level from the first cell
+
+                const id = button.dataset.id;
+
+                // Get values from input fields, ensure they are numbers
+                const amount = parseFloat(row.querySelector('.amount').value);
+                const onetime = parseFloat(row.querySelector('.onetime').value);
+                const monthstime = parseFloat(row.querySelector('.monthstime').value);
+                const rebet = parseFloat(row.querySelector('.rebet').value);
+                const sefe = parseFloat(row.querySelector('.sefe').value);
+
+                // Basic validation
+                if (isNaN(amount) || isNaN(onetime) || isNaN(monthstime) || isNaN(rebet) || isNaN(sefe)) {
+                    showAlert('error', 'Invalid Input', 'Please enter valid numbers for all fields.');
+                    button.disabled = false;
+                    button.innerHTML = originalButtonContent;
+                    return;
+                }
+
+                const updatedData = {
+                    id,
+                    level: level, // Include level if your API expects it in the update payload
+                    amount,
+                    onetime,
+                    monthstime,
+                    rebet,
+                    sefe
+                };
+
+                try {
+                    const response = await axios.post('/api/webapi/set-vip-data', updatedData, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    const responseData = response.data;
+
+                    if (responseData.status) {
+                        showAlert('success', 'Success', 'VIP data updated successfully!');
+                        // Optional: Re-fetch data for the "View Current" tab if it's open, or just refresh this row
+                    } else {
+                        showAlert('error', 'Failed', responseData.message || 'Failed to update VIP data.');
+                    }
+                } catch (error) {
+                    console.error('Error updating VIP data:', error);
+                    showAlert('error', 'API Error', 'An error occurred while updating data. Please try again.');
+                } finally {
+                    button.disabled = false; // Re-enable button
+                    button.innerHTML = originalButtonContent; // Reset button text
+                }
+            }
+        });
+
+        /**
+         * Fetches VIP data and displays it in the "View Current" tab (read-only).
+         */
+        async function fetchAndPopulateViewLevels() {
+            const tableBody = document.getElementById('levels-view-table-body');
+            tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-medium);">Loading current levels...</td></tr>';
+
+            try {
+                const response = await axios.get('/api/webapi/vip-data');
+                const responseData = response.data;
+
+                if (responseData.success && responseData.data.length > 0) {
+                    tableBody.innerHTML = ''; // Clear loading state
+                    responseData.data.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.level}</td>
+                            <td>${item.amount}</td>
+                            <td>${item.onetime}</td>
+                            <td>${item.level}</td> <td>${item.monthstime}</td>
+                            <td>${item.rebet}%</td>
+                            <td>${item.sefe}%</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--danger-color);">No current VIP data available.</td></tr>';
+                    showAlert('warning', 'No Data', responseData.message || 'No current VIP data to display.');
+                }
+            } catch (error) {
+                console.error('Error fetching VIP data for view:', error);
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--danger-color);">Failed to load current VIP data.</td></tr>';
+                showAlert('error', 'Network Error', 'Failed to fetch current VIP data. Please try again.');
+            }
+        }
+
+        // Tab switching logic
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+
+                // Add active class to the clicked tab and its corresponding content
+                tab.classList.add('active');
+                const targetTabContentId = tab.getAttribute('data-tab');
+                document.getElementById(targetTabContentId).classList.add('active');
+
+                // If "View Current" tab is clicked, fetch and display the data
+                if (targetTabContentId === 'view-levels') {
+                    fetchAndPopulateViewLevels();
+                }
+            });
+        });
+
+        // Initial data fetch and display for "Edit Levels" on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAndPopulateEditLevels();
+        });
+
+        // Back to top button logic
+        const backToTopButton = document.getElementById('back-to-top');
+        if (backToTopButton) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 200) { // Show button after scrolling 200px
+                    backToTopButton.style.display = 'flex';
+                } else {
+                    backToTopButton.style.display = 'none';
+                }
+            });
+
+            backToTopButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    </script>
+   
+
+    
+  </body>
+</html>
+
+
+

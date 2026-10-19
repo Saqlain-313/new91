@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Illegal Trade Admin Panel</title>
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+      .container-fluid {
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+      }
+
+      .header {
+        text-align: center;
+        background-color: #00807c;
+        color: white;
+        padding: 10px 0;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+      .header h1 {
+        margin: 0;
+      }
+      .dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+      }
+      .card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .card h3 {
+        margin: 0 0 10px;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: flex-end; /* Align items to the bottom */
+      }
+      .controls .form-control {
+        flex-grow: 1; /* Allow inputs to grow */
+        min-width: 150px; /* Ensure minimum width for inputs */
+      }
+      .controls .btn-group {
+        display: flex;
+        gap: 10px; /* Space between buttons in a group */
+      }
+      .controls button {
+        padding: 10px 20px;
+        background-color: #00807c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      .controls button:hover {
+        background-color: #00807c;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: white;
+        border-radius: 8px;
+      }
+
+      table th,
+      table td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      table th {
+        background-color: #00807c;
+        color: white;
+      }
+      .progress {
+        background-color: #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 10px;
+        height: 20px;
+      }
+      .progress-bar {
+        height: 100%;
+        background-color: #00807c;
+        text-align: center;
+        color: white;
+        line-height: 20px; /* Center text vertically */
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .container-fluid {
+          padding: 10px;
+        }
+        .controls {
+          flex-direction: column;
+          align-items: stretch; /* Stretch items to full width */
+        }
+        .controls .form-control {
+          width: 100%;
+        }
+        .controls .btn-group {
+          flex-direction: column; /* Stack buttons in a group */
+          gap: 5px;
+        }
+        .controls .btn-group button {
+          width: 100%;
+        }
+      }
+      @media (max-width: 576px) {
+        .d-flex.flex-column.flex-sm-row {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+        }
+        .d-flex.flex-column.flex-sm-row .mb-2.mb-sm-0 {
+          margin-bottom: 0.5rem !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <%- include('nav') %>
+
+      <div class="content-wrapper">
+        <section class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-12">
+                <h1
+                  style="
+                    color: #00807c;
+                    font-size: 2rem;
+                    font-weight: bold;
+                    text-align: start;
+                  "
+                >
+                  Illegal Trade Admin Panel
+                </h1>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="content">
+          <div class="container-fluid">
+            <!-- <div
+              class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-sm-between mb-4"
+            >
+              <h2 class="h2 text-dark mb-2 mb-sm-0">Illegal Bet Monitor</h2>
+              <span
+                class="badge badge-info py-2 px-3 rounded-pill d-flex align-items-center"
+              >
+                <i class="fas fa-info-circle mr-1"></i>
+                <span id="totalViolationsCount">0</span> total violations
+                detected
+              </span>
+            </div> -->
+
+            <div style="display: flex; flex-wrap: wrap; margin: 0 -12px">
+              <!-- Total Violations -->
+              <div
+                style="
+                  width: 100%;
+                  max-width: 25%;
+                  padding: 0 12px;
+                  margin-bottom: 1.5rem;
+                  box-sizing: border-box;
+                "
+              >
+                <div
+                  style="
+                    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+                    height: 100%;
+                    border-radius: 10px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: space-between;
+                      background: #ffffff;
+                      border-radius: 10px;
+                      padding: 20px;
+                    "
+                  >
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 1rem;
+                      "
+                    >
+                      <div
+                        style="
+                          padding: 10px;
+                          background: #cce5ff;
+                          border-radius: 50%;
+                          color: #0056b3;
+                          margin-right: 12px;
+                        "
+                      >
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                      </div>
+                      <span style="color: #015956; font-weight: bold"
+                        >Total Violations</span
+                      >
+                    </div>
+                    <p
+                      style="
+                        font-size: 2.5rem;
+                        font-weight: bold;
+                        color: #00807c;
+                        margin-bottom: 0;
+                      "
+                      id="cardTotalViolations"
+                    >
+                      0
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Active Violators -->
+              <div
+                style="
+                  width: 100%;
+                  max-width: 25%;
+                  padding: 0 12px;
+                  margin-bottom: 1.5rem;
+                  box-sizing: border-box;
+                "
+              >
+                <div
+                  style="
+                    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+                    height: 100%;
+                    border-radius: 10px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: space-between;
+                      background: #ffffff;
+                      border-radius: 10px;
+                      padding: 20px;
+                    "
+                  >
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 1rem;
+                      "
+                    >
+                      <div
+                        style="
+                          padding: 10px;
+                          background: #f8d7da;
+                          border-radius: 50%;
+                          color: #721c24;
+                          margin-right: 12px;
+                        "
+                      >
+                        <i class="fas fa-user-slash fa-2x"></i>
+                      </div>
+                      <span style="color: #015956; font-weight: bold"
+                        >Active Violators</span
+                      >
+                      <span
+                        style="
+                          margin-left: auto;
+                          background: #00807c;
+                          color: #fff;
+                          padding: 2px 8px;
+                          border-radius: 999px;
+                          font-size: 0.8rem;
+                        "
+                        id="activeViolatorsPercent"
+                        >0%</span
+                      >
+                    </div>
+                    <p
+                      style="
+                        font-size: 2.5rem;
+                        font-weight: bold;
+                        color: #00807c;
+                        margin-bottom: 0;
+                      "
+                      id="cardActiveViolators"
+                    >
+                      0
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Locked Accounts -->
+              <div
+                style="
+                  width: 100%;
+                  max-width: 25%;
+                  padding: 0 12px;
+                  margin-bottom: 1.5rem;
+                  box-sizing: border-box;
+                "
+              >
+                <div
+                  style="
+                    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+                    height: 100%;
+                    border-radius: 10px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: space-between;
+                      background: #ffffff;
+                      border-radius: 10px;
+                      padding: 20px;
+                    "
+                  >
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 1rem;
+                      "
+                    >
+                      <div
+                        style="
+                          padding: 10px;
+                          background: #fff3cd;
+                          border-radius: 50%;
+                          color: #856404;
+                          margin-right: 12px;
+                        "
+                      >
+                        <i class="fas fa-lock fa-2x"></i>
+                      </div>
+                      <span style="color: #015956; font-weight: bold"
+                        >Locked Accounts</span
+                      >
+                    </div>
+                    <p
+                      style="
+                        font-size: 2.5rem;
+                        font-weight: bold;
+                        color: #00807c;
+                        margin-bottom: 0;
+                      "
+                      id="cardLockedAccounts"
+                    >
+                      0
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Violation Rate -->
+              <div
+                style="
+                  width: 100%;
+                  max-width: 25%;
+                  padding: 0 12px;
+                  margin-bottom: 1.5rem;
+                  box-sizing: border-box;
+                "
+              >
+                <div
+                  style="
+                    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+                    height: 100%;
+                    border-radius: 10px;
+                  "
+                >
+                  <div
+                    style="
+                      display: flex;
+                      flex-direction: column;
+                      justify-content: space-between;
+                      background: #ffffff;
+                      border-radius: 10px;
+                      padding: 20px;
+                    "
+                  >
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 1rem;
+                      "
+                    >
+                      <div
+                        style="
+                          padding: 10px;
+                          background: #d4edda;
+                          border-radius: 50%;
+                          color: #155724;
+                          margin-right: 12px;
+                        "
+                      >
+                        <i class="fas fa-percent fa-2x"></i>
+                      </div>
+                      <span style="color: #015956; font-weight: bold"
+                        >Violation Rate</span
+                      >
+                    </div>
+                    <p
+                      style="
+                        font-size: 2.5rem;
+                        font-weight: bold;
+                        color: #00807c;
+                        margin-bottom: 0;
+                      "
+                      id="cardViolationRate"
+                    >
+                      0
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- <div class="row">
+              <div class="col-lg-8 mb-4">
+                <div class="card shadow-sm h-100">
+                  <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                      <div
+                        class="p-2 bg-light rounded-circle text-muted mr-3"
+                      >
+                        <i class="fas fa-gamepad fa-2x"></i>
+                      </div>
+                      <h3 class="h5 font-weight-bold text-light mb-0">
+                        Violations by Game
+                      </h3>
+                    </div>
+                    <div
+                      class="flex-grow-1 border border-light rounded p-4 d-flex align-items-center justify-content-center text-muted"
+                    >
+                      Game specific violation data would go here.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm h-100">
+                  <div class="card-body d-flex flex-column">
+                    <div class="d-flex align-items-center mb-3">
+                      <div
+                        class="p-2 bg-light rounded-circle text-muted mr-3"
+                      >
+                        <i class="fas fa-chart-line fa-2x"></i>
+                      </div>
+                      <h3 class="h5 font-weight-bold text-light mb-0">
+                        Risk Level Analysis
+                      </h3>
+                    </div>
+                    <div class="flex-grow-1">
+                      <div class="d-flex align-items-center mb-2">
+                        <span class="badge badge-success p-2 mr-2 rounded-circle"></span>
+                        <span class="text-light">LOW</span>
+                        <span class="ml-auto text-muted">0%</span>
+                      </div>
+                      <div class="d-flex align-items-center mb-2">
+                        <span class="badge badge-warning p-2 mr-2 rounded-circle"></span>
+                        <span class="text-light">MEDIUM</span>
+                        <span class="ml-auto text-muted">0%</span>
+                      </div>
+                      <div class="d-flex align-items-center mb-2">
+                        <span class="badge badge-danger p-2 mr-2 rounded-circle"></span>
+                        <span class="text-light">HIGH</span>
+                        <span class="ml-auto text-muted">0%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+
+            <div class="card shadow-sm mb-4">
+              <div class="card-header text-white" style="background: #00807c">
+                <h3 class="card-title mb-0">User Violations</h3>
+              </div>
+              <div class="card-body">
+                <div
+                  class="d-flex flex-wrap justify-content-between mb-3 controls"
+                >
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Search by User ID"
+                    id="searchInput"
+                  />
+                  <button id="searchBtn" class=" ">Search</button>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-hover table-bordered">
+                    <thead>
+                      <tr>
+                        <th>User ID</th>
+                        <th>Phone</th>
+                        <th>Total Illegal Count</th>
+                        <th>Progress (Max 10)</th>
+                        <th>Last Updated</th>
+                        <th>Action</th>
+                        <th>Details</th>
+                      </tr>
+                    </thead>
+                    <tbody id="userTableBody"></tbody>
+                  </table>
+                </div>
+                <nav>
+                  <ul
+                    class="pagination justify-content-center mt-3"
+                    id="userPagination"
+                  ></ul>
+                </nav>
+              </div>
+            </div>
+
+            <div class="card shadow-sm">
+              <div class="card-header text-white" style="background: #00807c">
+                <h3 class="card-title mb-0">Violation History</h3>
+              </div>
+              <div class="card-body">
+                <div
+                  class="d-flex flex-wrap justify-content-between mb-3 controls"
+                >
+                  <div class="form-group flex-grow-1 mr-2">
+                    <label for="startDate">Start Date</label>
+                    <input
+                      type="date"
+                      id="startDate"
+                      title="Start Date"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="form-group flex-grow-1 mr-2">
+                    <label for="endDate">End Date</label>
+                    <input
+                      type="date"
+                      id="endDate"
+                      title="End Date"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="btn-group align-self-end">
+                    <button id="historySearchBtn" class=" ">Search</button>
+                    <button id="clearBtn" class="btn btn-secondary">
+                      Clear
+                    </button>
+                    <button id="refreshBtn" class="btn btn-info">
+                      <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-hover table-bordered">
+                    <thead>
+                      <tr>
+                        <th>Period ID</th>
+                        <th>User ID</th>
+                        <th>Phone</th>
+                        <th>Game</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody id="historyTableBody"></tbody>
+                  </table>
+                </div>
+                <nav>
+                  <ul
+                    class="pagination justify-content-center mt-3"
+                    id="historyPagination"
+                  ></ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <a
+        id="back-to-tops"
+        href="#"
+        class="btn1 back-to-top"
+        role="button"
+        aria-label="Scroll to top"
+      >
+        <i class="fas fa-chevron-up"></i>
+      </a>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap Bundle -->
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AdminLTE -->
+    <script src="/dist/js/adminlte.min.js"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+    <!-- Axios (if needed) -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <!-- Custom Admin Script -->
+    <script src="/js/admin/admin.js"></script>
+
+    <script>
+      $(document).ready(function () {
+        // Initial fetch of all data when the page loads
+        fetchUserData();
+
+        // Search Button Click Event for User Violations
+        $("#searchBtn").on("click", function () {
+          let userId = $("#searchInput").val().trim();
+          fetchUserData(userId); // Fetch specific user data
+        });
+
+        // History Search Button Click Event
+        $("#historySearchBtn").on("click", function () {
+          let startDate = $("#startDate").val();
+          let endDate = $("#endDate").val();
+          fetchHistoryData(startDate, endDate);
+        });
+
+        // Clear History Filters Button Click Event
+        $("#clearBtn").on("click", function () {
+          $("#startDate").val("");
+          $("#endDate").val("");
+          fetchHistoryData(); // Clear filters and fetch all history
+        });
+
+        // Refresh History Button Click Event
+        $("#refreshBtn").on("click", function () {
+          $("#startDate").val("");
+          $("#endDate").val("");
+          fetchHistoryData(); // Refresh history data
+        });
+
+        // Function to fetch user and history data from API
+        function fetchUserData(userId = "") {
+          $.ajax({
+            type: "POST",
+            url: "/api/webapi/get-ligalTrade-data",
+            data: { user_id: userId }, // Fetch specific or all data
+            dataType: "json",
+            success: function (response) {
+              //console.log("API Response (Users & History):", response);
+              if (response.status && response.data) {
+                displayUserData(response.data.users, response.data.history);
+                displayHistoryData(response.data.history);
+                updateViolationCounts(response.data.users);
+              } else {
+                console.error(
+                  "Invalid response format or no data for users/history."
+                );
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error(
+                "API Fetch Error (Users & History):",
+                status,
+                error
+              );
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Could not fetch user data. Please try again later!",
+              });
+            },
+          });
+        }
+
+        // Function to fetch only history data (for date filtering)
+        function fetchHistoryData(startDate = "", endDate = "") {
+          $.ajax({
+            type: "POST", // Assuming history filter also uses POST
+            url: "/api/webapi/get-ligalTrade-data", // Or a specific history endpoint
+            data: { start_date: startDate, end_date: endDate },
+            dataType: "json",
+            success: function (response) {
+              //console.log("API Response (History Only):", response);
+              if (response.status && response.data && response.data.history) {
+                displayHistoryData(response.data.history);
+              } else {
+                console.error(
+                  "Invalid response format or no data for history."
+                );
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error("API Fetch Error (History Only):", status, error);
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Could not fetch history data. Please try again later!",
+              });
+            },
+          });
+        }
+
+        // Function to display User Data in Table
+        function displayUserData(users, history) {
+          let tableBody = $("#userTableBody");
+          tableBody.empty(); // Clear existing data
+
+          if (users.length === 0) {
+            tableBody.append(
+              '<tr><td colspan="7" class="text-center">No user violations found.</td></tr>'
+            );
+            return;
+          }
+
+          users.forEach((user) => {
+            let totalScore = user.legal_bet_score;
+            let progressPercentage = (totalScore / 10) * 100;
+            let progressColor =
+              progressPercentage >= 100 ? "#dc3545" : "#00807c"; // Red for 100%, Blue otherwise
+
+            let row = `
+              <tr>
+                <td>${user.id_user}</td>
+                <td>${user.phone}</td>
+                <td>${user.legal_bet_score}</td>
+                <td>
+                  <div class="progress">
+                    <div class="progress-bar" style="width: ${progressPercentage}%; background-color: ${progressColor};">
+                      ${totalScore}/10
+                    </div>
+                  </div>
+                </td>
+                <td>${
+                  user.last_illegal_date
+                    ? new Date(user.last_illegal_date).toLocaleString()
+                    : "N/A"
+                }</td>
+                <td>
+                  ${
+                    totalScore >= 10
+                      ? `<a class="btn btn-danger btn-sm unlock-btn" data-id="${user.id_user}" href="#"><i class="fa-solid fa-lock-open"></i> Unlock</a>`
+                      : `<span class="btn text-success btn-sm"><i class="fa-solid fa-lock"></i> Unblocked</span>`
+                  }
+                </td>
+                <td>
+                  <button class="btn btn-info btn-sm show-history-btn" data-id="${
+                    user.id_user
+                  }">
+                    Show History
+                  </button>
+                </td>
+              </tr>
+            `;
+            tableBody.append(row);
+          });
+        }
+
+        // Function to display History Data in Table
+        function displayHistoryData(history) {
+          let tableBody = $("#historyTableBody");
+          tableBody.empty(); // Clear existing data
+
+          if (history.length === 0) {
+            tableBody.append(
+              '<tr><td colspan="6" class="text-center">No violation history found.</td></tr>'
+            );
+            return;
+          }
+
+          history.forEach((entry) => {
+            let row = `
+              <tr>
+                <td>${entry.period}</td>
+                <td>${entry.user_id}</td>
+                <td>${entry.phone}</td>
+                <td>${entry.game}</td>
+                <td>${entry.score}</td>
+                <td>${new Date(entry.date).toLocaleString()}</td>
+              </tr>
+            `;
+            tableBody.append(row);
+          });
+        }
+
+        // Function to update violation count cards
+        function updateViolationCounts(users) {
+          let totalViolations = users.reduce(
+            (sum, user) => sum + user.legal_bet_score,
+            0
+          );
+          let activeViolators = users.filter(
+            (user) => user.legal_bet_score > 0
+          ).length;
+          let lockedAccounts = users.filter(
+            (user) => user.legal_bet_score >= 10
+          ).length;
+          let violationRate =
+            users.length > 0 ? (totalViolations / users.length).toFixed(2) : 0;
+          let activeViolatorsPercent =
+            users.length > 0
+              ? ((activeViolators / users.length) * 100).toFixed(0)
+              : 0;
+
+          $("#totalViolationsCount").text(totalViolations);
+          $("#cardTotalViolations").text(totalViolations);
+          $("#cardActiveViolators").text(activeViolators);
+          $("#activeViolatorsPercent").text(activeViolatorsPercent + "%");
+          $("#cardLockedAccounts").text(lockedAccounts);
+          $("#cardViolationRate").text(violationRate);
+        }
+
+        // Event Delegation for Unlock Button Click
+        $(document).on("click", ".unlock-btn", function (e) {
+          e.preventDefault();
+          let button = $(this);
+          let userId = button.data("id");
+
+          Swal.fire({
+            title: "Are you sure?",
+            text: `Do you want to unlock the account for User ID: ${userId}?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, unlock it!",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              $.ajax({
+                type: "POST",
+                url: "/api/webapi/admin/eliga-unblock",
+                data: { id: userId },
+                dataType: "json",
+                success: function (response) {
+                  if (response.status) {
+                    Swal.fire("Unlocked!", response.message, "success");
+                    fetchUserData(); // Refresh table data
+                  } else {
+                    Swal.fire("Failed!", response.message, "error");
+                  }
+                },
+                error: function (xhr, status, error) {
+                  console.error("Unlock API Error:", status, error);
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Could not unlock account. Please try again later!",
+                  });
+                },
+              });
+            }
+          });
+        });
+
+        // Event Delegation for Show History buttons
+        $(document).on("click", ".show-history-btn", function () {
+          let userId = $(this).data("id");
+          // Assuming you have the full history data available from the initial fetch
+          // Or you can make a new API call to get history for a specific user
+          $.ajax({
+            type: "POST",
+            url: "/api/webapi/get-ligalTrade-data", // Using the same endpoint, filtering on backend
+            data: { user_id: userId, get_history_only: true }, // Add a flag for history only
+            dataType: "json",
+            success: function (response) {
+              if (response.status && response.data && response.data.history) {
+                showHistoryPopup(response.data.history, userId);
+              } else {
+                Swal.fire(
+                  "No History!",
+                  "No violation history found for this user.",
+                  "info"
+                );
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error("Fetch User History Error:", status, error);
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Could not fetch user history. Please try again later!",
+              });
+            },
+          });
+        });
+
+        // Function to create and show the history popup
+        function showHistoryPopup(userHistory, userId) {
+          let modalBodyContent = "";
+          if (userHistory.length === 0) {
+            modalBodyContent =
+              '<p class="text-center">No violation history found for this user.</p>';
+          } else {
+            modalBodyContent = `
+                  <div class="table-responsive">
+                      <table class="table table-bordered table-striped">
+                          <thead>
+                              <tr>
+                                  <th>Period ID</th>
+                                  <th>Game</th>
+                                  <th>Date</th>
+                                  <th>Score</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              ${userHistory
+                                .map(
+                                  (entry) => `
+                                  <tr>
+                                      <td>${entry.period}</td>
+                                      <td>${entry.game}</td>
+                                      <td>${new Date(
+                                        entry.date
+                                      ).toLocaleString()}</td>
+                                      <td>${entry.score}</td>
+                                  </tr>
+                              `
+                                )
+                                .join("")}
+                          </tbody>
+                      </table>
+                  </div>
+              `;
+          }
+
+          let modalContent = `
+            <div class="modal fade" id="historyModal" tabindex="-1" role="dialog" aria-labelledby="historyModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="historyModalLabel">Violation History for User ID: ${userId}</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    ${modalBodyContent}
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Append the modal to the body and show it
+          $("body").append(modalContent);
+          $("#historyModal").modal("show");
+
+          // Clean up after modal is closed
+          $("#historyModal").on("hidden.bs.modal", function () {
+            $(this).remove();
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

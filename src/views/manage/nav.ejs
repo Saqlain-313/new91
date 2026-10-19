@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+   
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24; /* Adjust optical size as needed for better visual */
+            vertical-align: middle; /* Align icons nicely with text */
+            margin-right: 5px; /* Add some space between icon and text */
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            background-color: #5ccfcb !important;
+        }
+
+        .active {
+            background: linear-gradient(to right, #5ccfcb, #00807c) !important;
+            color: white !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+
+        a:hover {
+            background-color: #dee4e3 !important;
+            color: white !important;
+        }
+
+        a {
+            background-color: #00807c !important;      
+        }
+
+        [class*="sidebar-dark-"] .sidebar a {
+            color: #e2e2e2;
+        }
+
+        [class*="sidebar-dark-"] .nav-sidebar>.nav-item.menu-open>.nav-link,
+        [class*="sidebar-dark-"] .nav-sidebar>.nav-item:hover>.nav-link,
+        [class*="sidebar-dark-"] .nav-sidebar>.nav-item>.nav-link:focus {
+            color: white !important;
+            background-color: #5ccfcb !important;
+        }
+
+        .navbar-dark {
+            background-color: #ffffff;
+            border-color: #dee2e6;
+            padding: 10px 20px;
+            /* border-radius: 8px; */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn1 {
+            background: linear-gradient(135deg, #5ccfcb, #478ed1);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn1:hover {
+            background: linear-gradient(135deg, #478ed1, #5ccfcb);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="main-header navbar navbar-expand navbar-dark" style="background-color: #00807c;">
+        <ul class="navbar-nav">
+            <li>
+                <a class="nav-link" style="border-radius: 10px; color: white;" data-widget="pushmenu" href="#"
+                    role="button">
+                    <i class="fas fa-bars"></i>
+                </a>
+            </li>
+        </ul>
+        
+        <ul class="navbar-nav ml-auto">
+            <li>
+                <a class="nav-link" style="border-radius: 10px; color: white;" data-widget="fullscreen" href="#"
+                    role="button">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color: #00807c;">
+        <div class="sidebar" style="margin-top: 0;">
+            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                <div class="image">
+                    <img src="/images/facebook.png" class="img-circle elevation-2" alt="User Image" />
+                </div>
+                <div class="info">
+                    <a href="#" class="d-block">
+                        <img src="/images/logocm.png" style="width: 150px;" alt="User Image" />
+                    </a>
+                </div>
+            </div>
+
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                    <li class="nav-item" data-permission="Home">
+                        <a href="/admin/manager/Home" class="nav-link">
+                            <i class="material-symbols-outlined">home</i> <p>Dashboard </p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Create SubPanel">
+                        <a href="/admin/manager/createsubpanel" class="nav-link">
+                            <i class="material-symbols-outlined">dashboard</i> <p>Create SubPanel</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item" data-permission="Wingo">
+                        <a href="/admin/manager/index" class="nav-link">
+                            <i class="material-symbols-outlined">casino</i> <p>Wingo </p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item" data-permission="TRX">
+                        <a href="/admin/manager/trx" class="nav-link">
+                            <i class="material-symbols-outlined">paid</i> <p>TRX </p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="5D">
+                        <a href="/admin/manager/5d" class="nav-link">
+                            <i class="material-symbols-outlined">casino</i> <p>5D </p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="K3">
+                        <a href="/admin/manager/k3" class="nav-link">
+                            <i class="material-symbols-outlined">casino</i> <p>K3 </p>
+                        </a>
+                    </li>
+                    
+                       
+
+                    <li data-permission="Support Tickets">
+                        </li>
+
+                    <li class="nav-item" data-permission="Member">
+                        <a href="/admin/manager/members" class="nav-link">
+                            <i class="material-symbols-outlined">group</i> <p>Member</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item has-treeview" data-permission="Recharge (Approved)">
+                        <a href="/admin/manager/rechargeRecord" class="nav-link">
+                            <i class="material-symbols-outlined">attach_money</i> <p>
+                                Bones <i class="right material-symbols-outlined">chevron_left</i> </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li>
+                                <a href="/admin/manager/InvitationBonus" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>Invitation Bonus</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/manager/newfiles/attendencebones" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>Attendance Bones</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/manager/newfiles/SignupBones" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>Signup Bones</p>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/admin/manager/FirstDepositBonus" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>First Deposit Bonus</p>
+                                </a>
+                            </li>
+
+                            <li  data-permission="Spin Wheel">
+                        <a href="/admin/manager/spinwheel" class="nav-link">
+                            <i class="material-symbols-outlined">refresh</i> <p>Spin Wheel</p>
+                        </a>
+                    </li>
+
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="/admin/manager/newfiles/agentperformance" class="nav-link">
+                            <i class="material-symbols-outlined">person_outline</i> <p>Agent Performance</p>
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <a href="/admin/manager/newfiles/iprecord" class="nav-link">
+                            <i class="material-symbols-outlined">wifi</i> <p>IP Record</p>
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <a href="/admin/manager/newfiles/topperformance" class="nav-link">
+                            <i class="material-symbols-outlined">trending_up</i> <p>Top Performance</p>
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <a href="/admin/manager/newfiles/apitransaction" class="nav-link">
+                            <i class="material-symbols-outlined">api</i> <p>Api Transaction</p>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/admin/manager/newfiles/createuser" class="nav-link">
+                            <i class="material-symbols-outlined">person_add</i> <p>Create User</p>
+                        </a>
+                    </li>
+
+                    
+                    <li class="nav-item" data-permission="Illegal Trade">
+                        <a href="/admin/manager/llegaltrade" class="nav-link">
+                            <i class="material-symbols-outlined">gpp_bad</i> <p>Illegal Trade</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Profit & Loss">
+                        <a href="/admin/manager/profitloss" class="nav-link">
+                            <i class="material-symbols-outlined">area_chart</i> <p>Profit & Loss</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item" data-permission="User Level">
+                        <a href="/admin/manager/userlevel" class="nav-link">
+                            <i class="material-symbols-outlined">stacked_bar_chart</i> <p>User Level</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item" data-permission="Agents">
+                        <a href="/admin/manager/ctv" class="nav-link">
+                            <i class="material-symbols-outlined">groups</i> <p>Agents</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="demouser">
+                        <a href="/admin/manager/demouser" class="nav-link">
+                            <i class="material-symbols-outlined">person</i> <p>Demo Users</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Created Salary">
+                        <a href="/admin/manager/CreatedSalaryRecord" class="nav-link">
+                            <i class="material-symbols-outlined">currency_rupee</i> <p>Created Salary</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Level Setting">
+                        <a href="/admin/manager/levelSetting" class="nav-link">
+                            <i class="material-symbols-outlined">settings_suggest</i> <p>Level Setting</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Business Manage">
+                        <a href="/admin/manager/statistical" class="nav-link">
+                            <i class="material-symbols-outlined">business_center</i> <p>Business Manage</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Pending Recharge">
+                        <a href="/admin/manager/recharge" class="nav-link">
+                            <i class="material-symbols-outlined">account_balance_wallet</i> <p>Pending Recharge</p>
+                        </a>
+                    </li> 
+                    <!-- <li class="nav-item" data-permission="Pending Withdrawal">
+                        <a href="/admin/manager/withdraw" class="nav-link">
+                            <i class="material-symbols-outlined">payments</i> <p>Pending Withdrawal</p>
+                        </a>
+                    </li> -->
+                    <li class="nav-item has-treeview" data-permission="Recharge (Approved)">
+                        <a href="/admin/manager/rechargeRecord" class="nav-link">
+                            <i class="material-symbols-outlined">history</i> <p>
+                                Recharge 
+                                <i class="right material-symbols-outlined">chevron_left</i> </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li>
+                                <a href="/admin/manager/allrecharge" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>ALL</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/manager/successrecharge" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>SUCCESS</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/manager/pandingrecharge" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>PANDING</p>
+                                </a>
+                            </li>
+                            <li >
+                                <a href="/admin/manager/failrecharge" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>FAIL</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+
+                    <li class="nav-item has-treeview" data-permission="Recharge (Approved)">
+                        <a href="/admin/manager/rechargeRecord" class="nav-link">
+                            <i class="material-symbols-outlined">history</i> <p>
+                                Withdrawal 
+                                <i class="right material-symbols-outlined">chevron_left</i> </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li>
+                                <a href="/admin/manager/withdrawRecord" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>ALL</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/manager/withdrawalsuccess" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>SUCCESS</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/manager/withdraw" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>PANDING</p>
+                                </a>
+                            </li>
+                            <li >
+                                <a href="/admin/manager/withdrawlfail" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>FAIL</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    
+                    <li class="nav-item" data-permission="Turnover Report">
+                        <a href="/admin/manager/turnover" class="nav-link">
+                            <i class="material-symbols-outlined">analytics</i> <p>Turnover Report</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Betting History">
+                        <a href="/admin/manager/betting" class="nav-link">
+                            <i class="material-symbols-outlined">sports_esports</i> <p>Betting History</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Today Report">
+                        <a href="/admin/manager/today_report" class="nav-link">
+                            <i class="material-symbols-outlined">calendar_today</i> <p>Today Report</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Create Giftcode">
+                        <a href="/admin/manager/createBonus" class="nav-link">
+                            <i class="material-symbols-outlined">card_giftcard</i> <p>Create Giftcode</p>
+                        </a>
+                    </li>
+
+                       <li class="nav-item has-treeview" data-permission="Settings">
+  <a href="#" class="nav-link">
+    <i class="material-symbols-outlined">settings</i>
+    <p>
+      Settings
+      <i class="right material-symbols-outlined">chevron_left</i>
+    </p>
+  </a>
+  <ul class="nav nav-treeview">
+    
+    <li class="nav-item" data-permission="Settings">
+                        <a href="/admin/manager/settings" class="nav-link">
+                            <i class="material-symbols-outlined">settings</i> <p>General Settings</p>
+                        </a>
+                    </li>
+    <li class="nav-item" data-permission="Banner">
+      <a href="/admin/manager/banner" class="nav-link">
+        <i class="material-symbols-outlined">collections</i>
+        <p>Banner</p>
+      </a>
+    </li>
+    <li class="nav-item" data-permission="Activity Banner">
+      <a href="/admin/manager/activity-banner" class="nav-link">
+        <i class="material-symbols-outlined">campaign</i>
+        <p>Activity Banner</p>
+      </a>
+    </li>
+    <li class="nav-item" data-permission="Logo Setting">
+      <a href="/admin/manager/logo-setting" class="nav-link">
+        <i class="material-symbols-outlined">branding_watermark</i>
+        <p>Logo Setting</p>
+      </a>
+    </li>
+    <li class="nav-item" data-permission="Channel Setting">
+      <a href="/admin/manager/chennal-setting" class="nav-link">
+        <i class="material-symbols-outlined">stream</i>
+        <p>Channel Setting</p>
+      </a>
+    </li>
+    <li class="nav-item" data-permission="Notification">
+      <a href="/admin/manager/notification" class="nav-link">
+        <i class="material-symbols-outlined">notifications</i>
+        <p>Notification</p>
+      </a>
+    </li>
+    <li class="nav-item" data-permission="Vip Section">
+                        <a href="/admin/manager/vipsection" class="nav-link">
+                            <i class="material-symbols-outlined">workspace_premium</i> <p>Vip Section</p>
+                        </a>
+                    </li>
+  </ul>
+</li>
+
+
+
+
+<!--                     
+                    <li class="nav-item" data-permission="Settings">
+                        <a href="/admin/manager/settings" class="nav-link">
+                            <i class="material-symbols-outlined">settings</i> <p>Settings</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Banner">
+                        <a href="/admin/manager/banner" class="nav-link">
+                            <i class="material-symbols-outlined">collections</i> <p>Banner</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Activity Banner">
+                        <a href="/admin/manager/activity-banner" class="nav-link">
+                            <i class="material-symbols-outlined">campaign</i> <p>Activity Banner</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Logo Setting">
+                        <a href="/admin/manager/logo-setting" class="nav-link">
+                            <i class="material-symbols-outlined">branding_watermark</i> <p>Logo Setting</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Channel Setting">
+                        <a href="/admin/manager/chennal-setting" class="nav-link">
+                            <i class="material-symbols-outlined">stream</i> <p>Channel Setting</p>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-permission="Notification">
+                        <a href="/admin/manager/notification" class="nav-link">
+                            <i class="material-symbols-outlined">notifications</i> <p>Notification</p>
+                        </a>
+                    </li> -->
+                    <li class="nav-item has-treeview" data-permission="Recharge (Approved)">
+                        <a href="/admin/manager/livechat" class="nav-link">
+                            <i class="material-symbols-outlined">chat</i> <p>
+                                Live Chat
+                                <i class="right material-symbols-outlined">chevron_left</i> </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li>
+                                <a href="/admin/manager/deposite" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>Deposit Not Receive</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/manager/withdrawal" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>Withdrawal problem</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/manager/changeloginid" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>Change ID Login Password</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/manager/modifyBankInfo" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>Modify Bank Information</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/manager/usdtAddress" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>Add USDT Address</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/manager/activityBonus" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>Activity Bonus</p>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/manager/gameproblems" class="nav-link">
+                                    <i class="material-symbols-outlined">circle</i> <p>Game Problems</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+                    
+
+                    <li class="nav-item">
+                        <a href="/home" class="nav-link">
+                            <i class="material-symbols-outlined">logout</i> <p>Come Back</p>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <a id="back-to-tops" href="#" class="btn1 back-to-top" role="button" aria-label="Scroll to top">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+    <script>
+        async function fetchPermissions() {
+            try {
+                const navItems = document.querySelectorAll('.nav-item');
+
+
+
+                const response = await fetch('/user/permissions', { credentials: 'include' });
+                const data = await response.json();
+
+                if (!data.success) {
+                    console.error('Failed to fetch permissions');
+                    return;
+                }
+
+                const userPermissions = data.permissions || {};
+
+                // Show only permitted nav items
+                navItems.forEach(item => {
+                    const permission = item.getAttribute('data-permission');
+                    if (userPermissions[permission] === "1") {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error fetching permissions:', error);
+            }
+        }
+
+        fetchPermissions();
+    </script>
+
+</body>
+
+</html>

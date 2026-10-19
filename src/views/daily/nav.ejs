@@ -1,0 +1,263 @@
+<!-- <style>
+    .display-none {
+        display: none;
+    }
+    
+    .sidebar{
+    background: #00807c;
+    }
+    
+    .d-block{
+     color:#000000;
+     background:none;
+    }
+    
+    
+    .nav-link-text{
+       color:#000000;  
+    }
+
+    .active {
+            background: linear-gradient(to right, #5ccfcb, #00807c) !important;
+            color: white !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+
+
+        a {
+            background-color: #00807c !important;      
+        }
+
+        [class*="sidebar-dark-"] .sidebar a {
+            color: #a1a1ac;
+        }
+
+        [class*="sidebar-dark-"] .nav-sidebar>.nav-item.menu-open>.nav-link,
+        [class*="sidebar-dark-"] .nav-sidebar>.nav-item:hover>.nav-link,
+        [class*="sidebar-dark-"] .nav-sidebar>.nav-item>.nav-link:focus {
+            color: white !important;
+            background-color: #5ccfcb !important;
+        }
+
+
+        .navbar-dark {
+            background-color: #ffffff;
+            border-color: #dee2e6;
+            padding: 10px 20px;
+            /* border-radius: 8px; */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            background-color: #5ccfcb !important;
+        }
+
+        .main-sidebar .brand-text, .main-sidebar .logo-xl, .main-sidebar .logo-xs, .sidebar .nav-link p, .sidebar .user-panel .info{
+            color: rgb(179, 175, 175) !important;
+            
+        }
+
+        .active {
+    background: linear-gradient(to right, #5ccfcb, #00807c) !important;
+    color: white !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.main-sidebar .brand-text, .main-sidebar .logo-xl, .main-sidebar .logo-xs, .sidebar .nav-link p, .sidebar .user-panel .info {
+    color: white !important;
+}
+
+        
+   
+</style> -->
+
+<style>
+    .display-none {
+        display: none;
+    }
+
+    .sidebar {
+        background: #00807c;
+    }
+
+    /* INACTIVE LINKS - Gray icons and text */
+    .nav-sidebar .nav-link {
+        color: #a1a1ac !important;
+        background: none !important;
+    }
+
+    .nav-sidebar .nav-link i,
+    .nav-sidebar .nav-link p {
+        color: #a1a1ac !important;
+    }
+
+    /* ACTIVE LINK - White text and icon with gradient background */
+    .nav-sidebar .nav-link.active {
+        background: linear-gradient(to right, #5ccfcb, #00807c) !important;
+        color: white !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    .nav-sidebar .nav-link.active i,
+    .nav-sidebar .nav-link.active p {
+        color: white !important;
+    }
+
+    /* Hover style (optional, can be removed if you want only active) */
+    .nav-sidebar .nav-link:hover {
+        background-color: #5ccfcb !important;
+        color: white !important;
+    }
+
+    .navbar-dark {
+        background-color: #00807c;
+        border-color: #dee2e6;
+        padding: 10px 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Sidebar user panel text color */
+    .main-sidebar .brand-text,
+    .main-sidebar .logo-xl,
+    .main-sidebar .logo-xs,
+    .sidebar .nav-link p,
+    .sidebar .user-panel .info {
+        color: #a1a1ac !important;
+    }
+
+    /* Force white logo text if needed */
+    .main-sidebar .brand-text img {
+        filter: brightness(0) invert(1);
+    }
+</style>
+
+
+<nav class="main-header navbar navbar-expand navbar-dark" style="background-color:#00807c;">
+    <ul class="navbar-nav" id="menu-click">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+                <i class="fas fa-expand-arrows-alt"></i>
+            </a>
+        </li>
+    </ul>
+</nav>
+<aside class="main-sidebar  elevation-4" style="background-color: #00807c;">
+    <div class="sidebar" style="margin-top: 0;" >
+        <!-- <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="/images/facebook.png" class="img-circle elevation-2" alt="User Image">
+            </div>
+            <div class="info">
+                <a href="#" class="d-block">Collaborator</a>
+            </div>
+        </div> -->
+
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                <div class="image">
+                    <img src="/images/facebook.png" class="img-circle elevation-2" alt="User Image" />
+                </div>
+                <div class="info">
+                    <a href="#" class="d-block">
+                        <img src="/images/logocm.png" style="width: 150px;" alt="User Image" />
+                    </a>
+                </div>
+            </div>
+
+            <hr/>
+
+
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+
+    <li class="nav-item">
+        <a href="/manager/index" class="nav-link">
+            <i class="nav-icon fas fa-chart-line"></i>
+            <p>Statistics</p>
+        </a>
+    </li>
+
+    <li class="nav-item" id="member">
+        <a href="/manager/members" class="nav-link">
+            <i class="nav-icon fas fa-users"></i>
+            <p>Subordinates</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="/manager/listRecharge" class="nav-link">
+            <i class="nav-icon fas fa-wallet"></i>
+            <p>Recharge</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="/manager/listWithdraw" class="nav-link">
+            <i class="nav-icon fas fa-money-bill-wave"></i>
+            <p>Withdraw</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="/manager/gifts" class="nav-link">
+            <i class="nav-icon fas fa-gift"></i>
+            <p>Giftcode</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="/manager/support" class="nav-link">
+            <i class="nav-icon fas fa-headset"></i>
+            <p>Support</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="/manager/settings" class="nav-link">
+            <i class="nav-icon fas fa-cogs"></i>
+            <p>Settings</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="/manager/Agentperformance" class="nav-link">
+            <i class="nav-icon fas fa-user-check"></i>
+            <p>Agent Performance</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="/manager/salary" class="nav-link">
+            <i class="nav-icon fas fa-file-invoice-dollar"></i>
+            <p>Create Salary</p>
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="/home" class="nav-link">
+            <i class="nav-icon fas fa-home"></i>
+            <p>Home</p>
+        </a>
+    </li>
+
+</ul>
+
+        </nav>
+    </div>
+</aside>
+<script>
+    let nav = document.querySelector('#member');
+    let navList = document.querySelector('#navList-member');
+    let menuClick = document.querySelector('#menu-click');
+    menuClick, nav.addEventListener('click', () => {
+        navList.classList.toggle('display-none');
+    });
+</script>

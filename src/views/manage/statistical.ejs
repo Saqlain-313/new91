@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Statistics</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
+    />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css"
+    />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+
+  <style>
+    body {
+      background-color: #f4f6f9;
+      color: #343a40;
+    }
+
+    a {
+      color: #00807c;
+      text-decoration: none;
+      background-color: #192434;
+      padding: 10px 16px; /* Adjusted padding */
+      border-radius: 6px; /* Adjusted border-radius */
+      transition: background-color 0.5s ease, color 0.5s ease; /* Slower transition */
+    }
+
+    [class*="sidebar-dark-"] .sidebar a {
+      color: #9cc6ff;
+    }
+
+    a:hover {
+      background-color: #22baa6;
+      color: #ffffff;
+    }
+
+    .bg-primary {
+      background-color: #374992 !important;
+    }
+
+    .dark-mode .nav-pills .nav-link {
+      color: #9cc6ff;
+    }
+
+    .nav-pills .nav-link {
+      color: #00807c;
+    }
+
+    .navbar-light {
+      background-color: #e3f2fd;
+      border-color: #dee2e6;
+    }
+
+    .active {
+      background-color: #71b1f5 !important;
+    }
+
+    [class*="sidebar-dark-"] .sidebar a {
+      color: #9cc6ff;
+    }
+
+    .content-wrapper {
+      background-color: #ffffff;
+      color: #333;
+
+      border-radius: 12px; /* Increased border-radius */
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
+    }
+
+    .navbar-dark {
+      background-color: #ffffff;
+      border-color: #e3e6f0;
+    }
+
+    .info-box {
+      background-color: #ffffff;
+      border-radius: 12px; /* Increased border-radius */
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+      margin-bottom: 24px; /* Increased margin */
+    }
+
+    .info-box-icon {
+      border-radius: 12px 0 0 12px; /* Increased border-radius */
+      background-color: #f4f6f9;
+      color: #333;
+    }
+
+    .info-box-content {
+      padding: 12px; /* Increased padding */
+    }
+
+    .btn-primary {
+      background-color: #00807c;
+      border-color: #00807c;
+      color: #ffffff;
+      padding: 10px 16px; /* Adjusted padding */
+      border-radius: 6px; /* Adjusted border-radius */
+    }
+
+    .btn-primary:hover {
+      background-color: #03514e;
+      border-color: #03514e;
+    }
+
+    .form-control {
+      border-radius: 6px; /* Adjusted border-radius */
+      border: 1px solid #ced4da;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem; /* Increased margin */
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .shadow-sm {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow */
+    }
+
+    .shadow {
+      box-shadow: 0 5px 8px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+    }
+
+    .back-to-top {
+      background-color: #00807c;
+      border-color: #00807c;
+      color: #ffffff;
+      padding: 12px 18px; /* Increased padding */
+      border-radius: 8px; /* Increased border-radius */
+    }
+
+    .back-to-top:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+
+    .sub-btn {
+      background-color: rgb(8, 143, 216);
+    }
+    .sub-btn:hover {
+      background-color: rgb(0, 86, 179);
+    }
+
+    .icon-bg {
+      background-color: rgb(179, 254, 229);
+    }
+
+    .icon-bg-warning {
+      background-color: rgb(232, 232, 175);
+    }
+
+    .icon-bg-danger {
+      background-color: rgb(255, 179, 179);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      gap: 20px; /* Space between grid items */
+      padding: 0 12px; /* Matches your existing margin on the parent flex container */
+    }
+
+    /* Default for small devices (1 column) */
+    .dashboard-grid {
+      grid-template-columns: 1fr; /* One column, taking full width */
+    }
+
+    /* Styles for medium devices (adjust as needed, e.g., 2 columns) */
+    @media (min-width: 576px) {
+      /* Adjust this breakpoint as "small" to your definition */
+      .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr); /* Two equal columns */
+      }
+    }
+
+    /* Styles for large devices (3 columns) */
+    @media (min-width: 992px) {
+      /* Adjust this breakpoint as "large" to your definition */
+      .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr); /* Three equal columns */
+      }
+    }
+
+    /* Styles for very large devices (4 columns, matching your original 25% width) */
+    @media (min-width: 1200px) {
+      .dashboard-grid {
+        grid-template-columns: repeat(4, 1fr); /* Four equal columns */
+      }
+    }
+
+    /* Styles for the individual grid items */
+    .grid-item {
+      /* flex properties are no longer needed here as grid handles layout */
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 6px;
+      padding: 15px;
+      cursor: pointer;
+      box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+    }
+
+    .grid-item span.icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      background: #e0f7fa;
+      color: #00807c;
+      border-radius: 50%;
+      font-size: 24px;
+      margin-right: 15px;
+    }
+
+    .grid-item .info span:first-child {
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .grid-item .info span:last-child {
+      font-size: 20px;
+      font-weight: bold;
+      color: #00807c;
+    }
+
+    /* Specific color for losses */
+    .grid-item .totalLossCount,
+    .grid-item .totalLoss {
+      color: #d9534f;
+    }
+
+    /* Specific color for locked accounts and withdrawals */
+    .grid-item .totalMemberFail,
+    .grid-item .totalwithdraw,
+    .grid-item .totalwithdrawToday {
+      color: #856404;
+    }
+
+    /* Background colors for specific icons */
+    .grid-item .icon.red-bg {
+      background: #fdecea;
+      color: #d9534f;
+    }
+
+    .grid-item .icon.yellow-bg {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .grid-item .icon.green-bg {
+      background: #e8f5e9;
+      color: #28a745;
+    }
+  </style>
+
+  <body
+    class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed"
+  >
+    <div class="wrapper">
+      <%- include('nav') %>
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2 ml-2">
+              <div class="col-sm-6">
+                <h1 style="color: #00807c; font-size: 2rem; font-weight: bold">
+                  Statistical Data
+                </h1>
+              </div>
+            </div>
+          </div>
+          <div class="row ml-4">
+            <div
+              class="col-12 col-md-3 d-flex"
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 10px;
+              "
+            >
+              <form
+                method="get"
+                class="d-flex align-middle"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  background-color: #f9f9f9;
+                  padding: 15px;
+                  border-radius: 10px;
+                  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                "
+              >
+                <input
+                  type="date"
+                  class="form-control"
+                  name="datechoice"
+                  value="<%= data %>"
+                  required
+                  style="
+                    padding: 10px;
+                    font-size: 14px;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                    outline: none;
+                    transition: border-color 0.3s;
+                  "
+                  onfocus="this.style.borderColor='#6c757d';"
+                  onblur="this.style.borderColor='#ddd';"
+                />
+                <button
+                  class="btn sub-btn btn-success ml-2"
+                  type="submit"
+                  style="
+                    background-color: #046871;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    transition: background-color 0.3s;
+                  "
+                  onmouseover="this.style.backgroundColor='#04545c';"
+                  onmouseout="this.style.backgroundColor='#046871';"
+                >
+                  Search
+                </button>
+              </form>
+            </div>
+
+            <div class="col-5"><%= data %></div>
+          </div>
+          <!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="container-fluid">
+            <div class="dashboard-grid mb-2">
+              <div
+                onclick="location.href='/admin/manager/members'"
+                class="grid-item"
+              >
+                <span class="icon"><i class="fas fa-users"></i></span>
+                <div class="info">
+                  <span>Total Members</span><br />
+                  <span class="totalMember">0</span>
+                </div>
+              </div>
+
+              <div
+                onclick="location.href='/admin/manager/betting?today=true'"
+                class="grid-item"
+              >
+                <span class="icon"><i class="fas fa-calendar-day"></i></span>
+                <div class="info">
+                  <span>Today Bets</span><br />
+                  <span class="todaybets">0</span>
+                </div>
+              </div>
+
+              <div
+                onclick="location.href='/admin/manager/betting'"
+                class="grid-item"
+              >
+                <span class="icon"><i class="fas fa-list-alt"></i></span>
+                <div class="info">
+                  <span>Total Bets</span><br />
+                  <span class="totalbets">0</span>
+                </div>
+              </div>
+
+              <div
+                onclick="location.href='/admin/manager/betting?today=win'"
+                class="grid-item"
+              >
+                <span class="icon"><i class="fas fa-trophy"></i></span>
+                <div class="info">
+                  <span>Wins Count</span><br />
+                  <span class="totalWinCount">0</span>
+                </div>
+              </div>
+
+              <div
+                onclick="location.href='/admin/manager/betting?today=win'"
+                class="grid-item"
+              >
+                <span class="icon"><i class="fas fa-trophy"></i></span>
+                <div class="info">
+                  <span>Wins</span><br />
+                  <span class="totalWin">0</span>
+                </div>
+              </div>
+
+              <div
+                onclick="location.href='/admin/manager/betting?today=loss'"
+                class="grid-item"
+              >
+                <span class="icon red-bg"
+                  ><i class="fas fa-times-circle"></i
+                ></span>
+                <div class="info">
+                  <span>Losses Count</span><br />
+                  <span class="totalLossCount">0</span>
+                </div>
+              </div>
+
+              <div
+                onclick="location.href='/admin/manager/betting?today=loss'"
+                class="grid-item"
+              >
+                <span class="icon red-bg"
+                  ><i class="fas fa-times-circle"></i
+                ></span>
+                <div class="info">
+                  <span>Losses</span><br />
+                  <span class="totalLoss">0</span>
+                </div>
+              </div>
+
+              <div
+                onclick="location.href='/admin/manager/members?today=locked'"
+                class="grid-item"
+              >
+                <span class="icon yellow-bg"
+                  ><i class="fas fa-user-lock"></i
+                ></span>
+                <div class="info">
+                  <span>Locked Accounts</span><br />
+                  <span class="totalMemberFail">0</span>
+                </div>
+              </div>
+
+              <div
+                onclick="location.href='/admin/manager/rechargeRecord'"
+                class="grid-item"
+              >
+                <span class="icon green-bg"
+                  ><i class="fas fa-dollar-sign"></i
+                ></span>
+                <div class="info">
+                  <span>Total Deposits</span><br />
+                  <span class="totalRecharge">0</span>
+                </div>
+              </div>
+
+              <div
+                onclick="location.href='/admin/manager/rechargeRecord?today=true'"
+                class="grid-item"
+              >
+                <span class="icon green-bg"
+                  ><i class="fas fa-dollar-sign"></i
+                ></span>
+                <div class="info">
+                  <span>Deposits Today</span><br />
+                  <span class="totalRechargeToday">0</span>
+                </div>
+              </div>
+
+              <div
+                onclick="location.href='/admin/manager/withdrawRecord'"
+                class="grid-item"
+              >
+                <span class="icon yellow-bg"
+                  ><i class="fas fa-exchange-alt"></i
+                ></span>
+                <div class="info">
+                  <span>Total Withdrawals</span><br />
+                  <span class="totalwithdraw">0</span>
+                </div>
+              </div>
+
+              <div
+                onclick="location.href='/admin/manager/withdrawRecord?today=true'"
+                class="grid-item"
+              >
+                <span class="icon yellow-bg"
+                  ><i class="fas fa-exchange-alt"></i
+                ></span>
+                <div class="info">
+                  <span>Withdrawals Today</span><br />
+                  <span class="totalwithdrawToday">0</span>
+                </div>
+              </div>
+
+              <div class="grid-item">
+                <span class="icon"><i class="fas fa-chart-line"></i></span>
+                <div class="info">
+                  <span>Total P/L</span><br />
+                  <span class="pl">0</span>
+                </div>
+              </div>
+
+              <div class="grid-item">
+                <span class="icon"><i class="fas fa-chart-line"></i></span>
+                <div class="info">
+                  <span>Today P/L</span><br />
+                  <span class="plToday">0</span>
+                </div>
+              </div>
+
+              <div class="grid-item">
+                <span class="icon">
+                  <i class="fas fa-chart-line"></i>
+                </span>
+                <div class="info">
+                  <span>Net Earnings</span><br />
+                  <span class="totalToday">0</span>
+                </div>
+              </div>
+            </div>
+
+            <table id="data-table" style="display: none"></table>
+
+            <div class="row info-box">
+              <div class="form-group" style="width: 100%">
+                <div class="text-center">
+                  <label for="telegram">Export Data</label>
+                </div>
+                <button
+                  type="button"
+                  onclick="location.href='/admin/manager/export/todayrecharge?today=<%= data %>&purpose=todayrecharge'"
+                  class="btn btn-primary"
+                  style="width: 100%; margin-bottom: 5px"
+                >
+                  Today Recharge Export
+                </button>
+
+                <button
+                  type="button"
+                  onclick="location.href='/admin/manager/export/todayrecharge?today=<%=data %>&purpose=totalrecharge'"
+                  class="btn btn-primary"
+                  style="width: 100%; margin-bottom: 5px"
+                >
+                  Total Recharge Export
+                </button>
+
+                <button
+                  type="button"
+                  onclick="location.href='/admin/manager/export/todayrecharge?today=<%= data %>&purpose=totalwithdarwal'"
+                  class="btn btn-primary"
+                  style="width: 100%; margin-bottom: 5px"
+                >
+                  Total Withdrawal Export
+                </button>
+
+                <button
+                  type="button"
+                  onclick="location.href='/admin/manager/export/todayrecharge?today=<%= data %>&purpose=todaywithdarwal'"
+                  class="btn btn-primary"
+                  style="width: 100%; margin-bottom: 5px"
+                >
+                  Today Withdrawal Export
+                </button>
+
+                <button
+                  type="button"
+                  onclick="location.href='/admin/manager/export/todayrecharge?today=<%= data %>&purpose=todaybetting'"
+                  class="btn btn-primary"
+                  style="width: 100%; margin-bottom: 5px"
+                >
+                  Today Betting Export
+                </button>
+
+                <button
+                  type="button"
+                  onclick="location.href='/admin/manager/export/todayrecharge?today=<%= data %>&purpose=totalbetting'"
+                  class="btn btn-primary"
+                  style="width: 100%; margin-bottom: 5px"
+                >
+                  Total Betting Export
+                </button>
+              </div>
+            </div>
+
+            <!-- Increase/Decrease Points/Money for a Partner Form -->
+            <div class="row info-box">
+              <div class="form-group" style="width: 100%">
+                <div class="text-center">
+                  <label for="phone"
+                    >Increase/Decrease Points/Money for a Partner</label
+                  >
+                </div>
+                <label for="phone" style="color: #3498db">Username</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="phone2"
+                  placeholder="Enter partner username"
+                  value=""
+                /><br />
+                <label for="buff-three" style="color: #3498db"
+                  >Increase | Decrease</label
+                >
+                <select
+                  class="form-select mb-4"
+                  id="buff-three"
+                  style="width: 100%; padding: 5px"
+                >
+                  <option selected value="">
+                    -------- Select Function --------
+                  </option>
+                  <option value="1">Add Money (+)</option>
+                  <option value="2">Deduct Money (-)</option>
+                </select>
+                <label for="money-buff-three" style="color: #3498db"
+                  >Amount</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="money-buff-three"
+                  placeholder="Enter amount"
+                  value=""
+                /><br />
+                <button
+                  type="submit"
+                  class="btn buff-three"
+                  style="
+                    width: 100%;
+                    background: linear-gradient(90deg, #5ccfcb, #00807c);
+                    height: 50px;
+                    color: white;
+                    font-weight: bold;
+                  "
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+      </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+    <script>
+      $(window).on("load", function () {
+        $.ajax({
+          type: "POST",
+          url: "/api/webapi/admin/statistical",
+          data: {
+            today: "<%= data %>",
+          },
+          dataType: "json",
+          success: function (response) {
+            let usersOnline = response.usersOnline ? response.usersOnline : 0;
+            let win = response.win ? response.win : 0;
+            let loss = response.loss ? response.loss : 0;
+            let bet = response.bet ? response.bet : 0;
+            let betToday = response.betToday ? response.betToday : 0;
+            let usersOffline = response.usersOffline
+              ? response.usersOffline
+              : 0;
+            let recharges = response.recharges ? response.recharges : 0;
+            let withdraws = response.withdraws ? response.withdraws : 0;
+            let rechargeToday = response.rechargeToday
+              ? response.rechargeToday
+              : 0;
+            let withdrawToday = response.withdrawToday
+              ? response.withdrawToday
+              : 0;
+            let pl = response.pl ? response.pl : 0;
+            let pltoday = response.pltoday ? response.pltoday : 0;
+            $(".totalMember").text(usersOnline);
+            $(".totalWin").text(win);
+            $(".totalWinCount").text(response.wincount ? response.wincount : 0);
+            $(".totalbets").text(bet);
+            $(".todaybets").text(betToday);
+            $(".totalLoss").text(loss);
+            $(".totalLossCount").text(
+              response.losscount ? response.losscount : 0
+            );
+            $(".totalMemberFail").text(usersOffline);
+            $(".totalRecharge").text(recharges);
+            $(".totalwithdraw").text(withdraws);
+            $(".totalRechargeToday").text(rechargeToday);
+            $(".totalwithdrawToday").text(withdrawToday);
+
+            $(".plToday").html(pltoday);
+            $(".pl").html(pl);
+            $(".totalToday").html(recharges - withdraws);
+            if (rechargeToday - withdrawToday < 0) {
+              $(".totalTodays").removeClass("icon-bg");
+              $(".totalTodays").addClass("icon-bg-danger");
+            } else {
+              $(".totalTodays").addClass("icon-bg");
+              $(".totalTodays").removeClass("icon-bg-danger");
+            }
+
+            let tabledata = `
+                <tr><th>Category</th><th>Amount</th></tr>
+                <tr><td>Total Member</td><td>${usersOnline}</td></tr>
+                <tr><td>Total Win</td><td>${win}</td></tr>
+                <tr><td>Total Win Count</td><td>${
+                  response.wincount ? response.wincount : 0
+                }</td></tr>
+                <tr><td>Total Bets</td><td>${bet}</td></tr>
+                <tr><td>Today Bets</td><td>${betToday}</td></tr>
+                <tr><td>Total Loss</td><td>${loss}</td></tr>
+                <tr><td>Total Loss Count</td><td>${
+                  response.losscount ? response.losscount : 0
+                }</td></tr>
+                <tr><td>Locked Amount</td><td>${usersOffline}</td></tr>
+                <tr><td>Total Deposite</td><td>${recharges}</td></tr>
+                <tr><td>Total Withdraw</td><td>${withdraws}</td></tr>
+                <tr><td>Depposite Today</td><td>${rechargeToday}</td></tr>
+                <tr><td>Withdra Today</td><td>${withdrawToday}</td></tr>
+                <tr><td>Total PL</td><td>${pl}</td></tr>
+                <tr><td>Today PL</td><td>${pltoday}</td></tr>
+                <tr><td>Net Earnings</td><td>${recharges - withdraws}</td></tr>
+                `;
+
+            $("#data-table").html(tabledata);
+          },
+        });
+      });
+
+      $(".buff-three").click(function (e) {
+        e.preventDefault();
+        let select = $("#buff-three").val();
+        let money = $("#money-buff-three").val();
+        let phone = $("#phone2").val();
+        if (select && money) {
+          $.ajax({
+            type: "POST",
+            url: "/admin/manager/createBonus",
+            data: {
+              select: select,
+              type: "three",
+              money: money,
+              phone: phone,
+            },
+            dataType: "json",
+            success: function (response) {
+              if (response.status == true) {
+                Swal.fire({
+                  icon: "success",
+                  title: `${response.message}`,
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: `${response.message}`,
+                });
+              }
+            },
+          });
+        } else {
+          alert("请输入完整信息");
+        }
+      });
+
+      $(".buff-one").click(function (e) {
+        e.preventDefault();
+        let select = $("#buff-one").val();
+        let money = $("#money-buff-one").val();
+        let phone = $("#phone").val();
+        if (select && money) {
+          $.ajax({
+            type: "POST",
+            url: "/admin/manager/createBonus",
+            data: {
+              select: select,
+              type: "one",
+              money: money,
+              phone: phone,
+            },
+            dataType: "json",
+            success: function (response) {
+              if (response.status == true) {
+                Swal.fire({
+                  icon: "success",
+                  title: `${response.message}`,
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: `${response.message}`,
+                });
+              }
+            },
+          });
+        } else {
+          alert("请输入完整信息");
+        }
+      });
+
+      $(".buff-all").click(function (e) {
+        e.preventDefault();
+        let select = $("#buff-all-ctv").val();
+        let money = $("#money-buff-all").val();
+        if (select && money) {
+          $.ajax({
+            type: "POST",
+            url: "/admin/manager/createBonus",
+            data: {
+              select: select,
+              type: "all",
+              money: money,
+            },
+            dataType: "json",
+            success: function (response) {
+              if (response.status == true) {
+                Swal.fire({
+                  icon: "success",
+                  title: `${response.message}`,
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: `${response.message}`,
+                });
+              }
+            },
+          });
+        } else {
+          alert("请输入完整信息");
+        }
+      });
+
+      $(".create_ctv").click(function (e) {
+        e.preventDefault();
+        let username = $("#username").val().trim();
+        let password = $("#password").val().trim();
+        //console.log("username", username);
+        //console.log("password", password);
+        if (username && password) {
+          $.ajax({
+            type: "POST",
+            url: "/admin/manager/create/ctv",
+            data: {
+              username: username,
+              password: password,
+            },
+            dataType: "json",
+            success: function (response) {
+              if (response.status == true) {
+                Swal.fire({
+                  icon: "success",
+                  title: `${response.message}`,
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: `${response.message}`,
+                });
+              }
+            },
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Please enter complete information",
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

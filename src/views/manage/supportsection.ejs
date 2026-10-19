@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <title>Support Tickets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            height: 100vh;
+        }
+        .container {
+            width: 70%;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .chat-section {
+            width: 100%;
+            border-left: 1px solid #ddd;
+            background: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .tabs {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 10px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #e0e0e0;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            color: #333;
+        }
+        .tab.active {
+            background: #00807c;
+            color: white;
+        }
+        .content {
+            display: none;
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 0 5px 5px 5px;
+        }
+        .content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        table th, table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        table th {
+            background-color: #00807c;
+            color: white;
+        }
+        .actions i {
+            cursor: pointer;
+            margin-right: 10px;
+            color: #00807c;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .pagination button {
+            padding: 8px 14px;
+            border: none;
+            background: #00807c;
+            color: white;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .pagination button:hover {
+            background: #4a44e0;
+            transform: translateY(-2px);
+        }
+
+        .pagination button:active {
+            background: #3b36c5;
+            transform: translateY(0);
+        }
+
+        .pagination button.active {
+            background: #ff5b60;
+        }
+
+        .pagination button:disabled {
+            background: #ddd;
+            cursor: not-allowed;
+        }
+
+        .chat-box {
+            flex-grow: 1;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+        .chat-box .message {
+            margin-bottom: 10px;
+        }
+        .chat-box .message.user {
+            text-align: right;
+            color: #00807c;
+        }
+        .chat-box .message.admin {
+            text-align: left;
+            color: #555;
+        }
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .chat-input button {
+            padding: 10px 15px;
+            background: #00807c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .wrapper1{
+          width: 100%;
+        
+        }
+
+        .boxfix{
+            overflow: auto;
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper1">
+        <!-- Include navigation -->
+        <%- include('nav') %>
+        <div class="content-wrapper" style="padding: 20px;">
+            <section class="content-header ">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="" style="color: #00807c; font-size: 2rem; font-weight: bold;">Support Tickets</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main content -->
+            <section class="" >
+                <!-- Main Content Section -->
+                <div class="">
+                    <h2>Support Tickets</h2>
+                    <div class="tabs">
+                        <div class="tab active" data-target="open-tickets">Open Tickets</div>
+                        <div class="tab" data-target="reviewed-tickets">Reviewed Tickets</div>
+                    </div>
+                    <div id="open-tickets" class="content active boxfix" >
+                        <table class="">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Subject</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Bank Name Change</td>
+                                    <td>Open</td>
+                                    <td>High</td>
+                                    <td>23/10/2024, 21:13:00</td>
+                                    <td class="actions">
+                                        <i class="fas fa-comments" title="View Chat"></i>
+                                        <i class="fas fa-edit" title="Edit"></i>
+                                        <i class="fas fa-trash" title="Delete"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                       
+                    </div>
+                    <div id="reviewed-tickets" class="content">
+                        <p>No reviewed tickets yet.</p>
+                    </div>
+                </div>
+                <div>
+                    <div class="pagination">
+                        <button id="prev" disabled>Prev</button>
+                        <button id="page1" class="active">1</button>
+                        <button id="page2">2</button>
+                        <button id="page3">3</button>
+                        <button id="next">Next</button>
+                    </div>
+                </div>
+
+                <!-- Chat Section -->
+                <div class="chat-section">
+                    <h3>Chat - Bank Name Change</h3>
+                    <div class="chat-box">
+                        <div class="message user">:User  925989 - 23/10/2024, 21:13:00</div>
+                        <div class="message admin">Admin: Please provide more details.</div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Type a message..." />
+                        <button>Send</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Include scripts -->
+    <script>
+        let currentPage = 1;
+        const totalPages = 3;
+    
+        function updatePagination() {
+            document.getElementById('page1').classList.toggle('active', currentPage === 1);
+            document.getElementById('page2').classList.toggle('active', currentPage === 2);
+            document.getElementById('page3').classList.toggle('active', currentPage === 3);
+    
+            document.getElementById('prev').disabled = currentPage === 1;
+            document.getElementById('next').disabled = currentPage === totalPages;
+        }
+    
+        document.getElementById('prev').addEventListener('click', function () {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePagination();
+            }
+        });
+    
+        document.getElementById('next').addEventListener('click', function () {
+            if (currentPage < totalPages) {
+                currentPage++;
+                updatePagination();
+            }
+        });
+    
+        document.getElementById('page1').addEventListener('click', function () {
+            currentPage = 1;
+            updatePagination();
+        });
+    
+        document.getElementById('page2').addEventListener('click', function () {
+            currentPage = 2;
+            updatePagination();
+        });
+    
+        document.getElementById('page3').addEventListener('click', function () {
+            currentPage = 3;
+            updatePagination();
+        });
+    </script>
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.getElementById(tab.getAttribute('data-target')).classList.add('active');
+            });
+        });
+
+        // Chat functionality (mock)
+        const chatBox = document.querySelector('.chat-box');
+        const chatInput = document.querySelector('.chat-input input');
+        const sendButton = document.querySelector('.chat-input button');
+
+        sendButton.addEventListener('click', () => {
+            const message = chatInput.value.trim();
+            if (message) {
+                const userMessage = document.createElement('div');
+                userMessage.classList.add('message', 'user');
+                userMessage.textContent = `:User  ${message}`;
+                chatBox.appendChild(userMessage);
+                chatInput.value = '';
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        });
+    </script>
+    
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+

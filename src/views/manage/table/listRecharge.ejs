@@ -1,0 +1,47 @@
+<section class="content">
+    <!-- Default box -->
+    <div class="card" style="border: none; border-radius: 15px; background: linear-gradient(135deg, #0f2027, #2c5364); color: white; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);">
+        <div class="" style=" border-bottom: 1px solid rgba(255, 255, 255, 0.2);height: 2rem; margin: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+            <h3 class="card-title" style="color: white; font-size: 22px; font-weight: bold;">Recharge History</h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse" style="color: white;">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove" style="color: white;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-0" style="display: block; overflow-y: hidden; background: rgba(255, 255, 255, 0.05); border-radius: 0 0 15px 15px;">
+            <table class="table table-striped projects" id="table1" style="color: white; margin: 0; border-collapse: separate; border-spacing: 0; width: 100%;">
+                <thead>
+                    <tr style="background: rgba(255, 255, 255, 0.1);">
+                        <th class="text-center" style="padding: 15px; font-weight: bold; border-top-left-radius: 15px;">ID</th>
+                        <th class="text-center" style="padding: 15px; font-weight: bold;">Amount</th>
+                        <th class="text-center" style="padding: 15px; font-weight: bold;">Type</th>
+                        <th class="text-center" style="padding: 15px; font-weight: bold;">Status</th>
+                        <th class="text-center" style="padding: 15px; font-weight: bold; border-top-right-radius: 15px;">Time</th>
+                    </tr>
+                </thead>
+                <tbody id="list-recharge" style="background: rgba(255, 255, 255, 0.05);">
+                    <!-- Dynamic Content -->
+                </tbody>
+            </table>
+        </div>
+        <nav aria-label="Page navigation example" style="margin: 20px 0; display: flex; justify-content: center;">
+            <ul class="pagination table1" style="display: flex; gap: 10px;">
+                <li class="page-item previous" id="previousRecharge">
+                    <a class="page-link" href="#" tabindex="-1" style="background:  linear-gradient(135deg, #6a11cb, #2575fc); color: white; border: none; border-radius: 20px; padding: 8px 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">Previous</a>
+                </li>
+                <div id="numbers" style="display: flex; gap: 10px;">
+                    <li class="page-item">
+                        <a class="page-link active text-white" id="text-recharge" style="background: linear-gradient(135deg, #6a11cb, #2575fc); color: white; border: none; border-radius: 20px; padding: 8px 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">1</a>
+                    </li>
+                </div>
+                <li class="page-item next" id="nextRecharge">
+                    <a class="page-link" href="#" style="background: linear-gradient(135deg, #ff6a00, #ee0979); color: white; border: none; border-radius: 20px; padding: 8px 15px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</section>

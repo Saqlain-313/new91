@@ -1,0 +1,647 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manage Activity Reward Settings</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+     <!-- jQuery -->
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
+     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        header {
+            background-color: #00807c;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .container {
+            margin: 20px auto;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00807c;
+            box-shadow: 0 0 5px rgba(96, 91, 255, 0.5);
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00807c;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #4a45e3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            text-align: left;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #00807c;
+            color: white;
+        }
+
+        table td button {
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background-color: #4a45e3;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .progress-bar {
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-bar-inner {
+            background-color: #00807c;
+            height: 20px;
+            width: 0;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+            transition: width 0.5s;
+        }
+
+        .achievement {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 600px) {
+            .form-group {
+                flex-direction: column;
+            }
+
+            table th, table td {
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+    
+  </head>
+
+  
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <!-- Include navigation -->
+      
+      <div class="wrapper">
+        <!-- Include navigation -->
+        <%- include('nav') %>
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 style="color: #00807c; font-size: 2rem; font-weight: bold;">Manage Activity Reward Settings</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Activity Reward System</title>
+                <!-- Include SweetAlert2 -->
+                <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <!-- Font Awesome -->
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <style>
+                    :root {
+                        --primary-color: #00807c;
+                        --secondary-color: #4e4bc1;
+                        --danger-color: #e74c3c;
+                        --success-color: #2ecc71;
+                        --background-color: #f8f9fa;
+                        --text-color: #2d3748;
+                    }
+            
+                    body {
+                        font-family: 'Segoe UI', system-ui, sans-serif;
+                        margin: 0;
+                        padding: 0;
+                        background-color: var(--background-color);
+                        color: var(--text-color);
+                    }
+            
+                    header {
+                        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                        color: white;
+                        padding: 1.5rem;
+                        text-align: center;
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                    }
+            
+                    .container {
+                        margin: 2rem auto;
+                        background: white;
+                        border-radius: 12px;
+                        padding: 2rem;
+                        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+                        max-width: 1000px;
+                    }
+            
+                    .form-group {
+                        margin-bottom: 1.5rem;
+                        position: relative;
+                    }
+            
+                    .form-label {
+                        display: block;
+                        margin-bottom: 0.5rem;
+                        font-weight: 600;
+                        color: var(--primary-color);
+                    }
+            
+                    .form-input {
+                        width: 100%;
+                        padding: 0.875rem 1.25rem;
+                        border: 2px solid #e2e8f0;
+                        border-radius: 8px;
+                        font-size: 1rem;
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    }
+            
+                    .form-input:focus {
+                        border-color: var(--primary-color);
+                        box-shadow: 0 0 0 3px rgba(96, 91, 255, 0.15);
+                        outline: none;
+                    }
+            
+                    .btn {
+                        padding: 0.75rem 1.5rem;
+                        border: none;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                    }
+            
+                    .btn-primary {
+                        background: var(--primary-color);
+                        color: white;
+                    }
+            
+                    .btn-primary:hover {
+                        background: var(--secondary-color);
+                        transform: translateY(-1px);
+                    }
+            
+                    .table-wrapper {
+                        overflow-x: auto;
+                        margin: 2rem 0;
+                        border-radius: 8px;
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+                    }
+            
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        background: white;
+                    }
+            
+                    th, td {
+                        padding: 1rem;
+                        text-align: left;
+                        border-bottom: 1px solid #e2e8f0;
+                    }
+            
+                    th {
+                        background-color: var(--primary-color);
+                        color: white;
+                        font-weight: 600;
+                    }
+            
+                    tr:hover {
+                        background-color: #f8f9fa;
+                    }
+            
+                    .action-buttons {
+                        display: flex;
+                        gap: 0.5rem;
+                    }
+            
+                    .edit-btn {
+                        background: var(--primary-color);
+                        color: white;
+                        padding: 0.5rem 1rem;
+                        border-radius: 6px;
+                    }
+            
+                    .delete-btn {
+                        background: var(--danger-color);
+                        color: white;
+                        padding: 0.5rem 1rem;
+                        border-radius: 6px;
+                    }
+            
+                    .progress-bar {
+                        height: 24px;
+                        background-color: #e2e8f0;
+                        border-radius: 12px;
+                        overflow: hidden;
+                        position: relative;
+                        margin: 2rem 0;
+                    }
+            
+                    .progress-fill {
+                        height: 100%;
+                        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+                        transition: width 0.5s ease;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end;
+                        padding-right: 1rem;
+                        color: white;
+                        font-weight: 600;
+                    }
+            
+                    .achievement-card {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 1rem;
+                        margin: 0.5rem 0;
+                        background: white;
+                        border-radius: 8px;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                    }
+            
+                    .achievement-status {
+                        font-size: 1.2rem;
+                    }
+            
+                    @media (max-width: 768px) {
+                        .container {
+                            margin: 1rem;
+                            padding: 1rem;
+                        }
+                        
+                        th, td {
+                            padding: 0.75rem;
+                        }
+                        
+                        .action-buttons {
+                            flex-direction: column;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <header>
+                    <h1>Activity Reward System</h1>
+                </header>
+            
+                <section class="content">
+                    <div class="container">
+                        <form id="activityForm">
+                            <div class="form-group">
+                                <label class="form-label" for="activity">Activity Level</label>
+                                <input type="number" class="form-input" id="activity" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="reward">Calculated Reward</label>
+                                <input type="text" class="form-input" id="reward" readonly>
+                            </div>
+                            <button type="button" class="btn btn-primary" id="updateButton">
+                                <i class="fas fa-sync-alt"></i> Update Reward
+                            </button>
+                        </form>
+            
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Minimum Betting Amount</th>
+                                        <th>Activity Award</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="criteriaBody">
+                                    <!-- Dynamic content will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+            
+                        <h2>Progress Towards Reward</h2>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressBar">0%</div>
+                        </div>
+            
+                        <h2>Achievements</h2>
+                        <div id="achievements">
+                            <div class="achievement-card">
+                                <span>First Reward Achieved</span>
+                                <span class="achievement-status">❌</span>
+                            </div>
+                            <div class="achievement-card">
+                                <span>High Activity Level (2000+)</span>
+                                <span class="achievement-status">❌</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            
+                <script>
+                    // Initialize data
+                    let rewardCriteria = [
+                        { id: 1, minAmount: 100, award: '50 Points' },
+                        { id: 2, minAmount: 200, award: '100 Points' },
+                        { id: 3, minAmount: 500, award: '200 Points' },
+                        { id: 4, minAmount: 1000, award: '500 Points' },
+                        { id: 5, minAmount: 2000, award: '1000 Points' }
+                    ];
+            
+                    // Render table function
+                    function renderTable() {
+                        const tbody = document.getElementById('criteriaBody');
+                        tbody.innerHTML = rewardCriteria.map(criteria => `
+                            <tr>
+                                <td>${criteria.id}</td>
+                                <td>${criteria.minAmount}</td>
+                                <td>${criteria.award}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="edit-btn" data-id="${criteria.id}">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="delete-btn" data-id="${criteria.id}">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+            
+                    // Initial render
+                    renderTable();
+            
+                    // Update functionality
+                    document.getElementById('updateButton').addEventListener('click', () => {
+                        const activity = parseInt(document.getElementById('activity').value);
+                        let reward = 'No reward available';
+                        
+                        // Find matching reward
+                        const matchedCriteria = [...rewardCriteria].reverse().find(c => activity >= c.minAmount);
+                        if (matchedCriteria) reward = matchedCriteria.award;
+            
+                        document.getElementById('reward').value = reward;
+            
+                        // Update progress
+                        const maxAmount = Math.max(...rewardCriteria.map(c => c.minAmount));
+                        const progress = Math.min((activity / maxAmount) * 100, 100);
+                        document.getElementById('progressBar').style.width = `${progress}%`;
+                        document.getElementById('progressBar').textContent = `${progress.toFixed(1)}%`;
+            
+                        // Update achievements
+                        const achievements = document.querySelectorAll('.achievement-status');
+                        achievements[0].textContent = activity >= 100 ? '✔️' : '❌';
+                        achievements[1].textContent = activity >= 2000 ? '✔️' : '❌';
+                    });
+            
+                    document.addEventListener('click', (e) => {
+    const deleteBtn = e.target.closest('.delete-btn');
+    if (deleteBtn) {
+        const id = parseInt(deleteBtn.dataset.id, 10);
+        if (isNaN(id)) return;
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545', // Replace with actual color
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                rewardCriteria = rewardCriteria.filter(c => c.id !== id);
+                renderTable();
+                Swal.fire('Deleted!', 'Criteria has been deleted.', 'success');
+            }
+        });
+    }
+});
+
+            
+                    // Edit functionality
+                    document.addEventListener('click', (e) => {
+                        if (e.target.closest('.edit-btn')) {
+                            const id = parseInt(e.target.closest('.edit-btn').dataset.id);
+                            const criteria = rewardCriteria.find(c => c.id === id);
+                            
+                            Swal.fire({
+                                title: 'Edit Criteria',
+                                html: `
+                                    <input type="number" id="minAmount" class="swal2-input" placeholder="Minimum Amount" value="${criteria.minAmount}">
+                                    <input type="text" id="award" class="swal2-input" placeholder="Award" value="${criteria.award}">
+                                `,
+                                focusConfirm: false,
+                                preConfirm: () => {
+                                    return {
+                                        minAmount: parseInt(document.getElementById('minAmount').value),
+                                        award: document.getElementById('award').value
+                                    }
+                                }
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    criteria.minAmount = result.value.minAmount;
+                                    criteria.award = result.value.award;
+                                    renderTable();
+                                    Swal.fire('Updated!', 'Criteria has been updated.', 'success');
+                                }
+                            });
+                        }
+                    });
+                </script>
+            </body>
+            </html>
+        </div>
+    </div>
+        
+   
+         <a id="back-to-tops" href="#" class="btn1 back-to-top" role="button" aria-label="Scroll to top">
+           <i class="fas fa-chevron-up"></i>
+         </a>
+    </div>
+   
+    </div>
+
+    
+
+    <!-- Include scripts -->
+    <script>
+      const tasks = [];
+      const sections = Array(8)
+        .fill(null)
+        .map((_, i) => ({
+          id: i + 1,
+          value: i === 7 ? "NA" : (i + 1) * 10,
+        }));
+
+      function toggleDropdown() {
+        const dropdown = document.getElementById("instructionsDropdown");
+        dropdown.style.display =
+          dropdown.style.display === "none" ? "block" : "none";
+      }
+
+      function addTask() {
+        const taskNumber = document.getElementById("taskNumber").value;
+        const spins = document.getElementById("spins").value;
+
+        if (taskNumber && spins) {
+          tasks.push({ id: tasks.length + 1, taskNumber, spins });
+          renderTasks();
+        } else {
+          alert("Please enter both Task Number and Number of Spins.");
+        }
+      }
+
+      function renderTasks() {
+        const taskList = document.getElementById("taskList");
+        taskList.innerHTML = tasks
+          .map(
+            (task) =>
+              `<div class="task-item">
+                <span>Task: ${task.taskNumber}</span>
+                <span>Spins: ${task.spins}</span>
+                <button onclick="deleteTask(${task.id})" class="button button-danger">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>`
+          )
+          .join("");
+      }
+
+      function deleteTask(id) {
+        const index = tasks.findIndex((task) => task.id === id);
+        if (index > -1) {
+          tasks.splice(index, 1);
+          renderTasks();
+        }
+      }
+
+      function renderSections() {
+        const sectionsContainer = document.getElementById("sections");
+        sectionsContainer.innerHTML = sections
+          .map(
+            (section) =>
+              `<div class="section-item">
+                <span>Section ${section.id}</span>
+                <input type="text" value="${section.value}" />
+              </div>`
+          )
+          .join("");
+      }
+
+      renderSections();
+    </script>
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    
+  </body>
+</html>

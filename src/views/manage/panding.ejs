@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Browse Recharge - Admin Panel</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+  </head>
+
+  <style>
+    /* SweetAlert2 specific styles for white theme */
+    .swal2-popup {
+      border-radius: 8px !important;
+    }
+
+    .swal2-title {
+      color: #343a40 !important; /* Adjust title color for white theme */
+    }
+
+    .swal2-html-container {
+      color: #555 !important; /* Adjust text color for white theme */
+    }
+
+    .swal2-styled.swal2-confirm {
+      background-color: #00807c !important; /* Your desired main color */
+      color: #ffffff !important;
+    }
+
+    .swal2-styled.swal2-confirm:focus {
+      box-shadow: 0 0 0 3px rgba(0, 128, 124, 0.5) !important; /* Focus shadow */
+    }
+
+    .swal2-styled.swal2-cancel {
+      background-color: #6c757d !important; /* Default cancel button color */
+      color: #ffffff !important;
+    }
+
+    .swal2-styled.swal2-cancel:focus {
+      box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.5) !important;
+    }
+
+    /* Your existing custom styles */
+    body {
+      font-family: "Source Sans Pro", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    h1 {
+      color: #00807c;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .content-wrapper {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .search-container input {
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #00807c;
+      border-radius: 8px 0 0 8px;
+      outline: none;
+      flex: 1;
+      max-width: 500px;
+    }
+
+    .search-container button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #00807c;
+      color: #fff;
+      border: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .search-container button:hover {
+      background-color: #014a47; /* Darker shade of #00807c for hover */
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      background-color: #00807c;
+      color: white;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .card-body {
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      text-align: center;
+      padding: 12px;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #00807c;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tr:nth-child(odd) {
+      background-color: #dff5f5; /* Light blue/green for odd rows */
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 8px 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-success {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: #218838;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #c82333;
+    }
+
+    /* Added styles for the Action buttons to make them more distinct */
+    .btn-action {
+      margin: 0 5px; /* Add some space between buttons */
+      min-width: 80px; /* Give buttons a consistent minimum width */
+    }
+
+    @media (max-width: 768px) {
+      .search-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-container input {
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+
+      .search-container button {
+        border-radius: 8px;
+      }
+
+      table {
+        font-size: 14px;
+      }
+    }
+  </style>
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <%- include('nav') %>
+      <div class="content-wrapper">
+        <section class="content-header">
+          <div>
+            <h1>pendings Recharge</h1>
+          </div>
+        </section>
+
+        <div class="search-container">
+          <input type="text" id="search" placeholder="Enter the order id" />
+          <button id="searchBtn" class="btn">Search</button>
+        </div>
+
+        <section class="content">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Approve Recharge</h3>
+            </div>
+
+            <div class="card-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Account</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>UTR No</th>
+                    <th>Time</th>
+                    <th>Order ID</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        let allRechargeData = []; // Store all data for efficient client-side filtering
+
+        // Function to display the data in the table
+        function show(params, searchValue = "") {
+          let html = "";
+          // Filter data based on search value, if provided
+          let filteredData = params.filter((data) => {
+            return searchValue
+              ? data.id_order &&
+                  data.id_order.toString().toLowerCase().includes(searchValue)
+              : true;
+          });
+
+          if (filteredData.length === 0) {
+            $("tbody").html(`
+              <tr class="text-center">
+                <td colspan="9">No matching data found...</td>
+              </tr>
+            `);
+            return;
+          }
+
+          // Generate HTML for the filtered data
+          filteredData.forEach((data) => {
+            html += `<tr class="text-center">
+                    <td>
+                      ${data.id}
+                    </td>
+                    <td>
+                      <b>${data.phone}</b>
+                    </td>
+                    <td>
+                      ${data.type}
+                    </td>
+                    <td>
+                      <b> ${
+                        data.type === "USDT"
+                          ? "$" + Number(data.money / 93).toFixed(2) // Assuming 93 as exchange rate
+                          : "₹" + data.money
+                      }</b>
+                    </td>
+                    <td style="min-width: 190px;">
+                      <b>${data.utr}</b>
+                    </td>
+                    <td style="min-width: 190px;">
+                      <b>${data.today}</b>
+                    </td>
+                    <td style="min-width: 190px;">
+                      <b>${data.id_order}</b>
+                    </td>
+                    <td class="project-state">
+                      <span class="badge badge-warning">Waiting...</span>
+                    </td>
+                    <td class="project-actions text-center" style="min-width: 160px; display: flex; justify-content: center; gap: 10px; align-items: center;">
+  <a 
+    class="btn btn-success btn-sm btn-action" 
+    href="#" 
+    data-id="${data.id}" 
+    style="background-color: #28a745 !important; color: #fff !important; padding: 4px 10px; font-size: 12px;"
+  >
+    <i class="fa fa-check"></i> Approve
+  </a>
+  <a 
+    class="btn btn-danger btn-sm btn-action" 
+    href="#" 
+    data-id="${data.id}" 
+    style="background-color: #e74c3c !important; color: #fff !important; padding: 4px 10px; font-size: 12px;"
+  >
+    <i class="fas fa-trash"></i> Delete
+  </a>
+</td>
+
+                  </tr>`;
+          });
+
+          // Update the HTML content of the tbody
+          $("tbody").html(html);
+
+          // IMPORTANT: Rebind event handlers AFTER updating tbody content
+          bindActionButtons();
+        }
+
+        // Function to bind click events to action buttons
+        function bindActionButtons() {
+          // Handle Approve button click
+          $(".btn-success").off("click").on("click", function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            const id = $(this).data("id"); // Get ID from data-id attribute
+
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You are about to approve this recharge!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonText: "Yes, approve it!",
+              cancelButtonText: "No, cancel!",
+              reverseButtons: true,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                $.ajax({
+                  type: "POST",
+                  url: "/api/webapi/admin/rechargeDuyet",
+                  data: {
+                    id: id,
+                    type: "confirm",
+                  },
+                  dataType: "json",
+                  success: function (response) {
+                    if (response.status === true) {
+                      Swal.fire(
+                        "Approved!",
+                        response.message || "Recharge approved successfully.",
+                        "success"
+                      ).then(() => {
+                        location.reload(); // Reload the page to reflect changes
+                      });
+                    } else {
+                      Swal.fire(
+                        "Error!",
+                        response.message || "Failed to approve recharge.",
+                        "error"
+                      );
+                    }
+                  },
+                  error: function (xhr, status, error) {
+                    console.error("Error approving recharge:", error);
+                    Swal.fire(
+                      "Error!",
+                      "An error occurred while approving recharge. Please try again.",
+                      "error"
+                    );
+                  },
+                });
+              }
+            });
+          });
+
+          // Handle Reject button click
+          $(".btn-danger").off("click").on("click", function (e) {
+            e.preventDefault(); // Prevent default link behavior
+            const id = $(this).data("id"); // Get ID from data-id attribute
+
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You are about to reject this recharge!",
+              icon: "error", // Use error icon for rejection
+              showCancelButton: true,
+              confirmButtonText: "Yes, reject it!",
+              cancelButtonText: "No, cancel!",
+              reverseButtons: true,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                $.ajax({
+                  type: "POST",
+                  url: "/api/webapi/admin/rechargeDuyet",
+                  data: {
+                    id: id,
+                    type: "delete", // Use 'delete' for rejection as per your API
+                  },
+                  dataType: "json",
+                  success: function (response) {
+                    if (response.status === true) {
+                      Swal.fire(
+                        "Rejected!",
+                        response.message || "Recharge rejected successfully.",
+                        "success"
+                      ).then(() => {
+                        location.reload(); // Reload the page to reflect changes
+                      });
+                    } else {
+                      Swal.fire(
+                        "Error!",
+                        response.message || "Failed to reject recharge.",
+                        "error"
+                      );
+                    }
+                  },
+                  error: function (xhr, status, error) {
+                    console.error("Error rejecting recharge:", error);
+                    Swal.fire(
+                      "Error!",
+                      "An error occurred while rejecting recharge. Please try again.",
+                      "error"
+                    );
+                  },
+                });
+              }
+            });
+          });
+        }
+
+        // --- Initial Data Load ---
+        $.ajax({
+          type: "POST",
+          url: "/api/webapi/admin/recharge", // Your API endpoint to fetch recharge data
+          dataType: "json",
+          success: function (response) {
+            if (response && response.datas && Array.isArray(response.datas)) {
+              allRechargeData = response.datas; // Store the fetched data
+              show(allRechargeData, $("#search").val().toLowerCase()); // Display data, applying initial search if any
+            } else {
+              // Handle cases where response.datas is not an array or is missing
+              $("tbody").html(`
+                <tr class="text-center">
+                  <td colspan="9">No recharge data available or invalid API response format.</td>
+                </tr>
+              `);
+              console.warn("API response for /api/webapi/admin/recharge was not as expected:", response);
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error("Failed to fetch recharge data:", status, error, xhr.responseText);
+            Swal.fire(
+              "Error",
+              "Could not load recharge data. Please check the server and API endpoint.",
+              "error"
+            );
+            $("tbody").html(`
+              <tr class="text-center">
+                <td colspan="9">Failed to load recharge data. Please try again later.</td>
+              </tr>
+            `);
+          },
+        });
+
+        // --- Search Functionality ---
+        $("#search").on("input", function () {
+          const searchValue = $(this).val().toLowerCase();
+          show(allRechargeData, searchValue); // Filter and display from locally stored data
+        });
+
+        // --- Search Button Click (Optional, as input event already filters) ---
+        $("#searchBtn").on("click", function() {
+            const searchValue = $("#search").val().toLowerCase();
+            show(allRechargeData, searchValue);
+        });
+      });
+    </script>
+  </body>
+</html>

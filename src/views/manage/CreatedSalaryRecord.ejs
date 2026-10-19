@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Salary Records Management</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <style>
+        :root {
+            --primary-color: #00807c;
+            --primary-light: #e6f7f7;
+            --primary-dark: #006663;
+            --secondary-color: #4d49d7;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #fd7e14;
+            --info-color: #17a2b8;
+            --background-light: #f8fafc;
+            --background-card: #ffffff;
+            --text-dark: #1e293b;
+            --text-medium: #475569;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --border-radius: 8px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+        }
+
+        .content-wrapper {
+            background-color: var(--background-light);
+           
+            padding-left: 2rem;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .card {
+            background-color: var(--background-card);
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .form-control {
+            background-color: var(--background-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            color: var(--text-dark);
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: var(--transition);
+            height: auto;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 128, 124, 0.15);
+            outline: none;
+        }
+
+        .btn {
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: var(--transition);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            padding: 0;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .table-responsive {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .table {
+            width: 100%;
+            margin-bottom: 0;
+            color: var(--text-dark);
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+            padding: 1rem;
+            text-align: center;
+            vertical-align: middle;
+            border: none;
+        }
+
+        .table td {
+            padding: 1rem;
+            text-align: center;
+            vertical-align: middle;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .table tbody tr:nth-child(odd) {
+            background-color: var(--primary-light);
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(0, 128, 124, 0.1);
+        }
+
+        .form-section {
+            background-color: var(--background-card);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-medium);
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .form-submit:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .form-submit:active {
+            transform: translateY(0);
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: var(--background-card);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Pagination styles */
+         /* Previous styles remain the same */
+
+        /* Simplified Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            padding: 1rem 0;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .page-item {
+            display: flex;
+        }
+
+        .page-link {
+            color: white;
+            background-color: var(--background-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1.25rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+        }
+
+        .page-item.disabled .page-link {
+            color: var(--text-light);
+            background-color: var(--border-color);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .page-item:not(.disabled) .page-link:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            border-color: var(--primary-light);
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .page-link i {
+            margin: 0 0.25rem;
+        }
+        /* Status badges */
+        .badge {
+            padding: 0.5rem 0.75rem;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Loading state */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 4px solid var(--primary-light);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            color: var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-medium);
+        }
+
+        .empty-state-description {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 1rem;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Animation for new records */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .new-record {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <%- include('nav') %>
+        
+        <!-- Loading overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+        </div>
+        
+        <div class="content-wrapper">
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-4">
+                        <div class="col-sm-12">
+                            <h1>Salary Records Management</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stats Cards -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="stat-title">Total Salary Paid</div>
+                    <div class="stat-value" id="totalSalary">₹0</div>
+                    <div class="stat-change text-success" id="salaryChange">
+                        <i class="fas fa-arrow-up"></i> 0% from last month
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-title">Employees Paid</div>
+                    <div class="stat-value" id="employeeCount">0</div>
+                    <div class="stat-change text-info">
+                        <i class="fas fa-arrow-up"></i> 0% from last month
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-title">This Month</div>
+                    <div class="stat-value" id="monthlySalary">₹0</div>
+                    <div class="stat-change text-danger">
+                        <i class="fas fa-arrow-down"></i> 0% from last month
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Section -->
+            <div class="form-section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">Add New Salary Record</h2>
+                    <button class="btn btn-primary btn-icon" id="refreshData">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                
+                <form id="salaryForm">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="phone">Employee UID</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                    </div>
+                                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Enter UID" required />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="amount">Amount (₹)</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-rupee-sign"></i></span>
+                                    </div>
+                                    <input type="number" id="amount" name="amount" class="form-control" placeholder="Enter amount" required />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="type">Payment Type</label>
+                                <select id="type" name="type" class="form-control" required>
+                                    <option value="" disabled selected>Select payment type</option>
+                                    <option value="Salary">Salary</option>
+                                    <option value="Bonus">Bonus</option>
+                                    <option value="Advance">Advance</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes (Optional)</label>
+                        <textarea id="notes" name="notes" class="form-control" rows="2" placeholder="Any additional notes..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="form-submit">
+                        <i class="fas fa-plus-circle mr-2"></i> Add Salary Record
+                    </button>
+                </form>
+            </div>
+
+            <!-- Records Table -->
+            <section class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Salary Records History</h5>
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm" style="width: 350px; height: 40px;">
+  <input
+    type="text"
+    id="searchInput"
+    class="form-control"
+    placeholder="Search..."
+    style="height: 100%; border-top-right-radius: 0; border-bottom-right-radius: 0;"
+  />
+  <div class="input-group-append" style="height: 100%;">
+    <button
+      class="btn btn-primary"
+      id="searchButton"
+      style="height: 100%; border-top-left-radius: 0; border-bottom-left-radius: 0;"
+    >
+      <i class="fas fa-search"></i>
+    </button>
+  </div>
+</div>
+
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-0">
+  <!-- Table Wrapper for Horizontal Scroll -->
+  <div class="table-responsive" style="overflow-x: auto; width: 100%;">
+    <table class="table" id="salaryTable" style="min-width: 600px;">
+      <thead>
+        <tr>
+          <th class="text-center">Employee ID</th>
+          <th class="text-center">Amount</th>
+          <th class="text-center">Type</th>
+          <th class="text-center">Date</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- Empty state by default -->
+        <tr>
+          <td colspan="5" class="text-center py-4">
+            <div class="empty-state">
+              <div class="empty-state-icon">
+                <i class="fas fa-file-invoice-dollar"></i>
+              </div>
+              <h3 class="empty-state-title">No Salary Records Found</h3>
+              <p class="empty-state-description">
+                Add your first salary record using the form above.
+              </p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-container">
+        <ul class="pagination" id="salaryPagination">
+            <!-- Only Previous and Next buttons will be shown -->
+        </ul>
+    </div>
+</div>
+
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Global variables
+            let currentPage = 1;
+            const rowsPerPage = 10;
+            let allSalaryData = [];
+            let filteredData = [];
+            
+            // DOM elements
+            const $loadingOverlay = $('#loadingOverlay');
+            const $salaryForm = $('#salaryForm');
+            const $tableBody = $('#tableBody');
+            const $pagination = $('#salaryPagination');
+            const $searchInput = $('#searchInput');
+            const $refreshBtn = $('#refreshData');
+            const $totalSalary = $('#totalSalary');
+            const $employeeCount = $('#employeeCount');
+            const $monthlySalary = $('#monthlySalary');
+            
+            // Initialize the page
+            initPage();
+            
+            function initPage() {
+                fetchSalaryData();
+                setupEventListeners();
+            }
+            
+            function setupEventListeners() {
+                // Form submission
+                $salaryForm.on('submit', handleFormSubmit);
+                
+                // Refresh button
+                $refreshBtn.on('click', function() {
+                    fetchSalaryData();
+                    showToast('Data refreshed successfully', 'success');
+                });
+                
+                // Search functionality
+                $('#searchButton').on('click', handleSearch);
+                $searchInput.on('keyup', function(e) {
+                    if (e.key === 'Enter') {
+                        handleSearch();
+                    }
+                });
+            }
+            
+            function showLoading() {
+                $loadingOverlay.addClass('active');
+            }
+            
+            function hideLoading() {
+                $loadingOverlay.removeClass('active');
+            }
+            
+            function showToast(message, type = 'success') {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer);
+                        toast.addEventListener('mouseleave', Swal.resumeTimer);
+                    }
+                });
+                
+                Toast.fire({
+                    icon: type,
+                    title: message
+                });
+            }
+            
+            function fetchSalaryData() {
+                showLoading();
+                
+                $.ajax({
+                    type: "GET",
+                    url: "/api/webapi/admin/getSalary",
+                    dataType: "json",
+                    success: function(response) {
+                        hideLoading();
+                        
+                        if (response && Array.isArray(response.rows)) {
+                            allSalaryData = response.rows;
+                            filteredData = [...allSalaryData];
+                            
+                            // Update stats
+                            updateStatistics(allSalaryData);
+                            
+                            // Render table and pagination
+                            renderTable(currentPage);
+                            renderPagination();
+                            
+                            if (allSalaryData.length === 0) {
+                                showEmptyState();
+                            }
+                        } else {
+                            showError("Invalid data format received from server");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        hideLoading();
+                        showError("Failed to fetch salary data: " + error);
+                        showEmptyState();
+                    }
+                });
+            }
+            
+            function updateStatistics(data) {
+                // Calculate total salary
+                const total = data.reduce((sum, record) => sum + parseFloat(record.amount), 0);
+                $totalSalary.text('₹' + total.toLocaleString('en-IN'));
+                
+                // Calculate unique employees
+                const uniqueEmployees = new Set(data.map(record => record.phone));
+                $employeeCount.text(uniqueEmployees.size);
+                
+                // Calculate this month's salary (simplified example)
+                const currentMonth = new Date().getMonth();
+                const monthlyTotal = data
+                    .filter(record => new Date(record.time).getMonth() === currentMonth)
+                    .reduce((sum, record) => sum + parseFloat(record.amount), 0);
+                $monthlySalary.text('₹' + monthlyTotal.toLocaleString('en-IN'));
+            }
+            
+            function handleFormSubmit(e) {
+                e.preventDefault();
+                
+                const phoneNumber = $("#phone").val().trim();
+                const amount = $("#amount").val().trim();
+                const type = $("#type").val().trim();
+                const notes = $("#notes").val().trim();
+                
+                if (!phoneNumber || !amount || !type) {
+                    showToast('Please fill all required fields', 'error');
+                    return;
+                }
+                
+                showLoading();
+                
+                $.ajax({
+                    type: "POST",
+                    url: "/api/webapi/admin/CreatedSalary",
+                    dataType: "JSON",
+                    data: {
+                        phone: phoneNumber,
+                        amount: amount,
+                        type: type,
+                        notes: notes
+                    },
+                    success: function(response) {
+                        hideLoading();
+                        
+                        if (response && response.message) {
+                            showToast('Salary record added successfully', 'success');
+                            $salaryForm[0].reset();
+                            
+                            // Add the new record to our data (assuming response contains the new record)
+                            if (response.newRecord) {
+                                allSalaryData.unshift(response.newRecord);
+                                filteredData.unshift(response.newRecord);
+                                
+                                // Update stats
+                                updateStatistics(allSalaryData);
+                                
+                                // Reset to first page and render
+                                currentPage = 1;
+                                renderTable(currentPage);
+                                renderPagination();
+                            } else {
+                                // If we don't get the new record, just refresh
+                                fetchSalaryData();
+                            }
+                        } else {
+                            showToast('Record added but unexpected response format', 'warning');
+                        }
+                    },
+                    error: function(xhr) {
+                        hideLoading();
+                        
+                        let errorMessage = "Something went wrong!";
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        
+                        showToast(errorMessage, 'error');
+                    }
+                });
+            }
+            
+            function handleSearch() {
+                const searchTerm = $searchInput.val().toLowerCase().trim();
+                
+                if (searchTerm === '') {
+                    filteredData = [...allSalaryData];
+                } else {
+                    filteredData = allSalaryData.filter(record => 
+                        record.phone.toLowerCase().includes(searchTerm) ||
+                        record.amount.toString().includes(searchTerm) ||
+                        record.type.toLowerCase().includes(searchTerm) ||
+                        record.time.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                currentPage = 1;
+                renderTable(currentPage);
+                renderPagination();
+                
+                if (filteredData.length === 0) {
+                    showEmptyState();
+                }
+            }
+            
+            function renderTable(page) {
+                $tableBody.empty();
+                
+                if (filteredData.length === 0) {
+                    showEmptyState();
+                    return;
+                }
+                
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const paginatedData = filteredData.slice(start, end);
+                
+                paginatedData.forEach((record, index) => {
+                    const rowClass = index === 0 && page === 1 ? 'new-record' : '';
+                    
+                    const row = `
+                        <tr class="${rowClass}">
+                            <td class="text-center">${record.phone || 'N/A'}</td>
+                            <td class="text-center font-weight-bold">₹${record.amount ? parseFloat(record.amount).toLocaleString('en-IN') : '0'}</td>
+                            <td class="text-center">
+                                <span class="badge ${getTypeBadgeClass(record.type)}">
+                                    ${record.type || 'N/A'}
+                                </span>
+                            </td>
+                            <td class="text-center">${formatDate(record.time) || 'N/A'}</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-primary" onclick="viewRecordDetails('${record.id}')">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    
+                    $tableBody.append(row);
+                });
+            }
+            
+            function getTypeBadgeClass(type) {
+                switch (type.toLowerCase()) {
+                    case 'salary': return 'bg-primary';
+                    case 'bonus': return 'bg-success';
+                    case 'advance': return 'bg-warning';
+                    default: return 'bg-info';
+                }
+            }
+            
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+            
+            function renderPagination() {
+            $pagination.empty();
+            
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            
+            if (totalPages <= 1) return;
+            
+            // Previous button
+            const prevDisabled = currentPage === 1 ? 'disabled' : '';
+            $pagination.append(`
+                <li class="page-item ${prevDisabled}">
+                    <a class="page-link" href="#" data-page="${currentPage - 1}">
+                        <i class="fas fa-chevron-left mr-1"></i> Previous
+                    </a>
+                </li>
+            `);
+            
+            // Current page indicator (optional - remove if you don't want any page number)
+            $pagination.append(`
+                <li class="page-item active">
+                    <span class="page-link">${currentPage} / ${totalPages}</span>
+                </li>
+            `);
+            
+            // Next button
+            const nextDisabled = currentPage === totalPages ? 'disabled' : '';
+            $pagination.append(`
+                <li class="page-item ${nextDisabled}">
+                    <a class="page-link" href="#" data-page="${currentPage + 1}">
+                        Next <i class="fas fa-chevron-right ml-1"></i>
+                    </a>
+                </li>
+            `);
+            
+            // Pagination click handler
+            $pagination.off('click', '.page-link').on('click', '.page-link', function(e) {
+                e.preventDefault();
+                const page = parseInt($(this).data('page'));
+                
+                if (!isNaN(page) && page >= 1 && page <= totalPages) {
+                    currentPage = page;
+                    renderTable(currentPage);
+                }
+            });
+        }
+            
+            function showEmptyState() {
+                $tableBody.empty().append(`
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </div>
+                                <h3 class="empty-state-title">No Records Found</h3>
+                                <p class="empty-state-description">
+                                    ${filteredData.length === 0 && allSalaryData.length > 0 ? 
+                                        'No records match your search criteria.' : 
+                                        'Add your first salary record using the form above.'}
+                                </p>
+                                ${filteredData.length === 0 && allSalaryData.length > 0 ? 
+                                    '<button class="btn btn-primary mt-3" id="clearSearch">Clear Search</button>' : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `);
+                
+                $('#clearSearch').on('click', function() {
+                    $searchInput.val('');
+                    filteredData = [...allSalaryData];
+                    currentPage = 1;
+                    renderTable(currentPage);
+                    renderPagination();
+                });
+            }
+            
+            function showError(message) {
+                console.error(message);
+                showToast(message, 'error');
+            }
+            
+            // Make this function available globally
+            window.viewRecordDetails = function(recordId) {
+                // In a real application, this would show a modal with record details
+                // For now, we'll just show a toast
+                const record = allSalaryData.find(r => r.id === recordId);
+                
+                if (record) {
+                    Swal.fire({
+                        title: 'Record Details',
+                        html: `
+                            <div class="text-left">
+                                <p><strong>Employee ID:</strong> ${record.phone || 'N/A'}</p>
+                                <p><strong>Amount:</strong> ₹${record.amount || '0'}</p>
+                                <p><strong>Type:</strong> ${record.type || 'N/A'}</p>
+                                <p><strong>Date:</strong> ${formatDate(record.time) || 'N/A'}</p>
+                                ${record.notes ? `<p><strong>Notes:</strong> ${record.notes}</p>` : ''}
+                            </div>
+                        `,
+                        icon: 'info',
+                        confirmButtonText: 'Close'
+                    });
+                } else {
+                    showToast('Record details not found', 'error');
+                }
+            };
+        });
+    </script>
+</body>
+</html>

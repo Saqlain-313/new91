@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Logo Settings</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"
+      integrity="sha512-NQfB/bDaB8kaSXF8E77JjhHG5PM6XVRxvHzkZiwl3ddWCEPBa23T76MuWSwAJdMGJnmQqM0VeY9kFszsrBEFrQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <style>
+      body {
+        background-color: #f4f6f9;
+        color: #343a40;
+        font-family: "Source Sans Pro", sans-serif;
+      }
+
+      .form-container {
+        background: white;
+        padding: 20px 30px;
+        border-radius: 16px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        width: 95%;
+        margin: auto;
+      }
+
+      .form-container h2 {
+        text-align: center;
+        color: #6a11cb;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .form-group input[type="text"],
+      .form-group input[type="url"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+      }
+
+      .form-group img {
+        display: block;
+        width: 50px;
+        height: 50px;
+        margin: 10px auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .submit-btn {
+        width: 100%;
+        background: linear-gradient(to right, #6a11cb, #2575fc);
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        text-align: center;
+        transition: 0.3s ease;
+      }
+
+      .submit-btn:hover {
+        background: linear-gradient(to right, #2575fc, #6a11cb);
+      }
+
+      @media (max-width: 480px) {
+        .form-container {
+          padding: 15px 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <%- include('nav') %>
+      <div class="content-wrapper">
+        <section class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1
+                  class=""
+                  style="color: #00807c; font-size: 2rem; font-weight: bold"
+                >
+                  Logo Name Settings
+                </h1>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="form-container">
+          <h2 style="color: #00807c;">Logo Settings</h2>
+          <form id="logo-settings-form">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" value="BDG CLUB" />
+            </div>
+            <div class="form-group">
+              <label for="logo">Logo</label>
+              <input
+                type="url"
+                id="logo"
+                name="logo"
+                value="https://i.ibb.co/D1vKrQX/logo.png"
+              />
+              <img
+                id="logo-preview"
+                src="https://i.ibb.co/D1vKrQX/logo.png"
+                alt="Logo Preview"
+              />
+            </div>
+            <div class="form-group">
+              <label for="logo">Logo1</label>
+              <input
+                type="url"
+                id="logo1"
+                name="logo1"
+                value="https://i.ibb.co/D1vKrQX/logo.png"
+              />
+              <img
+                id="logo1-preview"
+                src="https://i.ibb.co/D1vKrQX/logo.png"
+                alt="Logo Preview"
+              />
+            </div>
+            <div class="form-group">
+              <label for="loader">Loader</label>
+              <input
+                type="url"
+                id="loader"
+                name="loader"
+                value="https://i.ibb.co/cxdmR85/loader.png"
+              />
+              <img
+                id="loader-preview"
+                src="https://i.ibb.co/cxdmR85/loader.png"
+                alt="Loader Preview"
+              />
+            </div>
+            <div class="form-group">
+              <label for="favicon">Favicon</label>
+              <input
+                type="url"
+                id="favicon"
+                name="favicon"
+                value="https://i.ibb.co/cxdmR85/loader.png"
+              />
+              <img
+                id="favicon-preview"
+                src="https://i.ibb.co/cxdmR85/loader.png"
+                alt="Favicon Preview"
+              />
+            </div>
+            <button type="button" class="submit-btn" id="save-settings" style="background: linear-gradient(90deg, #5ccfcb, #00807c); width: 100%;  font-weight: bold; color: white; border-radius: 10px;">
+              Save Settings
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Fetch initial data
+        $.ajax({
+          type: "GET",
+          url: "/api/webapi/banner",
+          dataType: "json",
+          success: function (response) {
+            let data = response.gameall;
+            $("#name").val(data?.name);
+            $("#logo").val(data?.logo);
+            $("#logo1").val(data?.logo1);
+            $("#loader").val(data?.loader);
+            $("#favicon").val(data?.favicon);
+
+            // Update previews
+            $("#logo-preview").attr("src", data?.logo);
+            $("#logo1-preview").attr("src", data?.logo1);
+            $("#loader-preview").attr("src", data?.loader);
+            $("#favicon-preview").attr("src", data?.favicon);
+          },
+          error: function () {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Failed to fetch data. Please try again later.",
+            });
+          },
+        });
+
+        // Update previews on input change
+        $("#logo").on("input", function () {
+          $("#logo-preview").attr("src", $(this).val());
+        });
+        $("#logo1").on("input", function () {
+          $("#logo1-preview").attr("src", $(this).val());
+        });
+
+        $("#loader").on("input", function () {
+          $("#loader-preview").attr("src", $(this).val());
+        });
+
+        $("#favicon").on("input", function () {
+          $("#favicon-preview").attr("src", $(this).val());
+        });
+
+        // Save settings
+        $("#save-settings").click(function () {
+          const name = $("#name").val();
+          const logo = $("#logo").val();
+          const logo1 = $("#logo1").val();
+          const loader = $("#loader").val();
+          const favicon = $("#favicon").val();
+
+          $.ajax({
+            type: "POST",
+            url: "/api/webapi/logo-banners",
+            data: {
+              name: name,
+              logo: logo,
+              logo1: logo1,
+              loader: loader,
+              favicon: favicon,
+            },
+            dataType: "json",
+            success: function (response) {
+              if (response.status) {
+                Swal.fire(
+                  "Good job!",
+                  "Your Links Updated Successfully!",
+                  "success"
+                );
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: response.message || "Empty or Wrong",
+                });
+              }
+            },
+            error: function () {
+              Swal.fire({
+                icon: "error",
+                title: "Network Error",
+                text: "Please try again later.",
+              });
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

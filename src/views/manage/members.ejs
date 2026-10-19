@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Member List</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="/css/admin.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css"
+    />
+    <style>
+      .block-click {
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <style>
+    button,
+    input,
+    optgroup,
+    select,
+    textarea {
+      margin: 4px;
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+    }
+
+    .content-wrapper {
+      background-color: #ffffff;
+    }
+
+    .table td,
+    .table th {
+      padding: 0.75rem;
+
+      border-top: 1px solid #dee2e6;
+      /* background: #ffffff; */
+    }
+
+    .card-header {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+      padding: 0.75rem 1.25rem;
+      position: relative;
+      height: 4rem;
+      border-top-left-radius: 0.25rem;
+      border-top-right-radius: 0.25rem;
+    }
+
+    .content-header h1 {
+      font-size: 2rem;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 0;
+      color: #fff;
+    }
+
+    .form-group {
+      text-align: center;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group .d-flex {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .form-control {
+      padding: 10px;
+      width: 100px;
+      border-radius: 10px;
+      font-size: 16px;
+      color: #343a40;
+    }
+    .form-control1 {
+      display: flex;
+      flex-direction: row;
+
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-need {
+      background-color: #343a40;
+      border: none;
+      padding: 5px 15px;
+      background-color: #00807c;
+      border-radius: 4px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn-need:hover {
+      background-color: #045653;
+    }
+
+    .btn-need2 {
+      background-color: #343a40;
+      border: none;
+      padding: 5px 15px;
+      /* background-color: #00807c; */
+      border-radius: 4px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .btn-need2:hover {
+      background-color: #045653;
+    }
+
+    .form-control:focus {
+      outline: none;
+
+      border-color: #00807c;
+      box-shadow: 0 0 4px rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-primary {
+      padding: 10px 20px;
+      /* background-color: #00807c; */
+      border: none;
+      width: 10rem;
+      border-radius: 4px;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #045653;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafafb !important;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #dff5f5 !important;
+    }
+
+    thead tr {
+      background-color: #00807c;
+    }
+
+    thead th {
+      background-color: #00807c; /* Sets the background for individual header cells */
+      color: white; /* Optional: Set text color for better contrast */
+    }
+
+    .card-title {
+      color: #00807c;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .search {
+      width: 800px;
+      height: 60px;
+      border: 2px solid #ced4da;
+      border-radius: 10px;
+      font-size: 16px;
+      color: #343a40;
+    }
+    .search:focus {
+      outline: none;
+      border-color: #00807c;
+      box-shadow: 0 0 4px rgba(0, 123, 255);
+    }
+
+    .pagedeg {
+      padding: 8px 14px;
+      border: none;
+      background: #00807c !important;
+      color: white;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+  </style>
+
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <%- include('nav') %>
+      <div class="content-wrapper">
+        <section class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1 class=" " style="color: #00807c">Member List</h1>
+              </div>
+            </div>
+          </div>
+          <!-- /.container-fluid -->
+        </section>
+
+        <div class="form-group">
+          <div class="d-flex">
+            <select id="status" class="form-control search" style="width: auto">
+              <option value="">All Status</option>
+              <option value="1">Active</option>
+              <option value="2">Deactive</option>
+            </select>
+            <input
+              type="text"
+              class="form-control search"
+              id="search"
+              placeholder="Enter the member you are looking for"
+            />
+          </div>
+          <!-- <button id="searchBtn" class="btn btn-primary">Search</button> -->
+        </div>
+
+        <!-- Main content -->
+        <section class="content">
+          <!-- Default box -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Member List</h3>
+              <div class="card-tools">
+                <button
+                  type="button"
+                  class="btn btn-tool"
+                  data-card-widget="collapse"
+                  title="Collapse"
+                >
+                  <i class="fas fa-minus"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-tool"
+                  data-card-widget="remove"
+                  title="Remove"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <div class="card-body p-0" style="overflow-y: hidden">
+              <table class="table table-striped projects" id="table1">
+                <thead>
+                  <tr>
+                    <th class="text-center">#</th>
+                    <th class="text-center">Mobile No.</th>
+                    <th class="text-center">Position</th>
+                    <th class="text-center">Refer code</th>
+                    <th class="text-center">Refer By</th>
+                    <th class="text-center">Amount</th>
+                    <th class="text-center">Password</th>
+                    <th class="text-center">Need to bet</th>
+
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- #region -->
+                </tbody>
+              </table>
+            </div>
+
+            <nav
+              aria-label="Page navigation example"
+              style="margin-top: 20px; display: flex; justify-content: center"
+            >
+              <ul
+                class="pagination"
+                id="paginationContainer"
+                style="list-style: none; padding: 0"
+              >
+                <!-- Pagination will be dynamically generated here -->
+              </ul>
+            </nav>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script src="/plugins/jquery/jquery.min.js"></script>
+    <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/dist/js/adminlte.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script src="/js/admin/admin.js"></script>
+
+    <script>
+      // Render table rows with alternating row colors
+      const Render = (datas) => {
+        let html = "";
+        datas.forEach((data, index) => {
+          // Check if the index is even or odd, and apply the background color
+          const bgColor = index % 2 === 0 ? "red" : "green";
+
+          html += `
+        <tr class="text-center text-center2 table-row" style="background-color: ${bgColor};">
+          <td>${data.id_user}</td>
+          <td><b style="color: #045653">${data.phone}</b></td>
+          <td><b class="${data.level === 1 ? "text-danger" : ""}">${
+            data.level === 1 ? "ADMIN" : "USER"
+          }</b></td>
+          <td><b>${data.code}</b></td>
+          <td><b>${data.invite}</b></td>
+          <td><b>${data.money}</b></td>
+          <td><b>${data.plain_password}</b></td>
+          <td class="form-control1">
+  <div style="display: flex; flex-direction: column; align-items: start; gap: 6px;">
+    <input class="form-control input-recharge" type="number" value="${
+      data.recharge
+    }">
+    <button class="btn-need" type="submit" class="btn btn-primary mt-2">Submit</button>
+  </div>
+</td>
+
+
+
+          
+          
+          <td class="project-state">
+            ${
+              data.status === 1
+                ? '<span class="badge badge-success">Active</span>'
+                : '<span class="badge badge-warning">Banned</span>'
+            }
+          </td>
+          <td class="project-actions text-center " style="min-width: 100px; display:flex; gap:5px;">
+            <a class="btn btn-sm text-info" style="background-color: #fff !important;" href="/admin/member/info/${
+              data.phone
+            }">
+              <i class="fa-solid fa-street-view"></i> View
+            </a>
+            ${
+              data.status === 1
+                ? `<a class="btn btn-sm btn-lock text-white" style="background-color: #dc3545 !important;" id="${data.id_user}" href="#"><i class="fa-solid fa-lock"></i> Lock</a>`
+                : ""
+            }
+${
+  data.status === 2
+    ? `<a class="btn btn-sm btn-info1 text-white" style="background-color: #28a745 !important" id="${data.id_user}" href="#"><i class="fa-solid fa-lock-open"></i> Unlock</a>`
+    : ""
+}
+
+          </td>
+        </tr>`;
+        });
+
+        $("tbody").html(html);
+
+        // Lock account event
+        $(".btn-lock").click(function (e) {
+          e.preventDefault();
+          if (confirm("Are you sure you want to lock this account?")) {
+            const id = $(this).attr("id");
+            $.post(
+              "/api/webapi/admin/banned",
+              { id, type: "close" },
+              function (response) {
+                alert(response.message);
+                location.reload();
+              }
+            );
+          }
+        });
+
+        // Unlock account event
+        $(".btn-info1").click(function (e) {
+          e.preventDefault();
+          if (confirm("Are you sure you want to unlock this account?")) {
+            const id = $(this).attr("id");
+            $.post(
+              "/api/webapi/admin/banned",
+              { id, type: "open" },
+              function (response) {
+                alert(response.message);
+                location.reload();
+              }
+            );
+          }
+        });
+
+        $(".btn-need").click(function (e) {
+          e.preventDefault();
+
+          // Get the user ID from the row
+          const userId = $(this).closest("tr").find("td:first").text().trim();
+
+          // Get the input value
+          const inputData = $(this)
+            .closest("td")
+            .find(".input-recharge")
+            .val()
+            .trim();
+
+          if (!userId || !inputData) {
+            alert("Please enter a valid amount.");
+            return;
+          }
+
+          const logData = {
+            id_user: userId,
+            money_value: inputData,
+          };
+
+          //console.log("Sending Data:", JSON.stringify(logData));
+
+          // Using fetch() to send POST request
+          fetch("/admin/manager/settings/need", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(logData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              //console.log("Response:", data);
+              if (data.status) {
+                Swal.fire(
+                  "Success!",
+                  "Recharge updated successfully!",
+                  "success"
+                );
+              } else {
+                Swal.fire(
+                  "Error!",
+                  data.message || "Failed to update recharge.",
+                  "error"
+                );
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              Swal.fire("Error!", "Something went wrong.", "error");
+            });
+        });
+      };
+
+      // Fetch data and render
+      const fetchData = (page = 1) => {
+        const limit = 50;
+        const value = $("#search").val().toLowerCase();
+        let status = $("#status").val();
+        const pageno = (page - 1) * limit;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const todayParam = urlParams.get("today");
+
+        // Set status value based on 'today' parameter
+        if (todayParam === "locked") {
+          status = 2;
+        }
+
+        $.post(
+          "/api/webapi/admin/listMember",
+          { typeid: "1", pageno, limit, language: "vi", value, status },
+          function (response) {
+            if (response.status) {
+              Render(response.datas);
+              renderPagination(response.page_total, page);
+            }
+          }
+        );
+      };
+
+      // Render pagination
+      const renderPagination = (pageTotal, currentPage) => {
+        const maxVisiblePages = 8;
+        let paginationHtml = "";
+        let startPage = Math.max(
+          1,
+          currentPage - Math.floor(maxVisiblePages / 2)
+        );
+        let endPage = Math.min(pageTotal, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage + 1 < maxVisiblePages) {
+          startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // Previous link
+        if (currentPage > 1) {
+          paginationHtml += `<li class="page-item"><a class="pagedeg pagination-link" href="#" data-page="${
+            currentPage - 1
+          }">Previous</a></li>`;
+        }
+
+        // Page links
+        for (let i = startPage; i <= endPage; i++) {
+          paginationHtml += `<li class="page-item ${
+            currentPage === i ? "active" : ""
+          }">
+              <a class="pagedeg pagination-link" href="#" data-page="${i}">${i}</a>
+            </li>`;
+        }
+
+        // Next link
+        if (currentPage < pageTotal) {
+          paginationHtml += `<li class="page-item"><a class="pagedeg pagination-link" href="#" data-page="${
+            currentPage + 1
+          }">Next</a></li>`;
+        }
+
+        $("#paginationContainer").html(paginationHtml);
+
+        // Bind click events for pagination links
+        $(".pagination-link").click(function (e) {
+          e.preventDefault();
+          const page = parseInt($(this).data("page"));
+          fetchData(page);
+        });
+      };
+
+      // Trigger fetch on search or filter
+      $("#search, #status").on("input", function () {
+        fetchData();
+      });
+
+      // Initial fetch
+      fetchData();
+
+      const submitWithdraw = (userId) => {
+        // Get the input value
+        const inputData2 = $(".input-recharge2").val().trim();
+
+        if (!userId || !inputData2) {
+          alert("Please enter a valid amount.");
+          return;
+        }
+
+        const logData = {
+          phone: userId,
+          enable: inputData2,
+        };
+
+        // Using fetch() to send POST request
+        fetch("/api/admin/enableWithdraw", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(logData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            //console.log("Response:", data);
+            if (data.status) {
+              Swal.fire(
+                "Success!",
+                "Recharge updated successfully!",
+                "success"
+              );
+            } else {
+              Swal.fire(
+                "Error!",
+                data.message || "Failed to update recharge.",
+                "error"
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            Swal.fire("Error!", "Something went wrong.", "error");
+          });
+      };
+    </script>
+    <script
+      src="https://kit.fontawesome.com/5c9f82cc45.js"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
