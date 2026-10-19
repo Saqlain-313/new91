@@ -28,15 +28,16 @@ const logFilePath = path.join(__dirname, "server.log");
 const corsdata = [
   "http://localhost:3000",
   "http://localhost:5173",
+  "http://localhost:7805",
   "https://chennai91.co",
 ];
 
 // Socket IO setup with CORS
 const io = new Server(server, {
   cors: {
-    // origin: corsdata, // Adjust to your actual client if needed
-    origin: "/", // Adjust to your actual client if needed
+    origin: corsdata,
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
@@ -77,7 +78,14 @@ app.use(
 );
 
 // Disable cache
-app.options("*", cors());
+app.options(
+  "*",
+  cors({
+    origin: corsdata,
+    methods: ["GET", "POST", "OPTIONS"],
+    credentials: true,
+  })
+);
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
   res.set("Pragma", "no-cache");
