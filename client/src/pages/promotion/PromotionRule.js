@@ -1,6 +1,6 @@
-import React from "react";
-import LevelImg from "../../assets/lv.png";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import LevelImg from "../../assets/lv.png";
 import CustomeNavbar from "../../components/CustomeNavbar";
 const RuleData = [
   {
@@ -77,19 +77,19 @@ const PromotionRule = () => {
     <>
       <CustomeNavbar name="Rule" />
       <div className="container-section mt-2">
-        <h1 className="text-lg font-medium text-center text-blue">
+        <h1 className="heading-h1 text-center color-blue">
           [Promotion partner] program
         </h1>
-        <p className="text-sm gray-100 text-center">
+        <p className="text-base  gray-text text-center">
           This activity is valid for a long time
         </p>
 
-        <div className="bg-body mt-5 px-2 pb-5 rounded-md">
-          <div className="sheet_nav_bg w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-sm">
+        <div className="nav-bg mt-5 px-2 pb-5 rounded-md">
+          <div className="bg-[#282730] w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-base">
             01
           </div>
 
-          <p className="fs-sm gray-100  leading-[18px]">
+          <p className="text-sm gray-text  leading-[18px]">
             There are 6 subordinate levels in inviting friends, if A invites B,
             then B is a level 1 subordinate of A. If B invites C, then C is a
             level 1 subordinate of B and also a level 2 subordinate of A. If
@@ -97,46 +97,46 @@ const PromotionRule = () => {
             level 2 subordinate of B and also a level 3 subordinate of A.
           </p>
         </div>
-        <div className="bg-body mt-5 px-2 pb-5 rounded-md">
-          <div className="sheet_nav_bg w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-sm">
+        <div className="nav-bg mt-5 px-2 pb-5 rounded-md">
+          <div className="bg-[#282730] w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-base">
             02
           </div>
 
-          <p className="fs-sm gray-100  leading-[18px]">
+          <p className="text-sm gray-text  leading-[18px]">
             When inviting friends to register, you must send the invitation link
             provided or enter the invitation code manually so that your friends
             become you level 1 subordinates.
           </p>
         </div>
-        <div className="bg-body mt-5 px-2 pb-5 rounded-md">
-          <div className="sheet_nav_bg w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-sm">
+        <div className="nav-bg mt-5 px-2 pb-5 rounded-md">
+          <div className="bg-[#282730] w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-base">
             03
           </div>
 
-          <p className="fs-sm gray-100  leading-[18px]">
+          <p className="text-sm gray-text  leading-[18px]">
             The invitee registers via the inviter's invitation code and
             completes the deposit, shortly after that the commission will be
             received immediately.
           </p>
         </div>
-        <div className="bg-body mt-5 px-2 pb-5 rounded-md">
-          <div className="sheet_nav_bg w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-sm">
+        <div className="nav-bg mt-5 px-2 pb-5 rounded-md">
+          <div className="bg-[#282730] w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-base">
             04
           </div>
 
-          <p className="fs-sm gray-100  leading-[18px]">
+          <p className="text-sm gray-text  leading-[18px]">
             The calculation of yesterday's commission starts every morning at
             01:00. After the commission calculation is completed, the commission
             is rewarded to the wallet and can be viewed through the commission
             collection record.
           </p>
         </div>
-        <div className="bg-body mt-5 px-2 pb-5 rounded-md">
-          <div className="sheet_nav_bg w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-sm">
+        <div className="nav-bg mt-5 px-2 pb-5 rounded-md">
+          <div className="bg-[#282730] w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-base">
             05
           </div>
 
-          <p className="fs-sm gray-100  leading-[18px]">
+          <p className="text-sm gray-text  leading-[18px]">
             Commission rates vary depending on your agency level on that day
             <br />
             Number of Teams: How many downline deposits you have to date.
@@ -148,17 +148,17 @@ const PromotionRule = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-12 sheet_nav_bg rounded-t-md p-2 mt-5">
-          <div className="col-span-3 flex text-center justify-center py-1">
+        <div className="grid grid-cols-12 bg-[#282730] rounded-t-md p-2 mt-5">
+          <div className="col-span-3 flex text-center justify-center">
             <h5 className="heading-h5">Rebat level</h5>
           </div>
-          <div className="col-span-3  text-center justify-center py-1">
+          <div className="col-span-3  text-center justify-center">
             <h5 className="heading-h5">Team Number</h5>
           </div>
-          <div className="col-span-3  text-center justify-center py-1">
+          <div className="col-span-3  text-center justify-center">
             <h5 className="heading-h5">Team Betting</h5>
           </div>
-          <div className="col-span-3  text-center justify-center py-1">
+          <div className="col-span-3  text-center justify-center">
             <h5 className="heading-h5">Team Deposit</h5>
           </div>
         </div>
@@ -168,13 +168,13 @@ const PromotionRule = () => {
           <div
             className={
               i % 2 == 0
-                ? "grid grid-cols-12 bg-body p-2 py-3"
-                : "grid grid-cols-12 p-2 py-2 inactive-bg"
+                ? "grid grid-cols-12 nav-bg p-2 py-3"
+                : "grid grid-cols-12 p-2 py-2"
             }
             key={i}
           >
             <div className="col-span-3 flex text-center justify-center items-center">
-              <span className="text-sm gray-100 font-medium relative flex">
+              <span className="text-base gray-text font-medium relative flex">
                 <img src={item.img} alt="" className="h-6 w-14" />
                 <span className="text-lv absolute right-1 fs-sm top-[5px]">
                   L{i}
@@ -182,48 +182,50 @@ const PromotionRule = () => {
               </span>
             </div>
             <div className="col-span-3  text-center justify-center  items-center">
-              <span className="text-sm gray-100 font-medium">{item.TN}</span>
+              <span className="text-base gray-text font-medium">{item.TN}</span>
             </div>
             <div className="col-span-3  text-center justify-center  items-center">
-              <span className="text-sm gray-100 font-medium">{item.TB}</span>
+              <span className="text-base gray-text font-medium">{item.TB}</span>
             </div>
             <div className="col-span-3  text-center justify-center  items-center">
-              <span className="text-sm gray-100 font-medium">{item.TD}</span>
+              <span className="text-base gray-text font-medium">{item.TD}</span>
             </div>
           </div>
         ))}
 
-        <div className="bg-body mt-5 px-2 pb-5 rounded-md">
-          <div className="sheet_nav_bg w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-sm">
+        <div className="nav-bg mt-5 px-2 pb-5 rounded-md">
+          <div className="bg-[#282730] w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-base">
             06
           </div>
 
-          <p className="fs-sm gray-100  leading-[18px]">
+          <p className="text-sm gray-text  leading-[18px]">
             The commission percentage depends on the membership level. The
             higher the membership level, the higher the bonus percentage.
             Different game types also have different payout percentages.
             <br />
             The commission rate is specifically explained as follows
             <br />
-            <span className="color-red-200">View rebate ration {">>"}</span>
+            <Link to="/promotion/RebateRatio">
+              <span className="color-red-200">View rebate ration {">>"}</span>
+            </Link>
           </p>
         </div>
-        <div className="bg-body mt-5 px-2 pb-5 rounded-md">
-          <div className="sheet_nav_bg w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-sm">
+        <div className="nav-bg mt-5 px-2 pb-5 rounded-md">
+          <div className="bg-[#282730] w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-base">
             07
           </div>
 
-          <p className="fs-sm gray-100  leading-[18px]">
+          <p className="text-sm gray-text  leading-[18px]">
             TOP20 commission ranking will be randomly awarded with a separate
             bonus
           </p>
         </div>
-        <div className="bg-body mt-5 px-2 pb-5 rounded-md">
-          <div className="sheet_nav_bg w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-sm">
+        <div className="nav-bg mt-5 px-2 pb-5 rounded-md">
+          <div className="bg-[#282730] w-[60%] rounded-bl-full mb-2 py-1 rounded-br-full flex justify-center m-auto  font-bold text-base">
             08
           </div>
 
-          <p className="fs-sm gray-100  leading-[18px]">
+          <p className="text-sm gray-text  leading-[18px]">
             The final interpretation of this activity belongs to{" "}
             {bannergetData?.gameall?.name}
           </p>

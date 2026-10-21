@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useRef, useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -18,25 +18,26 @@ const Picker = styled.div`
 `;
 
 const Item = styled.div`
-  width: 106px;
+  width: 120px;
   height: 41.67px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: ${(props) => (props.active ? "#fff" : "#80849C")};
+  color: ${(props) => (props.active ? "#15131E" : "#CED6E1")};
   background: ${(props) =>
-    props.active ? "linear-gradient(90deg, #F95B5B 0%, #FFB7AF 100%);" : "#fff"};
+    props.active
+      ? "var(--Gradient-1, linear-gradient(93deg, var(--mediam-blue) 7.38%, var(--bgblue) 94.48%))"
+      : "#201D2B"};
   font-weight: 700;
   cursor: pointer;
   padding: 8px;
   border-radius: 5px;
   flex-shrink: 0;
-  gap: 6px;
 `;
 
 const Span = styled.span`
-  font-size: 12px;
+  font-size: 15px;
 `;
 
 const Img = styled.img`

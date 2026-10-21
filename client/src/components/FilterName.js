@@ -1,5 +1,4 @@
-
-import React, { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -11,7 +10,7 @@ const Container = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: white;
+  background-color: #1f1f1f;
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
   z-index: 50;
@@ -31,7 +30,7 @@ const Item = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  color: ${(props) => (props.active ? "black" : "#768096")};
+  color: ${(props) => (props.active ? "#fff" : "#606877")};
   font-weight: 700;
   width: 100%;
   cursor: pointer;
@@ -44,7 +43,7 @@ const HighlightRow = styled.div`
   height: 40.67px;
   width: 100%;
   top: 170px;
-  background: #f0f0f0;
+  background: rgba(255, 255, 255, 0.05);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 5;
@@ -55,7 +54,7 @@ const ShadowTop = styled.div`
   top: 0;
   height: 60px;
   width: 100%;
-  // background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
   z-index: 30;
 `;
 
@@ -64,7 +63,7 @@ const ShadowBottom = styled.div`
   bottom: 0;
   height: 60px;
   width: 100%;
-  // background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
   z-index: 30;
 `;
 
@@ -97,15 +96,17 @@ const FilterName = ({ items, onActiveChange, openAll, setOpenAll }) => {
     <>
       <div className={openAll ? "overlay-section block" : "hidden"}></div>
       <div className={openAll ? "block" : "hidden"}>
-        <Container className="filter-section bg-body">
+        <Container className="filter-section">
           <div
-            className="flex justify-between px-4 py-2 z-40 relative bg-light"
-            
+            className="flex justify-between px-4 py-2 z-40 relative"
+            style={{
+              background: "rgba(255, 255, 255, 0.05)",
+            }}
           >
-            <button className="text-black" onClick={() => setOpenAll(false)}>
+            <button className="text-gray-300" onClick={() => setOpenAll(false)}>
               Cancel
             </button>
-            <button className="text-yellow-600" onClick={() => setOpenAll(false)}>
+            <button className="text-white" onClick={() => setOpenAll(false)}>
               Confirm
             </button>
           </div>

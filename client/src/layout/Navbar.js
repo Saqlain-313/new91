@@ -1,277 +1,194 @@
-import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import SmileImg from "../assets/smile.png";
-
 import "./navbar.css";
+
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [activeItem, setActiveItem] = useState("/");
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupVisible, setPopupVisible] = useState(false);
-
-  const { userInfo } = useSelector((state) => state.auth);
-
   const naviaget = useNavigate();
-  let location = useLocation();
 
+  const handleClick = (item) => {
+    setActiveItem(`/${item}`);
+    naviaget(`/${item}`);
+  };
+  let location = useLocation();
   useEffect(() => {
     setActiveItem(location.pathname);
   }, [activeItem]);
 
-  // Normal navigation click
-  const handleClick = (item) => {
-    setActiveItem(item);
-    naviaget(`/${item}`);
-  };
-
-  // Account tab click -> agar login nahi hai to popup, warna normal navigate
-  const handleAccountClick = () => {
-    if (!userInfo) {
-      openPopup();
-    } else {
-      handleClick("main");
-    }
-  };
-
-  const openPopup = () => {
-    setShowPopup(true);
-  };
-
-  // Smooth slide-up animation trigger
-  useEffect(() => {
-    if (showPopup) {
-      const t = setTimeout(() => setPopupVisible(true), 20);
-      return () => clearTimeout(t);
-    } else {
-      setPopupVisible(false);
-    }
-  }, [showPopup]);
-
-  useEffect(() => {
-    if (showPopup) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [showPopup]);
-
-  const closePopup = () => {
-    setPopupVisible(false);
-    setTimeout(() => setShowPopup(false), 350); // animation complete hone ka wait
-  };
-
-  const handleLoginNow = () => {
-    closePopup();
-    naviaget("/login"); // apna actual login route yahan daalein
-  };
-
   return (
     <>
-      {/* ================= EVENT REWARDS POPUP ================= */}
-      {showPopup && (
-        <div
-          className={`fixed inset-0 flex items-end justify-center z-[2000] transition-colors duration-300 ${
-            popupVisible
-              ? "bg-black/55 pointer-events-auto"
-              : "bg-black/0 pointer-events-none"
-          }`}
-          onClick={closePopup}
-        >
-          <div
-            className={`font-sans relative w-full max-w-[395px] bg-white rounded-t-[22px] pt-14 pb-8 text-center transition-transform duration-[350ms] ease-[cubic-bezier(0.32,0.72,0,1)] ${
-              popupVisible ? "translate-y-0" : "translate-y-full"
-            }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Glow clipped separately, matching sheet's rounded corners */}
-            <div className="absolute inset-0 rounded-t-[22px] overflow-hidden pointer-events-none z-0">
-              <div className="absolute inset-0 rounded-t-[22px] overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-0 left-0 w-full h-[280px] bg-gradient-to-b from-[#FDC7C7] via-[#FFE8E7] to-transparent"></div>
-              </div>
-            </div>
-
-            {/* Gift image - ab wrapper se bahar hai, isliye upar overflow ho sakta hai */}
-            <img
-              className="absolute z-20 left-1/2 -translate-x-1/2 -top-16 h-[150px] w-auto"
-              src="https://i.ibb.co/QFq7H0W1/gift.png"
-              alt="gift"
-            />
-
-            <div className="relative z-10 mt-[50px]">
-              <h2 className="flex items-center justify-center gap-2 text-2xl font-extrabold text-[#1a1a1a] mb-3">
-                <span> Event Rewards </span>
-              </h2>
-
-              <p className="text-[15px] text-[#333] mb-6 leading-relaxed">
-                Log in to participate in the{" "}
-                <span className="text-[#fa6b6b] font-semibold">
-                  event rewards
-                </span>{" "}
-                and unlock all 8 exclusive rewards
-              </p>
-
-              <button
-                className="w-full py-3.5 border-none rounded-full bg-gradient-to-r from-[#F95B5B] to-[#FF9890] text-white font-bold text-base mb-4 cursor-pointer"
-                onClick={handleLoginNow}
-              >
-                Log in now to participate
-              </button>
-
-              <button
-                className="bg-transparent border-none text-[#333] text-sm cursor-pointer"
-                onClick={closePopup}
-              >
-                Don't log in yet, continue browsing
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ================= SERVICE ICON ================= */}
-      <div
-        style={{
-          position: "fixed",
-          zIndex: 500,
-        }}
-        className="flex flex-col right-0 bottom-20"
-      >
-        {userInfo ? (
-          <Link
-            to={`https://h5support.chennai91.co/?token=${Cookies.get("auth")}`}
-            style={{ display: "inline-block" }}
-          >
-            <img
-              src="https://i.ibb.co/GfVXnKyb/smile.png"
-              alt="Service"
-              className="w-[70px] pe-3"
-            />
-          </Link>
-        ) : (
-          <div
-            onClick={() => handleClick("main/CustomerService")}
-            style={{ display: "inline-block" }}
-          >
-            <img src={SmileImg} alt="Service" className="w-[70px] pe-3" />
-          </div>
-        )}
-      </div>
-
-      {/* ================= BOTTOM NAVBAR ================= */}
+      <div>{/* <ServiceRotate /> */}</div>
       <div className="navbar-section">
         <div
-          className={`flex justify-center items-center flex-col p-2 pb-5 ${
-            activeItem === "/" || activeItem === "//" ? "active" : ""
+          className={`gray-100 flex  justify-center items-center flex-col p-2  ${
+            activeItem === "/promotion" ? "active" : ""
           }`}
-          onClick={() => handleClick("/")}
+          onClick={() => handleClick("promotion")}
         >
-          <svg
-            data-v-cbfefb2b=""
-            className={`size-6 ${
-              activeItem === "/" || activeItem === "//"
-                ? "svg-icon"
-                : "svg-icons"
-            }`}
-          >
-            <use href="#icon-home"></use>
-          </svg>
+          <div className="flex justify-center items-center ml-[5px]">
+            {/* <RiHomeSmileLine className="text-2xl" /> */}
+            {/* <MdHeartBroken
+              className={`text-2xl  ${
+                activeItem === "/promotion"
+                  ? "active"
+                  : "text-[#9ea2a8] "
+              }`}
+            /> */}
+            <svg
+              data-v-fb80cf49
+              className={
+                activeItem === "/promotion"
+                  ? "svg-icon icon-p3_promotion_a"
+                  : "svg-icon icon-p3_promotion"
+              }
+            >
+              <use
+                xlinkHref={
+                  activeItem === "/promotion"
+                    ? "#icon-p3_promotion_a"
+                    : "#icon-p3_promotion"
+                }
+              />
+            </svg>
+          </div>
           <span
-            className={`text-[10px] font-medium ${
-              activeItem === "/" || activeItem === "//"
-                ? "text-[#F95959]"
-                : "text-[#BEC6D4]"
+            className={`text-[11px] font-medium   ${
+              activeItem === "/promotion" ? "text-white" : " text-[#9ea2a8] "
             }`}
           >
-            Home
+            Promotion
           </span>
         </div>
-
         <div
-          className={`flex justify-center items-center flex-col p-2 pb-5 ${
+          className={`gray-100 flex  justify-center items-center flex-col p-2   ${
             activeItem === "/activity" ? "active" : ""
-          }`}
+          } `}
           onClick={() => handleClick("activity")}
         >
-          <svg
-            data-v-cbfefb2b=""
-            className={`size-6 ${
-              activeItem === "/activity" ? "svg-icon" : "svg-icons"
+          {/* <BiSolidGift
+            className={`text-2xl ${
+              activeItem === "/activity"
+                ? "active"
+                : "text-[#9ea2a8] "
             }`}
+          /> */}
+          <svg
+            data-v-fb80cf49
+            className={
+              activeItem === "/activity"
+                ? "svg-icon icon-p3_activity_a"
+                : "svg-icon icon-p3_activity"
+            }
           >
-            <use href="#icon-activity"></use>
+            <use
+              xlinkHref={
+                activeItem === "/activity"
+                  ? "#icon-p3_activity_a"
+                  : "#icon-p3_activity"
+              }
+            />
           </svg>
+
           <span
-            className={`text-[10px] font-medium ${
-              activeItem === "/activity" ? "text-[#F95959]" : "text-[#BEC6D4]"
+            className={`text-[11px] font-medium   ${
+              activeItem === "/activity" ? "text-white" : " text-[#9ea2a8] "
             }`}
           >
             Activity
           </span>
         </div>
 
-        <div className="p-2 pb-4" onClick={() => handleClick("WheelSpin")}>
-          <div className="nav-promotion relative flex flex-col items-center">
-            <img
-              src="https://i.ibb.co/PskczZng/wheel.png"
-              alt=""
-              className="relative"
-            />
-            <span
-              className={`absolute top-14 text-[16px] font-bold ${
-                activeItem === "/WheelSpin" ? "active" : "text-red-500"
+        <div
+          onClick={() => handleClick("")}
+          className={` flex  justify-center items-center flex-col p-2   ${
+            activeItem === "/" ? "promotion" : "gray-100"
+          } `}
+        >
+          <div className="nav-promotion">
+            {/* <LiaGamepadSolid
+              className={`text-2xl ${
+                activeItem === "/" ? "text-black" : " text-black"
               }`}
-            >
-              Get 500
-            </span>
+            /> */}
+            <svg data-v-fb80cf49 className="svg-icon icon-p3_home_a">
+              <use xlinkHref="#icon-p3_home_a" />
+            </svg>
           </div>
+          <span
+            className={`text-[11px] font-medium   ${
+              activeItem === "/" ? "text-white" : ""
+            }`}
+          ></span>
         </div>
 
         <div
-          className={`flex justify-center items-center flex-col p-2 pb-5 ${
-            activeItem === "/promotion" ? "active" : ""
+          className={`gray-100 flex  justify-center items-center flex-col p-2   ${
+            activeItem === "/wallet" ? "active" : ""
           }`}
-          onClick={() => handleClick("promotion")}
+          onClick={() => handleClick("wallet")}
         >
+          {/* <IoWallet
+            className={`text-2xl ${
+              activeItem === "/wallet"
+                ? "active"
+                : " text-[#9ea2a8] "
+            }`}
+          /> */}
           <svg
-            data-v-6ab3f23e
-            className={`size-6 icon-promotion2 ${
-              activeItem === "/promotion" ? "svg-icon" : "svg-icons"
-            }`}
+            data-v-fb80cf49
+            className={
+              activeItem === "/wallet"
+                ? "svg-icon icon-p3_wallet"
+                : "svg-icon icon-p3_wallet_a"
+            }
           >
-            <use xlinkHref="#icon-promotion2" />
+            <use
+              xlinkHref={
+                activeItem === "/wallet"
+                  ? "#icon-p3_wallet_a"
+                  : "#icon-p3_wallet"
+              }
+            />
           </svg>
+
           <span
-            className={`text-[10px] font-medium ${
-              activeItem === "/promotion" ? "text-[#F95959]" : "text-[#BEC6D4]"
+            className={`text-[11px] font-medium   ${
+              activeItem === "/wallet" ? "text-white" : "text-[#9ea2a8] "
             }`}
           >
-            Promotion
+            Wallet
           </span>
         </div>
-
-        {/* ACCOUNT TAB -> yahan special handler use ho raha hai */}
         <div
-          className={`flex justify-center items-center flex-col p-2 pb-5 ${
+          className={`gray-100 flex  justify-center items-center flex-col p-2   ${
             activeItem === "/main" ? "active" : ""
           }`}
-          onClick={handleAccountClick}
+          onClick={() => handleClick("main")}
         >
-          <svg
-            data-v-cbfefb2b=""
-            className={`size-6 ${
-              activeItem === "/main" ? "svg-icon" : "svg-icons"
+          {/* <FaUser
+            className={`text-2xl text-[#9ea2a8] ${
+              activeItem === "/main" ? "active" : ""
             }`}
+          /> */}
+          <svg
+            data-v-fb80cf49
+            className={
+              activeItem === "/main"
+                ? "svg-icon icon-p3_main_a"
+                : "svg-icon icon-p3_main"
+            }
           >
-            <use href="#icon-main"></use>
+            <use
+              xlinkHref={
+                activeItem === "/main" ? "#icon-p3_main_a" : "#icon-p3_main"
+              }
+            />
           </svg>
+
           <span
-            className={`text-[10px] font-medium ${
-              activeItem === "/main" ? "text-[#F95959]" : "text-[#BEC6D4]"
+            className={`text-[11px] font-medium   ${
+              activeItem === "/main" ? "text-white" : "text-[#9ea2a8] "
             }`}
           >
             Account

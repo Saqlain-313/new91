@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-  Fragment,
-  useRef,
-} from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
   IoIosArrowBack,
   IoIosArrowDropright,
@@ -13,43 +7,37 @@ import {
 } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 
-import { IoCloseCircleOutline } from "react-icons/io5";
-import { PiCopySimpleBold } from "react-icons/pi";
+import debounce from "lodash/debounce";
+import { FaMinus, FaPlus } from "react-icons/fa";
 import { FaCircleQuestion } from "react-icons/fa6";
-import "./k3.css";
+import { IoCloseCircleOutline } from "react-icons/io5";
 import {
   MdKeyboardDoubleArrowLeft,
   MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
-import { FaMinus, FaPlus } from "react-icons/fa";
-
-import TimeImg from "../../assets/time.png";
-import TimeActiveImg from "../../assets/time_aactive.png";
-
+import { PiCopySimpleBold } from "react-icons/pi";
+import { useDispatch, useSelector } from "react-redux";
+import io from "socket.io-client";
+import Audio1 from "../../assets/audio/di1.mp3";
+import Audio2 from "../../assets/audio/di2.mp3";
 import N1 from "../../assets/n1.png";
 import N2 from "../../assets/n2.png";
 import N3 from "../../assets/n3.png";
 import N4 from "../../assets/n4.png";
 import N5 from "../../assets/n5.png";
 import N6 from "../../assets/n6.png";
-
-import { useDispatch, useSelector } from "react-redux";
-import { userDetail } from "../../store/reducer/authReducer";
+import TimeImg from "../../assets/time.png";
+import TimeActiveImg from "../../assets/time_aactive.png";
 import CopyCopmponent from "../../components/CopyCopmponent";
-import { k3History, k3PeriodList } from "../../store/reducer/gameReducer";
-import { k3Bet } from "../../store/reducer/betReducer";
-import io from "socket.io-client";
-import Audio1 from "../../assets/audio/di1.mp3";
-import Audio2 from "../../assets/audio/di2.mp3";
-import debounce from "lodash/debounce";
-
 import { host } from "../../store/reducer/api";
+import { userDetail } from "../../store/reducer/authReducer";
+import { k3Bet } from "../../store/reducer/betReducer";
+import { k3History, k3PeriodList } from "../../store/reducer/gameReducer";
+import "./k3.css";
 
-import HeaderInfo from "../wingo/HeaderInfo";
 import Loader from "../../components/Loader";
-import EmptyData from "../activity/EmptyData";
-
-const WinImg = "https://i.ibb.co/TMnbvp0N/win-popup.png";
+import HeaderInfo from "../wingo/HeaderInfo";
+const WinImg = "https://i.ibb.co/ssJ2HLw/win-popup.png";
 const LoseImg = "https://i.ibb.co/8zTQQmx/loss-popup.png";
 
 const BallData = [
@@ -145,7 +133,7 @@ const K3 = () => {
   const { bannergetData } = useSelector((state) => state.user);
   const { userInfo } = useSelector((state) => state.auth);
   const { k3PeriodListData, k3HistoryData } = useSelector(
-    (state) => state.game
+    (state) => state.game,
   );
   const { loader } = useSelector((state) => state.bet);
   const [activeTime, setActiveTime] = useState("1Min");
@@ -291,7 +279,7 @@ const K3 = () => {
 
   const handleBet = async () => {
     dispatch(
-      k3Bet({ typeid1, selectTab, selectBet, totalbalance, multiplier })
+      k3Bet({ typeid1, selectTab, selectBet, totalbalance, multiplier }),
     ).then((res) => {
       setBetAlert(true);
       setOpenPopup(false);
@@ -316,7 +304,7 @@ const K3 = () => {
     setSelectedNumbers((prevSelected) =>
       prevSelected.includes(number)
         ? prevSelected.filter((n) => n !== number)
-        : [...prevSelected, number]
+        : [...prevSelected, number],
     );
     setTimeout(() => {
       setOpenPopup(true);
@@ -337,7 +325,7 @@ const K3 = () => {
       if (isNumberSelected) {
         // If the number is already selected, remove it and its corresponding number
         return prevSelected.filter(
-          (n) => n !== number && n !== correspondingNumber
+          (n) => n !== number && n !== correspondingNumber,
         );
       } else if (number == "s") {
         return prevSelected.filter((n) => n !== "b").concat("s");
@@ -393,7 +381,7 @@ const K3 = () => {
       dispatch(k3PeriodList({ typeid1, pageno, pageto }));
       dispatch(k3History({ typeid1, pageno, pageto }));
     }, 500),
-    [dispatch, typeid1]
+    [dispatch, typeid1],
   );
 
   const debouncedDispatchResult = useCallback(
@@ -407,7 +395,7 @@ const K3 = () => {
         }
       });
     }, 500),
-    [dispatch, typeid1]
+    [dispatch, typeid1],
   );
   useEffect(() => {
     dispatch(userDetail());
@@ -435,7 +423,7 @@ const K3 = () => {
         setChangeTime(true);
         setChangeDice(true);
 
-        //console.log("server data received");
+        console.log("server data received");
       }
 
       if (typeid1 == 3 && Array.isArray(msg?.data) && msg.game == 3) {
@@ -509,7 +497,7 @@ const K3 = () => {
     }
 
     if (typeid1 == 3) {
-      //console.log("k3 3 min");
+      console.log("k3 3 min");
       socket.current = io.connect(host); // Your server's URL
       // Define the event name directly based on typeid1
       const eventName = `timeUpdate_3`;
@@ -693,17 +681,6 @@ const K3 = () => {
     setResultPopup(false);
   };
 
-  useEffect(() => {
-    if (resultPopup && (winResult === true || winResult === false)) {
-      const timer = setTimeout(() => {
-        handleClose(); // 5 sec ke baad popup close
-      }, 5000);
-
-      // Cleanup: agar popup close ho jaye ya component unmount ho to timer clear ho
-      return () => clearTimeout(timer);
-    }
-  }, [resultPopup, winResult]);
-
   return (
     <>
       {!userInfo && <Loader />}
@@ -716,8 +693,9 @@ const K3 = () => {
       <div className="container-section relative mt-[-75px]">
         {/* time tabs */}
         <div className="grid grid-cols-12 bg-popup-nav rounded-xl">
+          {/* 1Min */}
           <div
-            className={`col-span-3 cursor-pointer  flex items-center flex-col justify-center py-2 ${
+            className={`col-span-3 cursor-pointer flex items-center flex-col justify-center py-2 ${
               activeTime == "1Min" ? "blue-linear2" : ""
             } rounded-xl`}
             onClick={() => handleK3Minut("1Min")}
@@ -725,68 +703,74 @@ const K3 = () => {
             <img
               src={activeTime == "1Min" ? TimeActiveImg : TimeImg}
               alt=""
-              className="w-10"
+              className={`w-10 ${activeTime == "1Min" ? "hue-rotate-45" : ""}`}
             />
             <p
-              className={`text-center  fs-sm font-sans leading-4 ${
-                activeTime == "1Min" ? "text-white" : "gray-100"
+              className={`text-center fs-sm font-sans leading-4 ${
+                activeTime == "1Min" ? "text-black" : "gray-text"
               }`}
             >
               K3 Lotre <br /> 1Min
             </p>
           </div>
+
+          {/* 3Min */}
           <div
-            className={`col-span-3  cursor-pointer flex items-center flex-col justify-center py-2  rounded-xl  ${
+            className={`col-span-3 cursor-pointer flex items-center flex-col justify-center py-2 ${
               activeTime == "3Min" ? "blue-linear2" : ""
-            }`}
+            } rounded-xl`}
             onClick={() => handleK3Minut("3Min")}
           >
             <img
               src={activeTime == "3Min" ? TimeActiveImg : TimeImg}
               alt=""
-              className="w-10"
+              className={`w-10 ${activeTime == "3Min" ? "hue-rotate-45" : ""}`}
             />
             <p
-              className={`text-center  fs-sm font-sans leading-4 ${
-                activeTime == "3Min" ? "text-white" : "gray-100"
+              className={`text-center fs-sm font-sans leading-4 ${
+                activeTime == "3Min" ? "text-black" : "gray-text"
               }`}
             >
               K3 Lotre <br /> 3Min
             </p>
           </div>
+
+          {/* 5Min */}
           <div
-            className={`col-span-3  cursor-pointer flex items-center flex-col justify-center py-2  rounded-xl  ${
+            className={`col-span-3 cursor-pointer flex items-center flex-col justify-center py-2 ${
               activeTime == "5Min" ? "blue-linear2" : ""
-            }`}
+            } rounded-xl`}
             onClick={() => handleK3Minut("5Min")}
           >
             <img
               src={activeTime == "5Min" ? TimeActiveImg : TimeImg}
               alt=""
-              className="w-10"
+              className={`w-10 ${activeTime == "5Min" ? "hue-rotate-45" : ""}`}
             />
             <p
-              className={`text-center  fs-sm font-sans leading-4 ${
-                activeTime == "5Min" ? "text-white" : "gray-100"
+              className={`text-center fs-sm font-sans leading-4 ${
+                activeTime == "5Min" ? "text-black" : "gray-text"
               }`}
             >
               K3 Lotre <br /> 5Min
             </p>
           </div>
+
+          {/* 10Min */}
           <div
-            className={`col-span-3  cursor-pointer flex items-center flex-col justify-center py-2  rounded-xl  ${
+            className={`col-span-3 cursor-pointer flex items-center flex-col justify-center py-2 ${
               activeTime == "10Min" ? "blue-linear2" : ""
-            }`}
+            } rounded-xl`}
             onClick={() => handleK3Minut("10Min")}
           >
             <img
               src={activeTime == "10Min" ? TimeActiveImg : TimeImg}
               alt=""
-              className="w-10"
+              className={`w-10 ${activeTime == "10Min" ? "hue-rotate-45" : ""}`}
             />
             <p
-              className={`text-center  fs-sm font-sans leading-4 ${
-                activeTime == "10Min" ? "text-white" : "gray-100"
+              className={`text-center fs-sm font-sans leading-4 ${
+                activeTime == "10Min" ? "text-black" : "gray-text"
               }`}
             >
               K3 Lotre <br /> 10Min
@@ -796,11 +780,11 @@ const K3 = () => {
 
         {/* wingo tim */}
         <div className="relative">
-          <div className="bg-light p-3 mt-5">
+          <div className="nav-bg p-3 mt-5">
             <div className="flex justify-between  rounded-lg ">
               <div>
                 <div className="flex items-center">
-                  <span className="text-sm gray-100">Period</span>
+                  <span className="text-sm gray-text">Period</span>
                   <button
                     className="border flex items-center ms-2 border-[--bg-color-l] color-l justify-center rounded-full px-4 py-[1px]"
                     onClick={() => setHowtoPlay(true)}
@@ -829,24 +813,24 @@ const K3 = () => {
               </div>
               {/* period */}
               <div className="flex flex-col items-end">
-                <p className="fs-sm gray-100">Time remaining</p>
+                <p className="fs-sm gray-text">Time remaining</p>
                 <div className="flex items-center mt-2">
-                  <span className="bg-[#E6EBF0] text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
+                  <span className="bg-popup-nav text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
                     0
                   </span>
                   <span
-                    className="bg-[#E6EBF0] text-lg mx-[2px] font-semibold w-5 text-center color-l rounded"
+                    className="bg-popup-nav text-lg mx-[2px] font-semibold w-5 text-center color-l rounded"
                     id="minute"
                   >
                     {minutetime2}
                   </span>
-                  <span className=" bg-light px-1 text-lg mx-[1px] font-semibold color-l">
+                  <span className=" nav-bg px-1 text-lg mx-[1px] font-semibold color-l">
                     :
                   </span>
-                  <span className="bg-[#E6EBF0] text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
+                  <span className="bg-popup-nav text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
                     {secondtime1}
                   </span>
-                  <span className="bg-[#E6EBF0] text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
+                  <span className="bg-popup-nav text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
                     {secondtime2}
                   </span>
                 </div>
@@ -886,8 +870,8 @@ const K3 = () => {
               <button
                 className={` fs-sm   w-full  py-3 rounded-t-md ${
                   selectTab == 1
-                    ? "bg-color-l2 text-white"
-                    : "bg-[#E6EBF0] gray-100"
+                    ? "bg-color-l2 text-whites"
+                    : "bg-popup-nav gray-text"
                 }`}
                 onClick={() => setSelectTab(1)}
               >
@@ -896,8 +880,8 @@ const K3 = () => {
               <button
                 className={` fs-sm  mx-1 w-full  py-3 rounded-t-md ${
                   selectTab == 2
-                    ? "bg-color-l2 text-white"
-                    : "bg-[#E6EBF0] gray-100"
+                    ? "bg-color-l2 text-whites"
+                    : "bg-popup-nav gray-text"
                 }`}
                 onClick={() => {
                   setSelectTab(2);
@@ -911,7 +895,7 @@ const K3 = () => {
                 className={` fs-sm mr-1 w-full  py-3 rounded-t-md ${
                   selectTab == 3
                     ? "bg-color-l2 text-white"
-                    : "bg-[#E6EBF0] gray-100"
+                    : "bg-popup-nav gray-text"
                 }`}
                 onClick={() => {
                   setSelectTab(3);
@@ -925,7 +909,7 @@ const K3 = () => {
                 className={` fs-sm  w-full  py-3 rounded-t-md ${
                   selectTab == 4
                     ? "bg-color-l2 text-white"
-                    : "bg-[#E6EBF0] gray-100"
+                    : "bg-popup-nav gray-text"
                 }`}
                 onClick={() => {
                   setSelectTab(4);
@@ -950,7 +934,7 @@ const K3 = () => {
                       >
                         <div className="text">{item.number}</div>
                       </div>
-                      <div className="fs-sm gray-100">{item.x}X</div>
+                      <div className="fs-sm gray-text">{item.x}X</div>
                     </div>
                   ))}
                 </div>
@@ -1000,7 +984,7 @@ const K3 = () => {
                       className={`relative p-2 w-14 h-10 flex items-center justify-center rounded-md ${
                         selectedNumbers.includes(number)
                           ? "bg-purple-500 text-white"
-                          : "bg-purple-900 gray-100"
+                          : "bg-purple-900 gray-text"
                       }`}
                     >
                       {number}
@@ -1024,7 +1008,7 @@ const K3 = () => {
                       className={`relative p-2 w-14 h-10 flex items-center justify-center rounded-md ${
                         selectedNumbers3.includes(number)
                           ? "bg-red-500 text-white"
-                          : "bg-red-900 gray-100"
+                          : "bg-red-900 gray-text"
                       }`}
                     >
                       {number}
@@ -1044,7 +1028,7 @@ const K3 = () => {
                       className={`relative p-2 w-14 h-10 flex items-center justify-center rounded-md ${
                         selectedNumbers3.includes(number)
                           ? "bg-green-500 text-white"
-                          : "bg-green-900 gray-100"
+                          : "bg-green-900 gray-text"
                       }`}
                     >
                       {number}
@@ -1072,7 +1056,7 @@ const K3 = () => {
                       className={`relative p-2 w-12 h-10 flex items-center justify-center rounded-md ${
                         selectedNumbers.includes(number)
                           ? "bg-purple-500 text-white"
-                          : "bg-purple-900 gray-100"
+                          : "bg-purple-900 gray-text"
                       }`}
                     >
                       {number}
@@ -1094,7 +1078,7 @@ const K3 = () => {
                     className={`relative p-2 w-full h-10 flex items-center justify-center rounded-md ${
                       selectedNumbers3.includes("@3")
                         ? "bg-red-500 text-white"
-                        : "bg-red-900 gray-100"
+                        : "bg-red-900 gray-text"
                     }`}
                   >
                     Any 3 of the same number: odds
@@ -1122,7 +1106,7 @@ const K3 = () => {
                       className={`relative p-2 w-14 h-10 flex items-center justify-center rounded-md ${
                         selectedNumbers.includes(number)
                           ? "bg-purple-500 text-white"
-                          : "bg-purple-900 gray-100"
+                          : "bg-purple-900 gray-text"
                       }`}
                     >
                       {number}
@@ -1144,7 +1128,7 @@ const K3 = () => {
                     className={`relative p-2 w-full h-10 flex items-center justify-center rounded-md ${
                       selectedNumbers3.includes("@u@")
                         ? "bg-red-500 text-white"
-                        : "bg-red-900 gray-100"
+                        : "bg-red-900 gray-text"
                     }`}
                   >
                     3 continuous numbers
@@ -1167,7 +1151,7 @@ const K3 = () => {
                       className={`relative p-2 w-14 h-10 flex items-center justify-center rounded-md ${
                         selectedNumbers3.includes(number)
                           ? "bg-purple-500 text-white"
-                          : "bg-purple-900 gray-100"
+                          : "bg-purple-900 gray-text"
                       }`}
                     >
                       {number}
@@ -1187,10 +1171,10 @@ const K3 = () => {
 
           {openTime && (
             <div className="flex items-center justify-center absolute z-10 m-auto top-0 bottom-0 left-0 right-0 ">
-              <span className="text-[120px] colors bg-[#E6EBF0] text-blue font-medium rounded-xl  w-28  h-[150px] flex items-center justify-center mr-5">
+              <span className="text-[120px] colors bg-popup-nav text-blue font-medium rounded-xl  w-28  h-[150px] flex items-center justify-center mr-5">
                 0
               </span>
-              <span className="ms-5 text-[120px] colors bg-[#E6EBF0] text-blue font-medium rounded-xl  w-28  h-[150px] flex items-center justify-center">
+              <span className="ms-5 text-[120px] colors bg-popup-nav text-blue font-medium rounded-xl  w-28  h-[150px] flex items-center justify-center">
                 {secondtime2}
               </span>
             </div>
@@ -1206,8 +1190,8 @@ const K3 = () => {
             <button
               className={` flex justify-center items-center h-full w-full py-2 border-none rounded-lg ${
                 gameHistory == "ghistory"
-                  ? " text-base blue-linear text-white font-medium "
-                  : "bg-light text-sm gray-100"
+                  ? " text-base blue-linear text-black  font-medium "
+                  : "nav-bg text-sm gray-text"
               }`}
               onClick={() => handleGameHistory("ghistory")}
             >
@@ -1218,8 +1202,8 @@ const K3 = () => {
             <button
               className={` flex justify-center items-center h-full w-full py-2 border-none rounded-lg ${
                 gameHistory == "chart"
-                  ? "text-base blue-linear  font-medium text-white"
-                  : "bg-light text-sm gray-100"
+                  ? "text-base blue-linear  font-medium text-black "
+                  : "nav-bg text-sm gray-text"
               }`}
               onClick={() => handleGameHistory("chart")}
             >
@@ -1230,8 +1214,8 @@ const K3 = () => {
             <button
               className={` flex justify-center items-center h-full w-full py-2 border-none rounded-lg ${
                 gameHistory == "mhistory"
-                  ? " text-base blue-linear text-white font-medium "
-                  : "bg-light text-sm gray-100"
+                  ? " text-base blue-linear text-black  font-medium "
+                  : "nav-bg text-sm gray-text"
               }`}
               onClick={() => handleGameHistory("mhistory")}
             >
@@ -1243,7 +1227,7 @@ const K3 = () => {
 
         {gameHistory == "ghistory" && (
           <div>
-            <div className="grid grid-cols-12 nav-bg text-white rounded-t-md p-2 mt-5">
+            <div className="grid grid-cols-12 bg-popup-nav rounded-t-md p-2 mt-5">
               <div className="col-span-4 flex text-center justify-center">
                 <h5 className="heading-h5 text-base">Period</h5>
               </div>
@@ -1258,21 +1242,21 @@ const K3 = () => {
 
             {Array.isArray(k3PeriodListData?.data?.gameslist) &&
               k3PeriodListData?.data?.gameslist.map((item, i) => (
-                <div className="grid grid-cols-12 bg-light p-2 py-3" key={i}>
+                <div className="grid grid-cols-12 nav-bg p-2 py-3" key={i}>
                   <div className="col-span-4 flex text-center justify-center items-center">
-                    <span className="text-sm gray-100 relative flex">
+                    <span className="text-sm gray-text relative flex">
                       {item?.period}
                     </span>
                   </div>
                   <div className="col-span-1 text-center justify-center items-center">
-                    <span className="text-sm gray-100  ">
+                    <span className="text-sm gray-text  ">
                       {String(item.result)
                         .split("")
                         .reduce((acc, digit) => acc + parseInt(digit), 0)}
                     </span>
                   </div>
                   <div className="col-span-2  text-center justify-center  items-center">
-                    <span className="text-sm gray-100  ">
+                    <span className="text-sm gray-text  ">
                       {String(item.result)
                         .split("")
                         .reduce((acc, digit) => acc + parseInt(digit), 0) > 10
@@ -1281,7 +1265,7 @@ const K3 = () => {
                     </span>
                   </div>
                   <div className="col-span-2  text-center justify-center  items-center">
-                    <span className="text-sm gray-100">
+                    <span className="text-sm gray-text">
                       {String(item.result)
                         .split("")
                         .reduce((acc, digit) => acc + parseInt(digit), 0) %
@@ -1292,7 +1276,7 @@ const K3 = () => {
                     </span>
                   </div>
                   <div className="col-span-3 flex text-center justify-center  items-center">
-                    <span className="fs-sm gray-100  flex justify-center items-center">
+                    <span className="fs-sm gray-text  flex justify-center items-center">
                       {getImageFromNumber(item.result).map((img, i) => (
                         <img
                           src={img}
@@ -1305,12 +1289,10 @@ const K3 = () => {
                   </div>
                 </div>
               ))}
-            <div className="bg-light p-6 flex items-center justify-center mt-5">
+            <div className="nav-bg p-6 flex items-center justify-center mt-5">
               <button
                 className={`rounded-md p-2 mr-4 ${
-                  pageto / 10 >= 2
-                    ? "bg-color-l2 text-whites"
-                    : " bg-blues text-whites"
+                  pageto / 10 >= 2 ? "bg-color-l2 text-whites" : " bg-popup-nav"
                 } `}
                 disabled={pageto / 10 > 1 ? false : true}
                 onClick={handleDecrease}
@@ -1320,14 +1302,14 @@ const K3 = () => {
                   <IoIosArrowBack className="text-lg" />
                 </Link>
               </button>
-              <span className="fs-sm gray-100">
+              <span className="fs-sm gray-text">
                 {pageto / 10}/{k3PeriodListData?.page}
               </span>
               <button
                 className={`rounded-md p-2 ms-4 ${
                   k3PeriodListData?.page
                     ? "bg-color-l2 text-white"
-                    : "bg-[#E6EBF0]"
+                    : "bg-popup-nav bg-popup-nav"
                 } `}
                 disabled={k3PeriodListData?.page > pageto / 10 ? false : true}
                 onClick={handleIncrease}
@@ -1343,7 +1325,7 @@ const K3 = () => {
 
         {gameHistory == "chart" && (
           <div>
-            <div className="grid grid-cols-12 nav-bg text-white rounded-t-md p-2 mt-5">
+            <div className="grid grid-cols-12  bg-popup-nav rounded-t-md p-2 mt-5">
               <div className="col-span-4 flex text-center justify-center">
                 <h5 className="heading-h5 text-base">Period</h5>
               </div>
@@ -1357,15 +1339,15 @@ const K3 = () => {
             </div>
             {Array.isArray(k3PeriodListData?.data?.gameslist) &&
               k3PeriodListData?.data?.gameslist.map((item, i) => (
-                <div className="grid grid-cols-11 bg-light p-2 py-3" key={i}>
+                <div className="grid grid-cols-11 nav-bg p-2 py-3" key={i}>
                   <div className="col-span-4 flex text-center justify-center items-center">
-                    <span className="text-sm gray-100  relative flex">
+                    <span className="text-sm gray-text  relative flex">
                       {item.period}
                     </span>
                   </div>
 
                   <div className="col-span-3 flex text-center justify-center  items-center">
-                    <span className="fs-sm gray-100  flex justify-center items-center">
+                    <span className="fs-sm gray-text  flex justify-center items-center">
                       {getImageFromNumber(item.result).map((img, i) => (
                         <img
                           src={img}
@@ -1377,24 +1359,24 @@ const K3 = () => {
                     </span>
                   </div>
                   <div className="col-span-4  text-center justify-center  items-center">
-                    <span className="text-sm gray-100">
+                    <span className="text-sm gray-text">
                       {new Set(String(item.result)).size == 1
                         ? "3 same numbers"
                         : new Set(String(item.result)).size == 2
-                        ? "2 same numbers"
-                        : new Set(String(item.result)).size == 3
-                        ? "3 different numbers"
-                        : item.result}
+                          ? "2 same numbers"
+                          : new Set(String(item.result)).size == 3
+                            ? "3 different numbers"
+                            : item.result}
                     </span>
                   </div>
                 </div>
               ))}
-            <div className="bg-light p-6 flex items-center justify-center mt-5">
+            <div className="nav-bg p-6 flex items-center justify-center mt-5">
               <button
                 className={`rounded-md p-2 mr-4 ${
                   pageto / 10 >= 2
                     ? "bg-color-l2 color-orange"
-                    : " bg-blues text-whites"
+                    : " bg-popup-nav"
                 } `}
                 disabled={pageto / 10 > 1 ? false : true}
                 onClick={handleDecrease}
@@ -1404,14 +1386,14 @@ const K3 = () => {
                   <IoIosArrowBack className="text-lg" />
                 </Link>
               </button>
-              <span className="fs-sm gray-100">
+              <span className="fs-sm gray-text">
                 {pageto / 10}/{k3PeriodListData?.page}
               </span>
               <button
                 className={`rounded-md p-2 ms-4 ${
                   k3PeriodListData?.page
                     ? "bg-color-l2 color-orange"
-                    : " bg-[#E6EBF0]"
+                    : " bg-popup-nav"
                 } `}
                 disabled={k3PeriodListData?.page > pageto / 10 ? false : true}
                 onClick={handleIncrease}
@@ -1426,15 +1408,14 @@ const K3 = () => {
         )}
 
         {gameHistory == "mhistory" && (
-          <div className="bg-light p-2 py-3 mt-5">
+          <div className="nav-bg p-2 py-3 mt-5">
             <div className="flex items-end justify-end mb-3">
-              <Link className="text-blue fs-sm border rounded-lg border-[#F5CC2C] px-3 py-1 flex item-center items-end text-whites">
+              <Link className="text-blue fs-sm border rounded-lg border-[#21D9CC] px-3 py-1 flex item-center items-end text-whites">
                 Details <IoIosArrowDropright className="mb-[2px]" />
               </Link>
             </div>
 
-            {k3HistoryData?.data?.gameslist?.length > 0 ? (
-              Array.isArray(k3HistoryData?.data?.gameslist) &&
+            {Array.isArray(k3HistoryData?.data?.gameslist) &&
               k3HistoryData?.data?.gameslist?.map((item, i) => (
                 <div key={i}>
                   <div
@@ -1443,49 +1424,41 @@ const K3 = () => {
                   >
                     <div className="flex items-center">
                       <div
-                        className={`flex font-semibold justify-center items-center h-10 w-10 rounded-lg mr-2
-    ${
-      /* 🔹 background colour */
-      item.bet.split(",")[0] === "c"
-        ? "bgs-green"
-        : item.bet.split(",")[0] === "l"
-        ? "bgs-red-200"
-        : item.bet.split(",")[0] === "b"
-        ? "color-yellow-bg-200"
-        : "bgs-blue-500"
-    }
-    ${
-      /* 🔹 font‑size  */
-      ["b", "s", "c", "l"].includes(item.bet.split(",")[0])
-        ? "text-[14px]"
-        : "text-base"
-    }
-  `}
+                        className={`flex text-sm justify-center items-center h-10 w-10 rounded-md mr-2 
+                                ${
+                                  item.bet.split(",")[0] == "c"
+                                    ? "bgs-green"
+                                    : item.bet.split(",")[0] == "l"
+                                      ? "bgs-red-200"
+                                      : item.bet.split(",")[0] == "b"
+                                        ? "color-yellow-bg-200"
+                                        : "bgs-blue-500"
+                                }
+                                 `}
                       >
-                        {item.bet.split(",")[0] === "c"
+                        {item.bet.split(",")[0] == "c"
                           ? "Even"
-                          : item.bet.split(",")[0] === "l"
-                          ? "Odd"
-                          : item.bet.split(",")[0] === "b"
-                          ? "Big"
-                          : item.bet.split(",")[0] === "s"
-                          ? "Small"
-                          : item.bet.split(",")[0]}
+                          : item.bet.split(",")[0] == "l"
+                            ? "Odd"
+                            : item.bet.split(",")[0] == "b"
+                              ? "Big"
+                              : item.bet.split(",")[0] == "s"
+                                ? "Small"
+                                : item.bet.split(",")[0]}
                       </div>
-
                       <div>
                         <h3 className="heading-h3 gray-50 text-md">
                           {item?.stage}
                         </h3>
-                        <p className="fs-sm gray-100">{item.time}</p>
+                        <p className="fs-sm gray-text">{item.time}</p>
                       </div>
                     </div>
                     {item.status !== 0 && (
                       <div className="flex flex-col items-end">
                         <div
-                          className={`min-w-[80px] text-center border px-3 py-[2px] rounded-md text-sm  ${
+                          className={`border  px-5 py-[2px] rounded-md text-sm  ${
                             item.status === 1
-                              ? "color-green border-green-500"
+                              ? "color-green border-color-green"
                               : "color-red-200 border-color-red"
                           }`}
                         >
@@ -1509,9 +1482,9 @@ const K3 = () => {
                     }`}
                   >
                     <h2 className="heading-h2 gray-50 text-lg">Details</h2>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2 rounded-md">
-                      <span className=" gray-100 ">Order number</span>
-                      <span className=" gray-100 flex item-center">
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2 rounded-md">
+                      <span className=" gray-text ">Order number</span>
+                      <span className=" gray-text flex item-center">
                         {item.id_product}
                         <PiCopySimpleBold
                           className="mt-[3px]"
@@ -1521,28 +1494,28 @@ const K3 = () => {
                         />
                       </span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2 rounded-md">
-                      <span className=" gray-100 ">Period</span>
-                      <span className=" gray-100 ">{item.stage}</span>
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2 rounded-md">
+                      <span className=" gray-text ">Period</span>
+                      <span className=" gray-text ">{item.stage}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
-                      <span className=" gray-100 ">Purchase amount</span>
-                      <span className=" gray-100 ">₹{item.money}</span>
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
+                      <span className=" gray-text ">Purchase amount</span>
+                      <span className=" gray-text ">₹{item.money}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
-                      <span className=" gray-100 ">Quantiy</span>
-                      <span className=" gray-100 ">{item.amount}</span>
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
+                      <span className=" gray-text ">Quantiy</span>
+                      <span className=" gray-text ">{item.amount}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
-                      <span className="gray-100 ">Amount after tax</span>
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
+                      <span className="gray-text ">Amount after tax</span>
                       <span className="color-red-200 ">₹{item.price}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
-                      <span className="gray-100 ">Tax</span>
-                      <span className="gray-100 ">₹{item.fee}</span>
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
+                      <span className="gray-text ">Tax</span>
+                      <span className="gray-text ">₹{item.fee}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
-                      <span className="gray-100 ">Result</span>
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
+                      <span className="gray-text ">Result</span>
                       {item.status !== 0 && (
                         <div className=" flex text-center justify-center  items-center">
                           {getImageFromNumber(item.result).map((img, i) => (
@@ -1556,26 +1529,26 @@ const K3 = () => {
                         </div>
                       )}
                     </div>
-                    <div className=" flex flex-col    bg-[#E6EBF0] p-1 mb-2  rounded-md">
-                      <p className="gray-100">Select</p>
-                      <span className=" gray-100 flex">
+                    <div className=" flex flex-col    bg-popup-nav p-1 mb-2  rounded-md">
+                      <p className="gray-text">Select</p>
+                      <span className=" gray-text flex">
                         {item.typeGame}:{" "}
                         {item.bet.split(",")[0] == "c"
                           ? "Even"
                           : item.bet.split(",")[0] == "l"
-                          ? "Odd"
-                          : item.bet.split(",")[0] == "b"
-                          ? "Big"
-                          : item.bet.split(",")[0] == "s"
-                          ? item.bet
-                              .split(",")
-                              .map((char) => mappings[char])
-                              .join(" ")
-                          : item.bet}
+                            ? "Odd"
+                            : item.bet.split(",")[0] == "b"
+                              ? "Big"
+                              : item.bet.split(",")[0] == "s"
+                                ? item.bet
+                                    .split(",")
+                                    .map((char) => mappings[char])
+                                    .join(" ")
+                                : item.bet}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
-                      <span className=" gray-100 ">Status</span>
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
+                      <span className=" gray-text ">Status</span>
                       {item.status !== 0 && (
                         <span
                           className={` color-red-200 ${
@@ -1587,8 +1560,8 @@ const K3 = () => {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between  bg-[#E6EBF0] p-1 mb-2  rounded-md">
-                      <span className=" gray-100 ">Win/loss</span>
+                    <div className="flex items-center justify-between  bg-popup-nav p-1 mb-2  rounded-md">
+                      <span className=" gray-text ">Win/loss</span>
                       {item.status !== 0 && (
                         <span
                           className={` ${
@@ -1601,22 +1574,19 @@ const K3 = () => {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between  bg-[#E6EBF0] p-1 mb-2  rounded-md">
-                      <span className=" gray-100 ">Order time</span>
-                      <span className=" gray-100 ">{item.time}</span>
+                    <div className="flex items-center justify-between  bg-popup-nav p-1 mb-2  rounded-md">
+                      <span className=" gray-text ">Order time</span>
+                      <span className=" gray-text ">{item.time}</span>
                     </div>
                   </div>
                 </div>
-              ))
-            ) : (
-              <EmptyData />
-            )}
-            <div className="bg-light p-6 flex items-center justify-center mt-5">
+              ))}
+            <div className="nav-bg p-6 flex items-center justify-center mt-5">
               <button
                 className={`rounded-md p-2 mr-4 ${
                   pageto / 10 >= 2
                     ? "bg-color-l2 text-white"
-                    : "bg-blues text-whites"
+                    : "bg-popup-nav bg-popup-nav"
                 } `}
                 disabled={pageto / 10 > 1 ? false : true}
                 onClick={handleDecrease}
@@ -1626,14 +1596,14 @@ const K3 = () => {
                   <IoIosArrowBack className="text-lg" />
                 </Link>
               </button>
-              <span className="fs-sm gray-100">
+              <span className="fs-sm gray-text">
                 {pageto / 10}/{k3HistoryData?.page}
               </span>
               <button
                 className={`rounded-md p-2 ms-4 ${
                   k3HistoryData?.page
                     ? "bg-color-l2 text-white"
-                    : "bg-[#E6EBF0]"
+                    : "bg-popup-nav bg-popup-nav"
                 } `}
                 disabled={k3HistoryData?.page > pageto / 10 ? false : true}
                 onClick={handleIncrease}
@@ -1652,7 +1622,7 @@ const K3 = () => {
 
       {/* popups */}
       <div
-        className={`bg-light z-[12]  items-center transition ease-in-out delay-150 justify-center fixed bottom-0 rounded-t-2xl filter-section w-[24.7rem] ${
+        className={`nav-bg z-[12]  items-center transition ease-in-out delay-150 justify-center fixed bottom-0 rounded-t-2xl filter-section w-[24.7rem] ${
           openPopup ? "flex" : "hidden"
         }`}
       >
@@ -1678,19 +1648,19 @@ const K3 = () => {
                       item == "l"
                         ? "bgs-red-200"
                         : item == "c"
-                        ? "bgs-green"
-                        : item == "b"
-                        ? "bg-yellow"
-                        : "bgs-blue-500"
+                          ? "bgs-green"
+                          : item == "b"
+                            ? "bg-yellow"
+                            : "bgs-blue-500"
                     }`}
                   >
                     {item == "l"
                       ? "Odd"
                       : item == "c"
-                      ? "Even"
-                      : item == "b"
-                      ? "Big"
-                      : "Small"}
+                        ? "Even"
+                        : item == "b"
+                          ? "Big"
+                          : "Small"}
                   </div>
                 ))}
               </div>
@@ -1846,7 +1816,7 @@ const K3 = () => {
                     className={`text-base mx-1 px-2 py-[3px]  rounded-md ${
                       balance === value
                         ? "bg-color-l2 color-orange"
-                        : "bg-[#E6EBF0] text-whites"
+                        : "bg-popup-nav text-whites"
                     }`}
                   >
                     {value}
@@ -1892,7 +1862,7 @@ const K3 = () => {
                   className={` text-base mx-1 px-2 py-[3px]  rounded-md ${
                     activeX === i
                       ? "bg-color-l2 color-orange"
-                      : "bg-[#E6EBF0] text-whites"
+                      : "bg-popup-nav text-whites"
                   }`}
                   key={i}
                   onClick={() => {
@@ -1913,7 +1883,7 @@ const K3 = () => {
                   checked={isChecked}
                   onChange={handleCheckboxChange}
                 />
-                <div className="w-6 h-6 rounded-full border-2 border-[#dd9138] flex items-center justify-center peer-checked:bg-[#dd9138]">
+                <div className="w-6 h-6 rounded-full border-2 border-black flex items-center justify-center peer-checked:bg-cyan-400">
                   <svg
                     className={`w-4 h-4 text-whites ${
                       isChecked ? "block" : "hidden"
@@ -1928,7 +1898,7 @@ const K3 = () => {
                     />
                   </svg>
                 </div>
-                <span className="gray-100 ms-2 mr-2 text-sm cursor-pointer">
+                <span className="gray-text ms-2 mr-2 text-sm cursor-pointer">
                   I agree
                 </span>{" "}
                 <Link className="color-red-200 fs-sm flex items-center">
@@ -1940,7 +1910,7 @@ const K3 = () => {
           </div>
           <div className="flex justify-between items-center">
             <button
-              className="bg-[#E6EBF0] text-whites w-[40%] p-2 text-sm font-medium"
+              className="bg-popup-nav text-whites w-[40%] p-2 text-sm font-medium"
               onClick={() => {
                 setOpenPopup(false);
                 setSelectedNumbers3([]);
@@ -1985,10 +1955,10 @@ const K3 = () => {
               {winResult ? "Congratulations" : "Sorry"}
             </p>
 
-            <div className="fs-sm gray-100  flex justify-center items-center mt-3">
+            <div className="fs-sm gray-text  flex justify-center items-center mt-3">
               {Array.isArray(k3PeriodListData?.data?.gameslist) &&
                 getImageFromNumber(
-                  k3PeriodListData?.data?.gameslist[0]?.result
+                  k3PeriodListData?.data?.gameslist[0]?.result,
                 ).map((img, i) => (
                   <img
                     src={img}
@@ -2059,7 +2029,7 @@ const K3 = () => {
               )}
             </div>
             <p
-              className={`fs-sm gray-100 text-center font-semibold ${
+              className={`fs-sm gray-text text-center font-semibold ${
                 winResult ? "mt-1" : "mt-3"
               }`}
             >
@@ -2089,8 +2059,8 @@ const K3 = () => {
       <div className={openHowtoPlay ? "overlay-section block" : "hidden"}></div>
 
       {openHowtoPlay ? (
-        <div className="fixed top-32 bg-light w-[270px] flex flex-col justify-center items-center m-auto left-0 right-0 rounded-t-2xl rounded-b-2xl z-30">
-          <div className=" blue-linear w-full text-center text-white text-xl py-2  rounded-t-2xl">
+        <div className="fixed top-32 nav-bg w-[270px] flex flex-col justify-center items-center m-auto left-0 right-0 rounded-t-2xl rounded-b-2xl z-30">
+          <div className=" blue-linear w-full text-center text-whites text-xl py-2  rounded-t-2xl">
             How to play
           </div>
           <div className="h-[300px] overflow-auto p-2 fs-sm leading-6 text-whites">
@@ -2146,9 +2116,9 @@ const K3 = () => {
               <span>(98*2)=196</span>
             </p>
           </div>
-          <div className="flex justify-center items-center bg-light w-full py-3 rounded-b-2xl">
+          <div className="flex justify-center items-center nav-bg w-full py-3 rounded-b-2xl">
             <button
-              className="blue-linear rounded-full w-40 py-2 text-white"
+              className="blue-linear rounded-full w-40 py-2"
               onClick={() => setHowtoPlay(false)}
             >
               Close

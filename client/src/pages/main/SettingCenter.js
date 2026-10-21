@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { FaCircleExclamation } from "react-icons/fa6";
-import { IoIosArrowBack } from "react-icons/io";
-import { MdEmail, MdLock, MdOutlineArrowForwardIos } from "react-icons/md";
-import { Link } from "react-router-dom";
-import AvatarImg from "../../assets/avatar5.png";
-import { PiCopySimpleLight } from "react-icons/pi";
+import { useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
+import { FaCircleExclamation } from "react-icons/fa6";
+import { MdEmail, MdLock, MdOutlineArrowForwardIos } from "react-icons/md";
+import { PiCopySimpleLight } from "react-icons/pi";
+import { Link } from "react-router-dom";
 
 import { RxCrossCircled } from "react-icons/rx";
-import CopyCopmponent from "../../components/CopyCopmponent";
 import { useDispatch, useSelector } from "react-redux";
+import CopyCopmponent from "../../components/CopyCopmponent";
+import CustomeNavbar from "../../components/CustomeNavbar";
 import { changeUserName, userDetail } from "../../store/reducer/authReducer";
 import { AvatarData } from "./AvatarData";
-import CustomeNavbar from "../../components/CustomeNavbar";
 const SettingCenter = () => {
   const { userInfo, successMessage } = useSelector((state) => state.auth);
   const [openAll, setOpenAll] = useState(false);
@@ -51,7 +49,7 @@ const SettingCenter = () => {
   }, [dispatch]);
   return (
     <>
-      <CustomeNavbar name="Settings Center" bgClass="nav-bg" />
+      <CustomeNavbar name="Settings Center" />
 
       <div className="nav-bg h-32 w-full rounded-b-[60px]"></div>
       <div className="container-section relative mt-[-120px]">
@@ -63,30 +61,30 @@ const SettingCenter = () => {
               className="w-20 rounded-full h-20"
             />
             <Link className="flex items-center" to={"/main/avatar"}>
-              <span className="text-sm gray-50 mr-2">Change avatar</span>
-              <MdOutlineArrowForwardIos className="text-lg gray-50" />
+              <span className="text-sm  mr-2">Change avatar</span>
+              <MdOutlineArrowForwardIos className="text-lg " />
             </Link>
           </div>
           <div
             className="flex items-center justify-between mt-2"
             onClick={handleOpenAll}
           >
-            <p className="text-sm font-sans font-medium gray-50">Nickname</p>
+            <p className="text-sm font-sans font-medium ">Nickname</p>
             <Link className="flex items-center">
-              <span className="text-base mr-2 text-whites">
+              <span className="text-base font-medium mr-2">
                 {userInfo?.name_user}
               </span>
-              <MdOutlineArrowForwardIos className="text-lg text-whites" />
+              <MdOutlineArrowForwardIos className="text-lg " />
             </Link>
           </div>
           <hr className=" border-text-whites mt-8" />
           <div className="flex items-center justify-between mt-2">
-            <p className="text-sm font-sans font-medium gray-50">UID</p>
+            <p className="text-sm font-sans font-medium ">UID</p>
             <Link className="flex items-center">
-              <span className="text-base font-medium mr-2 gray-50">
+              <span className="text-base font-medium mr-2">
                 {userInfo?.id_user}
               </span>
-              <span className="ps-2 text-[#F95959]" onClick={copyToClipCode}>
+              <span className="ps-2 color-l" onClick={copyToClipCode}>
                 <PiCopySimpleLight />
               </span>
             </Link>
@@ -95,21 +93,21 @@ const SettingCenter = () => {
       </div>
 
       <div className="container-section mt-8">
-        <div className="flex items-center mt-2  border-l-4 border-[#F5CC2C] font-semibold">
+        <div className="flex items-center mt-2  border-l-4 border-[#21D9CC] font-semibold">
           {" "}
-          <h3 className="heading-h3 ml-1 text-whites">Security information</h3>
+          <h3 className="heading-h3 ml-1 text-white">Security information</h3>
         </div>
         <ul className="mt-3">
-          <li className="mt-2 bg-body p-3 py-4 rounded-lg bg-body">
+          <li className="mt-2 nav-bg p-3 py-4 rounded-lg nav-bg">
             <Link
               className="flex justify-between items-center  "
               to={"/main/SettingCenter/changePassword"}
             >
               <div className="flex items-center">
                 <span className="bg-[rgb(147_197_253/14%)] p-1 rounded-md">
-                  <MdLock className="text-[#F95959] text-2xl " />
+                  <MdLock className="color-l text-2xl " />
                 </span>
-                <span className="text-base text-whites ms-2 font-sans">
+                <span className="text-sm font-semibold text-whites ms-2 font-sans">
                   Login password
                 </span>
               </div>
@@ -119,16 +117,16 @@ const SettingCenter = () => {
               </div>
             </Link>
           </li>
-          <li className="mt-4 bg-body p-3 py-4 rounded-lg bg-body">
+          <li className="mt-4 nav-bg p-3 py-4 rounded-lg nav-bg">
             <Link
               className="flex justify-between items-center"
               to={"/main/SettingCenter/BindEmail"}
             >
               <div className="flex items-center">
                 <span className="bg-[rgb(147_197_253/14%)] p-1 rounded-md">
-                  <MdEmail className="text-[#F95959] text-2xl " />
+                  <MdEmail className="color-l text-2xl " />
                 </span>
-                <span className="text-base text-whites ms-2 font-sans">
+                <span className="text-sm font-semibold text-whites ms-2 font-sans">
                   {userInfo?.email?.length > 5
                     ? userInfo?.email
                     : "Bind mainbox"}
@@ -140,13 +138,13 @@ const SettingCenter = () => {
               </div>
             </Link>
           </li>
-          <li className="mt-4 bg-body p-3 py-4 rounded-lg bg-body">
+          <li className="mt-4 nav-bg p-3 py-4 rounded-lg nav-bg">
             <Link className="flex justify-between items-center  ">
               <div className="flex items-center">
                 <span className="bg-[rgb(147_197_253/14%)] p-1 rounded-md">
-                  <FaCircleExclamation className="text-[#F95959] text-2xl " />
+                  <FaCircleExclamation className="color-l text-2xl " />
                 </span>
-                <span className="text-base text-whites ms-2 font-sans">
+                <span className="text-sm font-semibold text-whites ms-2 font-sans">
                   Updated version
                 </span>
               </div>
@@ -165,16 +163,16 @@ const SettingCenter = () => {
           openAll ? "block" : "hidden"
         } transition ease-in-out delay-150 container-section`}
       >
-        <div className="absolute top-32  z-50  right-2 p-3 left-2 flex flex-col m-auto rounded-lg nav-bg">
-          <div className="flex justify-between items-cente text-white">
+        <div className="absolute top-32  z-50  right-2 p-3 left-2 flex flex-col m-auto rounded-lg bg-popup-nav">
+          <div className="flex justify-between items-cente text-whites">
             <span className="info-dialog-header left-arrow"></span>
             <h3 className="heading-h3 text-xl font-medium">Change Nickname</h3>
             <span className="info-dialog-header right-arrow"></span>
           </div>
-          <div className="bg-body p-3 mt-4 rounded-lg">
+          <div className="nav-bg p-3 mt-4 rounded-lg">
             <div className="flex items-center">
               <FaUserCircle className="color-l text-2xl" />{" "}
-              <p className="text-base ms-2 text-black">Nickname</p>
+              <p className="text-base font-medium ms-2 gray-text ">Nickname</p>
             </div>
             <input
               type="text"
@@ -195,7 +193,7 @@ const SettingCenter = () => {
             className="absolute bottom-[-35px] flex left-0 right-0 m-auto justify-center text-3xl"
             onClick={handleOpenAll}
           >
-            <RxCrossCircled className="text-white" />
+            <RxCrossCircled className="text-whites" />
           </span>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   IoIosArrowBack,
   IoIosArrowDropright,
@@ -6,35 +6,34 @@ import {
 } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 
-import "./5d.css";
 import { PiCopySimpleBold } from "react-icons/pi";
+import "./5d.css";
 
+import { FaMinus, FaPlus } from "react-icons/fa";
 import {
   MdKeyboardDoubleArrowLeft,
   MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
-import { FaMinus, FaPlus } from "react-icons/fa";
 
 import TimeImg from "../../assets/time.png";
 import TimeActiveImg from "../../assets/time_aactive.png";
 
-import { useDispatch, useSelector } from "react-redux";
-import { userDetail } from "../../store/reducer/authReducer";
 import debounce from "lodash/debounce";
-import CopyCopmponent from "../../components/CopyCopmponent";
-import { d5History, d5PeriodList } from "../../store/reducer/gameReducer";
-import { d5Bet } from "../../store/reducer/betReducer";
+import { useDispatch, useSelector } from "react-redux";
 import io from "socket.io-client";
 import Audio1 from "../../assets/audio/di1.mp3";
 import Audio2 from "../../assets/audio/di2.mp3";
+import CopyCopmponent from "../../components/CopyCopmponent";
+import { userDetail } from "../../store/reducer/authReducer";
+import { d5Bet } from "../../store/reducer/betReducer";
+import { d5History, d5PeriodList } from "../../store/reducer/gameReducer";
 
 import { IoCloseCircleOutline } from "react-icons/io5";
 import { host } from "../../store/reducer/api";
 
 import HeaderInfo from "../wingo/HeaderInfo";
-import EmptyData from "../activity/EmptyData";
 
-const WinImg = "https://i.ibb.co/TMnbvp0N/win-popup.png";
+const WinImg = "https://i.ibb.co/ssJ2HLw/win-popup.png";
 const LoseImg = "https://i.ibb.co/8zTQQmx/loss-popup.png";
 
 const xData = [1, 5, 10, 20, 50, 100];
@@ -42,7 +41,7 @@ const socket = io(host);
 const FiveD = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const { d5PeriodListData, d5HistoryData } = useSelector(
-    (state) => state.game
+    (state) => state.game,
   );
   const { loader } = useSelector((state) => state.bet);
   const [activeTime, setActiveTime] = useState(1);
@@ -134,7 +133,7 @@ const FiveD = () => {
   }
   const handleBet = async () => {
     dispatch(
-      d5Bet({ typeid1, selectTab, selectBet, balance, multiplier })
+      d5Bet({ typeid1, selectTab, selectBet, balance, multiplier }),
     ).then((res) => {
       setBetAlert(true);
       setOpenPopup(false);
@@ -159,7 +158,7 @@ const FiveD = () => {
     debounce(() => {
       dispatch(userDetail());
     }, 500),
-    []
+    [],
   );
 
   const debouncedDispatch = useCallback(
@@ -170,7 +169,7 @@ const FiveD = () => {
       setSpinClass("");
       updateNumbers();
     }, 500),
-    [dispatch, typeid1]
+    [dispatch, typeid1],
   );
 
   const debouncedDispatchResult = useCallback(
@@ -184,7 +183,7 @@ const FiveD = () => {
         }
       });
     }, 500),
-    [dispatch, typeid1]
+    [dispatch, typeid1],
   );
 
   useEffect(() => {
@@ -222,19 +221,19 @@ const FiveD = () => {
       const line = document.createElementNS(svgns, "line");
       line.setAttribute(
         "x1",
-        `${firstActive.offsetLeft + firstActive.offsetWidth / 2}px`
+        `${firstActive.offsetLeft + firstActive.offsetWidth / 2}px`,
       );
       line.setAttribute(
         "y1",
-        `${firstActive.offsetTop + firstActive.offsetHeight / 2}px`
+        `${firstActive.offsetTop + firstActive.offsetHeight / 2}px`,
       );
       line.setAttribute(
         "x2",
-        `${secondActive.offsetLeft + secondActive.offsetWidth / 2}px`
+        `${secondActive.offsetLeft + secondActive.offsetWidth / 2}px`,
       );
       line.setAttribute(
         "y2",
-        `${secondActive.offsetTop + secondActive.offsetHeight / 2}px`
+        `${secondActive.offsetTop + secondActive.offsetHeight / 2}px`,
       );
       line.setAttribute("stroke", "red");
       line.setAttribute("stroke-width", "2");
@@ -264,7 +263,7 @@ const FiveD = () => {
       if (typeid1 == 1 && Array.isArray(msg?.data) && msg.game == 1) {
         debouncedDispatch(dispatch, typeid1, pageno, pageto);
         setChangeTime(true);
-        //console.log("server data received");
+        console.log("server data received");
         chartFunction();
       }
 
@@ -489,7 +488,7 @@ const FiveD = () => {
       } else if (isCharacter) {
         // Remove all numbers and characters and add the selected character
         let charactersOnly = prevSelected.filter(
-          (n) => typeof n === "string" && n.length === 1
+          (n) => typeof n === "string" && n.length === 1,
         );
         charactersOnly = [];
 
@@ -556,7 +555,7 @@ const FiveD = () => {
 
   const playAudio1 = () => {
     audio1Ref.current.muted = false;
-    //console.log("object,", audio1Ref.current.play());
+    console.log("object,", audio1Ref.current.play());
     audio1Ref.current.play().catch((error) => {
       console.error("Error playing audio1:", error);
     });
@@ -633,18 +632,6 @@ const FiveD = () => {
     setWinResult(null);
     setResultPopup(false);
   };
-
-  useEffect(() => {
-    if (resultPopup && (winResult === true || winResult === false)) {
-      const timer = setTimeout(() => {
-        handleClose(); // 5 sec ke baad popup close
-      }, 5000);
-
-      // Cleanup: agar popup close ho jaye ya component unmount ho to timer clear ho
-      return () => clearTimeout(timer);
-    }
-  }, [resultPopup, winResult]);
-
   return (
     <>
       <HeaderInfo
@@ -655,78 +642,85 @@ const FiveD = () => {
       />
       <div className="container-section relative mt-[-75px]">
         {/* time tabs */}
-        <div className="grid grid-cols-12 bg-[#fff] rounded-xl">
+        <div className="grid grid-cols-12 bg-popup-nav rounded-xl">
+          {/* 1Min */}
           <div
-            className={`col-span-3 cursor-pointer  flex items-center flex-col justify-center py-2 ${
-              activeTime == 1 ? "blue-linear2" : ""
+            className={`col-span-3 cursor-pointer flex items-center flex-col justify-center py-2 ${
+              activeTime == "1" ? "blue-linear2" : ""
             } rounded-xl`}
-            onClick={() => handle5DMinut(1)}
+            onClick={() => handle5DMinut("1")}
           >
             <img
-              src={activeTime == 1 ? TimeActiveImg : TimeImg}
+              src={activeTime == "1" ? TimeActiveImg : TimeImg}
               alt=""
-              className="w-12"
+              className={`w-12 ${activeTime == "1" ? "hue-rotate-45" : ""}`}
             />
             <p
-              className={`text-center  fs-sm font-sans leading-4 ${
-                activeTime == 1 ? "text-white" : "gray-100"
+              className={`text-center fs-sm font-sans leading-4 ${
+                activeTime == "1" ? "text-black" : "gray-text"
               }`}
             >
               5D Lotre <br /> 1Min
             </p>
           </div>
+
+          {/* 3Min */}
           <div
-            className={`col-span-3  cursor-pointer flex items-center flex-col justify-center py-2  rounded-xl  ${
+            className={`col-span-3 cursor-pointer flex items-center flex-col justify-center py-2 ${
               activeTime == "3" ? "blue-linear2" : ""
-            }`}
+            } rounded-xl`}
             onClick={() => handle5DMinut("3")}
           >
             <img
               src={activeTime == "3" ? TimeActiveImg : TimeImg}
               alt=""
-              className="w-12"
+              className={`w-12 ${activeTime == "3" ? "hue-rotate-45" : ""}`}
             />
             <p
-              className={`text-center  fs-sm font-sans leading-4 ${
-                activeTime == "3" ? "text-white" : "gray-100"
+              className={`text-center fs-sm font-sans leading-4 ${
+                activeTime == "3" ? "text-black" : "gray-text"
               }`}
             >
               5D Lotre <br /> 3Min
             </p>
           </div>
+
+          {/* 5Min */}
           <div
-            className={`col-span-3  cursor-pointer flex items-center flex-col justify-center py-2  rounded-xl  ${
+            className={`col-span-3 cursor-pointer flex items-center flex-col justify-center py-2 ${
               activeTime == "5" ? "blue-linear2" : ""
-            }`}
+            } rounded-xl`}
             onClick={() => handle5DMinut("5")}
           >
             <img
               src={activeTime == "5" ? TimeActiveImg : TimeImg}
               alt=""
-              className="w-12"
+              className={`w-12 ${activeTime == "5" ? "hue-rotate-45" : ""}`}
             />
             <p
-              className={`text-center  fs-sm font-sans leading-4 ${
-                activeTime == "5" ? "text-white" : "gray-100"
+              className={`text-center fs-sm font-sans leading-4 ${
+                activeTime == "5" ? "text-black" : "gray-text"
               }`}
             >
               5D Lotre <br /> 5Min
             </p>
           </div>
+
+          {/* 10Min */}
           <div
-            className={`col-span-3  cursor-pointer flex items-center flex-col justify-center py-2  rounded-xl  ${
+            className={`col-span-3 cursor-pointer flex items-center flex-col justify-center py-2 ${
               activeTime == "10" ? "blue-linear2" : ""
-            }`}
+            } rounded-xl`}
             onClick={() => handle5DMinut("10")}
           >
             <img
               src={activeTime == "10" ? TimeActiveImg : TimeImg}
               alt=""
-              className="w-12"
+              className={`w-12 ${activeTime == "10" ? "hue-rotate-45" : ""}`}
             />
             <p
-              className={`text-center  fs-sm font-sans leading-4 ${
-                activeTime == "10" ? "text-white" : "gray-100"
+              className={`text-center fs-sm font-sans leading-4 ${
+                activeTime == "10" ? "text-black" : "gray-text"
               }`}
             >
               5D Lotre <br /> 10Min
@@ -734,11 +728,11 @@ const FiveD = () => {
           </div>
         </div>
 
-        <div className="bg-light p-3 mt-5 rounded-md">
+        <div className="nav-bg p-3 mt-5 rounded-md">
           <div className="flex justify-between">
             <div>
-              <span className="text-sm gray-100">Lottery</span> <br />
-              <span className="text-sm gray-100">Results</span> <br />
+              <span className="text-sm gray-text">Lottery</span> <br />
+              <span className="text-sm gray-text">Results</span> <br />
             </div>
             <div className="flex ">
               <div className="grid grid-cols-10 gap-2">
@@ -750,7 +744,7 @@ const FiveD = () => {
                         className="col-span-2 flex justify-center items-center flex-col text-whites"
                         key={i}
                       >
-                        <div className="w-9 flex justify-center items-center h-9 bg-[#E6EBF0] rounded-full">
+                        <div className="w-9 flex justify-center items-center h-9 bg-popup-nav rounded-full">
                           {data}
                         </div>
                         <p className="text-center text-sm text-whites">
@@ -762,7 +756,7 @@ const FiveD = () => {
               <span className="text-whites mx-1  h-9 justify-center items-center flex">
                 ={" "}
               </span>
-              <div className="w-9 flex justify-center items-center text-sm h-9 bg-color-l2 text-white rounded-full">
+              <div className="w-9 flex justify-center items-center text-sm h-9 bg-color-l2 text-black rounded-full">
                 {Array.isArray(d5PeriodListData?.data?.gameslist) &&
                   d5PeriodListData?.data?.gameslist[0]?.result
                     ?.split("")
@@ -773,11 +767,11 @@ const FiveD = () => {
         </div>
 
         {/* wingo tim */}
-        <div className="bg-light relative p-3 mt-5 rounded-md">
+        <div className="nav-bg relative p-3 mt-5 rounded-md">
           <div className="flex justify-between  rounded-lg ">
             <div>
               <div className="flex items-center">
-                <span className="text-sm gray-100">Period</span>
+                <span className="text-sm gray-text">Period</span>
                 <button
                   className="border flex items-center ms-2 border-[--bg-color-l] color-l justify-center rounded-full px-4 py-[1px]"
                   onClick={() => setHowtoPlay(true)}
@@ -806,21 +800,21 @@ const FiveD = () => {
             </div>
             {/* period */}
             <div className="flex flex-col items-end">
-              <p className="text-sm gray-100">Time remaining</p>
+              <p className="text-sm gray-text">Time remaining</p>
               <div className="flex items-center mt-2">
-                <span className="bg-[#E6EBF0] text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
+                <span className="bg-popup-nav text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
                   0
                 </span>
-                <span className="bg-[#E6EBF0] text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
+                <span className="bg-popup-nav text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
                   {minute2}
                 </span>
-                <span className=" bg-light px-1 text-lg mx-[1px] font-semibold color-l">
+                <span className=" nav-bg px-1 text-lg mx-[1px] font-semibold color-l">
                   :
                 </span>
-                <span className="bg-[#E6EBF0] text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
+                <span className="bg-popup-nav text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
                   {secondtime1}
                 </span>
-                <span className="bg-[#E6EBF0] text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
+                <span className="bg-popup-nav text-lg mx-[2px] font-semibold w-5 text-center color-l rounded">
                   {secondtime2}
                 </span>
               </div>
@@ -861,7 +855,7 @@ const FiveD = () => {
                 className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2 rounded-t-md ${
                   selectTab == "a"
                     ? " bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-blues text-whites"
+                    : "gray-1"
                 }`}
                 onClick={() => setSelectTab("a")}
               >
@@ -871,7 +865,7 @@ const FiveD = () => {
                 className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2 rounded-t-md ${
                   selectTab == "b"
                     ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-blues text-whites"
+                    : "gray-1"
                 }`}
                 onClick={() => {
                   setSelectTab("b");
@@ -883,7 +877,7 @@ const FiveD = () => {
                 className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2 rounded-t-md ${
                   selectTab == "c"
                     ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-blues text-whites"
+                    : "gray-1"
                 }`}
                 onClick={() => {
                   setSelectTab("c");
@@ -895,7 +889,7 @@ const FiveD = () => {
                 className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2  rounded-t-md ${
                   selectTab == "d"
                     ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-blues text-whites"
+                    : "gray-1"
                 }`}
                 onClick={() => {
                   setSelectTab("d");
@@ -907,7 +901,7 @@ const FiveD = () => {
                 className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2  rounded-t-md ${
                   selectTab == "e"
                     ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-blues text-whites"
+                    : "gray-1"
                 }`}
                 onClick={() => {
                   setSelectTab("e");
@@ -919,7 +913,7 @@ const FiveD = () => {
                 className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2  rounded-t-md ${
                   selectTab == "f"
                     ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-blues text-whites"
+                    : "gray-1"
                 }`}
                 onClick={() => {
                   setSelectTab("f");
@@ -931,7 +925,7 @@ const FiveD = () => {
                 className={` text-md font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2  rounded-t-md ${
                   selectTab == "total"
                     ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-blues text-whites"
+                    : "gray-1"
                 }`}
                 onClick={() => {
                   setSelectTab("total");
@@ -947,7 +941,7 @@ const FiveD = () => {
                     className={`col-span-3 cursor-pointer  rounded-md font-medium text-base p-1 flex justify-between items-center ${
                       selectedNumbers.includes("b")
                         ? "bg-yellow text-white"
-                        : " bg-blues text-whites"
+                        : " gray-1"
                     }`}
                     onClick={() => handleSelectNumber3("b")}
                   >
@@ -957,7 +951,7 @@ const FiveD = () => {
                     className={`col-span-3 cursor-pointer  rounded-md font-medium text-base p-1 flex justify-between items-center ${
                       selectedNumbers.includes("s")
                         ? "bgs-blue-500 text-white"
-                        : " bg-blues text-whites"
+                        : " gray-1"
                     }`}
                     onClick={() => handleSelectNumber3("s")}
                   >
@@ -967,7 +961,7 @@ const FiveD = () => {
                     className={`col-span-3 cursor-pointer  rounded-md font-medium text-base p-1 flex justify-between items-center ${
                       selectedNumbers.includes("l")
                         ? "bgs-red-200 text-white"
-                        : " bg-blues text-whites"
+                        : " gray-1"
                     }`}
                     onClick={() => handleSelectNumber3("l")}
                   >
@@ -977,7 +971,7 @@ const FiveD = () => {
                     className={`col-span-3 cursor-pointer  rounded-md font-medium text-base p-1 flex justify-between items-center ${
                       selectedNumbers.includes("c")
                         ? "bgs-green text-white"
-                        : " bg-blues text-whites"
+                        : " gray-1"
                     }`}
                     onClick={() => handleSelectNumber3("c")}
                   >
@@ -994,13 +988,13 @@ const FiveD = () => {
                         className={`flex flex-col justify-center items-center cursor-pointer w-10 h-10 rounded-full border border-[--gray-400] ${
                           selectedNumbers.includes(number)
                             ? "bgs-blue-500 text-white"
-                            : "gray-100"
+                            : "gray-text"
                         }`}
                         onClick={() => handleSelectNumber3(number)}
                       >
                         <div className="text">{number}</div>
                       </div>
-                      <div className="fs-sm gray-100">9</div>
+                      <div className="fs-sm gray-text">9</div>
                     </div>
                   ))}
                 </div>
@@ -1072,8 +1066,8 @@ const FiveD = () => {
             <button
               className={` flex justify-center items-center h-full w-full py-2 border-none rounded-lg ${
                 gameHistory == "ghistory"
-                  ? " text-base blue-linear text-white font-medium "
-                  : "bg-light text-sm gray-100"
+                  ? " text-base blue-linear text-black font-medium "
+                  : "nav-bg text-sm gray-text"
               }`}
               onClick={() => setGameHistory("ghistory")}
             >
@@ -1084,8 +1078,8 @@ const FiveD = () => {
             <button
               className={` flex justify-center items-center h-full w-full py-2 border-none rounded-lg ${
                 gameHistory == "chart"
-                  ? "text-base blue-linear  text-white font-medium "
-                  : "bg-light text-sm gray-100"
+                  ? "text-base blue-linear  text-black font-medium "
+                  : "nav-bg text-sm gray-text"
               }`}
               onClick={() => setGameHistory("chart")}
             >
@@ -1096,8 +1090,8 @@ const FiveD = () => {
             <button
               className={` flex justify-center items-center h-full w-full py-2 border-none rounded-lg ${
                 gameHistory == "mhistory"
-                  ? " text-base blue-linear  text-white font-medium "
-                  : "bg-light text-sm gray-100"
+                  ? " text-base blue-linear  text-black font-medium "
+                  : "nav-bg text-sm gray-text"
               }`}
               onClick={() => setGameHistory("mhistory")}
             >
@@ -1109,7 +1103,7 @@ const FiveD = () => {
 
         {gameHistory == "ghistory" && (
           <div>
-            <div className="grid grid-cols-12 nav-bg rounded-t-md p-2 text-white mt-5">
+            <div className="grid grid-cols-12 bg-popup-nav rounded-t-md p-2 mt-5">
               <div className="col-span-5 flex text-center justify-center">
                 <h5 className="heading-h5 text-base">Period</h5>
               </div>
@@ -1124,7 +1118,7 @@ const FiveD = () => {
 
             {Array.isArray(d5PeriodListData?.data?.gameslist) &&
               d5PeriodListData?.data?.gameslist.map((item, i) => (
-                <div className="grid grid-cols-12 bg-light p-2 py-3" key={i}>
+                <div className="grid grid-cols-12 nav-bg p-2 py-3" key={i}>
                   <div className="col-span-5 flex text-center justify-center items-center">
                     <span className="text-sm text-whites relative flex  ">
                       {item.period}
@@ -1141,7 +1135,7 @@ const FiveD = () => {
                     ))}
                   </div>
                   <div className="col-span-2  text-center flex justify-center m-auto  items-center">
-                    <div className="text-sm w-6 h-6 flex justify-center items-center  rounded-full bg-color-l2 text-white">
+                    <div className="text-sm w-6 h-6 flex justify-center items-center  rounded-full bg-color-l2 text-black">
                       {String(item.result)
                         .split("")
                         .reduce((acc, digit) => acc + parseInt(digit), 0)}
@@ -1149,12 +1143,12 @@ const FiveD = () => {
                   </div>
                 </div>
               ))}
-            <div className="bg-light p-6 flex items-center justify-center mt-5">
+            <div className="nav-bg p-6 flex items-center justify-center mt-5">
               <button
                 className={`rounded-md p-2 mr-4 ${
                   pageto / 10 >= 2
-                    ? "bg-[#E6EBF0] text-whites"
-                    : "bg-blues text-whites"
+                    ? "bg-popup-nav text-white"
+                    : "bg-popup-nav bg-text-whites"
                 } `}
                 disabled={pageto / 10 > 1 ? false : true}
                 onClick={handleDecrease}
@@ -1170,8 +1164,8 @@ const FiveD = () => {
               <button
                 className={`rounded-md p-2 ms-4 ${
                   d5PeriodListData?.page
-                    ? "bg-color-l2 text-white"
-                    : "bg-[#E6EBF0] text-whites"
+                    ? "bg-color-l2 text-black"
+                    : "bg-popup-nav bg-text-whites"
                 } `}
                 disabled={d5PeriodListData?.page > pageto / 10 ? false : true}
                 onClick={handleIncrease}
@@ -1188,13 +1182,13 @@ const FiveD = () => {
         {gameHistory == "chart" && (
           <div>
             <div className="chart-section mt-5  rounded-t-md">
-              <div className="bg-light pb-5">
+              <div className="nav-bg pb-5">
                 <div className="flex items-center mt-4 border-b border-[--gray-400] text-white">
                   <button
                     className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2 rounded-t-md ${
                       selectTab == "a"
                         ? " bg-color-l2 text-white after:bg-custom-radial-gradient"
-                        : "bg-[#E6EBF0] text-whites"
+                        : "bg-popup-nav"
                     }`}
                     onClick={() => setSelectTab("a")}
                   >
@@ -1204,7 +1198,7 @@ const FiveD = () => {
                     className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2 rounded-t-md ${
                       selectTab == "b"
                         ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                        : "bg-[#E6EBF0] text-whites"
+                        : "bg-popup-nav"
                     }`}
                     onClick={() => {
                       setSelectTab("b");
@@ -1216,7 +1210,7 @@ const FiveD = () => {
                     className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2 rounded-t-md ${
                       selectTab == "c"
                         ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                        : "bg-[#E6EBF0] text-whites"
+                        : "bg-popup-nav"
                     }`}
                     onClick={() => {
                       setSelectTab("c");
@@ -1228,7 +1222,7 @@ const FiveD = () => {
                     className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2  rounded-t-md ${
                       selectTab == "d"
                         ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                        : "bg-[#E6EBF0] text-whites"
+                        : "bg-popup-nav"
                     }`}
                     onClick={() => {
                       setSelectTab("d");
@@ -1240,7 +1234,7 @@ const FiveD = () => {
                     className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2  rounded-t-md ${
                       selectTab == "e"
                         ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                        : "bg-[#E6EBF0] text-whites"
+                        : "bg-popup-nav"
                     }`}
                     onClick={() => {
                       setSelectTab("e");
@@ -1252,7 +1246,7 @@ const FiveD = () => {
                     className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2  rounded-t-md ${
                       selectTab == "f"
                         ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                        : "bg-[#E6EBF0] text-whites"
+                        : "bg-popup-nav"
                     }`}
                     onClick={() => {
                       setSelectTab("f");
@@ -1320,8 +1314,8 @@ const FiveD = () => {
                 </div>
               </div>
 
-              <div className="container2 bg-light text-white mt-5">
-                <div className="flex items-center nav-bg justify-evenly rounded-t-md py-2">
+              <div className="container2 nav-bg mt-5">
+                <div className="flex items-center bg-popup-nav justify-evenly rounded-t-md py-2">
                   <h5 className="heading-h5 text-base font-semibold ">
                     Period
                   </h5>
@@ -1459,12 +1453,10 @@ const FiveD = () => {
               </div>
             </div>
 
-            <div className="bg-light p-6 flex items-center justify-center mt-5">
+            <div className="nav-bg p-6 flex items-center justify-center mt-5">
               <button
                 className={`rounded-md p-2 mr-4 ${
-                  pageto / 10 >= 2
-                    ? "bg-[#E6EBF0] text-white"
-                    : "bg-blues text-whites"
+                  pageto / 10 >= 2 ? "bg-popup-nav text-white" : "bg-popup-nav"
                 } `}
                 disabled={pageto / 10 > 1 ? false : true}
                 onClick={handleDecrease}
@@ -1480,8 +1472,8 @@ const FiveD = () => {
               <button
                 className={`rounded-md p-2 ms-4 ${
                   d5PeriodListData?.page
-                    ? "bg-color-l2 text-white"
-                    : "bg-[#E6EBF0]"
+                    ? "bg-color-l2 text-black"
+                    : "bg-popup-nav"
                 } `}
                 disabled={d5PeriodListData?.page > pageto / 10 ? false : true}
                 onClick={handleIncrease}
@@ -1496,14 +1488,13 @@ const FiveD = () => {
         )}
 
         {gameHistory == "mhistory" && (
-          <div className="bg-light p-2 py-3 mt-5">
+          <div className="nav-bg p-2 py-3 mt-5">
             <div className="flex items-end justify-end mb-3">
-              <Link className="text-blue fs-sm border rounded-lg border-[#F5CC2C] px-3 py-1 flex item-center items-end ">
+              <Link className="text-blue fs-sm border rounded-lg border-[#21D9CC] px-3 py-1 flex item-center items-end ">
                 Details <IoIosArrowDropright className="mb-[2px]" />
               </Link>
             </div>
-            {d5HistoryData?.data?.gameslist?.length > 0 ? (
-              Array.isArray(d5HistoryData?.data?.gameslist) &&
+            {Array.isArray(d5HistoryData?.data?.gameslist) &&
               d5HistoryData?.data?.gameslist?.map((item, i) => (
                 <div key={i}>
                   <div
@@ -1512,35 +1503,27 @@ const FiveD = () => {
                   >
                     <div className="flex items-center">
                       <div
-                        className={`flex justify-center items-center h-10 w-10 rounded-lg mr-2 
+                        className={`flex justify-center items-center h-10 w-10 rounded-md mr-2 
                               ${
                                 item.bet.split(",")[0] == "c"
                                   ? "bgs-green"
                                   : item.bet.split(",")[0] == "l"
-                                  ? "bgs-red-200"
-                                  : item.bet.split(",")[0] == "b"
-                                  ? "color-yellow-bg-200"
-                                  : "bgs-blue-500"
-                              }
-                              ${
-                                /* 🔹 font‑size  */
-                                ["b", "s", "c", "l"].includes(
-                                  item.bet.split(",")[0]
-                                )
-                                  ? "text-[14px]"
-                                  : "text-base"
+                                    ? "bgs-red-200"
+                                    : item.bet.split(",")[0] == "b"
+                                      ? "color-yellow-bg-200"
+                                      : "bgs-blue-500"
                               }
                                `}
                       >
                         {item.bet.split(",")[0] == "c"
                           ? "Even"
                           : item.bet.split(",")[0] == "l"
-                          ? "Odd"
-                          : item.bet.split(",")[0] == "b"
-                          ? "Big"
-                          : item.bet.split(",")[0] == "s"
-                          ? "Small"
-                          : item.bet.split(",")[0]}
+                            ? "Odd"
+                            : item.bet.split(",")[0] == "b"
+                              ? "Big"
+                              : item.bet.split(",")[0] == "s"
+                                ? "Small"
+                                : item.bet.split(",")[0]}
                       </div>
                       <div>
                         <h3 className="heading-h3 text-whites text-md">
@@ -1552,9 +1535,9 @@ const FiveD = () => {
                     {item.status !== 0 && (
                       <div className="flex flex-col items-end">
                         <div
-                          className={`min-w-[80px] text-center border px-3 py-[2px] rounded-md text-sm ${
+                          className={`border  px-5 py-[2px] rounded-md text-sm  ${
                             item.status === 1
-                              ? "color-green border-green-500"
+                              ? "color-green border-color-green"
                               : "color-red-200 border-color-red"
                           }`}
                         >
@@ -1578,7 +1561,7 @@ const FiveD = () => {
                     }`}
                   >
                     <h2 className="heading-h2 text-whites text-lg">Details</h2>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2 rounded-md">
+                    <div className="flex items-center justify-between bg-text-whites p-1 mb-2 rounded-md">
                       <span className=" text-whites ">Order number</span>
                       <span className=" text-whites flex item-center">
                         {item.id_product}
@@ -1590,27 +1573,27 @@ const FiveD = () => {
                         />
                       </span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2 rounded-md">
+                    <div className="flex items-center justify-between bg-text-whites p-1 mb-2 rounded-md">
                       <span className=" text-whites ">Period</span>
                       <span className=" text-whites ">{item.stage}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-text-whites p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Purchase amount</span>
                       <span className=" text-whites ">₹{item.money}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-text-whites p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Quantiy</span>
                       <span className=" text-whites ">{item?.amount}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-text-whites p-1 mb-2  rounded-md">
                       <span className="text-whites ">Amount after tax</span>
                       <span className="color-red-200 ">₹{item.price}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-text-whites p-1 mb-2  rounded-md">
                       <span className="text-whites ">Tax</span>
                       <span className="text-whites ">₹{item.fee}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-text-whites p-1 mb-2  rounded-md">
                       <span className="text-whites ">Result</span>
                       {item.status !== 0 && (
                         <div className=" flex text-center justify-center  items-center">
@@ -1622,25 +1605,25 @@ const FiveD = () => {
                         </div>
                       )}
                     </div>
-                    <div className=" flex justify-between items-center   bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className=" flex justify-between items-center   bg-text-whites p-1 mb-2  rounded-md">
                       <p className="text-whites">Select</p>
                       <span className=" text-whites flex">
                         {" "}
                         {item.bet == "c"
                           ? "Even"
                           : item.bet == "l"
-                          ? "Odd"
-                          : item.bet == "b"
-                          ? "Big"
-                          : item.bet == "s"
-                          ? item.bet
-                              .split(",")
-                              .map((char) => mappings[char])
-                              .join(" ")
-                          : item.bet}
+                            ? "Odd"
+                            : item.bet == "b"
+                              ? "Big"
+                              : item.bet == "s"
+                                ? item.bet
+                                    .split(",")
+                                    .map((char) => mappings[char])
+                                    .join(" ")
+                                : item.bet}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-text-whites p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Status</span>
                       {item.status !== 0 && (
                         <span
@@ -1653,7 +1636,7 @@ const FiveD = () => {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-text-whites p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Win/loss</span>
                       {item.status !== 0 && (
                         <span
@@ -1667,22 +1650,19 @@ const FiveD = () => {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-text-whites p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Order time</span>
                       <span className=" text-whites ">{item.time}</span>
                     </div>
                   </div>
                 </div>
-              ))
-            ) : (
-              <EmptyData />
-            )}
-            <div className="bg-light p-6 flex items-center justify-center mt-5">
+              ))}
+            <div className="nav-bg p-6 flex items-center justify-center mt-5">
               <button
                 className={`rounded-md p-2 mr-4 ${
                   pageto / 10 >= 2
-                    ? "bg-[#E6EBF0] text-white"
-                    : "bg-blues text-whites"
+                    ? "bg-popup-nav text-black"
+                    : "bg-popup-nav bg-text-whites"
                 } `}
                 disabled={pageto / 10 > 1 ? false : true}
                 onClick={handleDecrease}
@@ -1698,8 +1678,8 @@ const FiveD = () => {
               <button
                 className={`rounded-md p-2 ms-4 ${
                   d5HistoryData?.page
-                    ? "bg-color-l2 text-white"
-                    : "bg-[#E6EBF0]"
+                    ? "bg-color-l2 text-black"
+                    : "bg-text-whites"
                 } `}
                 disabled={d5HistoryData?.page > pageto / 10 ? false : true}
                 onClick={handleIncrease}
@@ -1718,7 +1698,7 @@ const FiveD = () => {
 
       {/* popups */}
       <div
-        className={`bg-light z-[12] items-center transition ease-in-out delay-150 justify-center fixed bottom-0 rounded-t-2xl filter-section w-[24.7rem] ${
+        className={`nav-bg z-[12] items-center transition ease-in-out delay-150 justify-center fixed bottom-0 rounded-t-2xl filter-section w-[24.7rem] ${
           openPopup ? "flex" : "hidden"
         }`}
       >
@@ -1729,7 +1709,7 @@ const FiveD = () => {
                 className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2 rounded-t-md ${
                   selectTab == "a"
                     ? " bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-[#E6EBF0] text-whites"
+                    : "bg-popup-nav"
                 }`}
                 onClick={() => setSelectTab("a")}
               >
@@ -1739,7 +1719,7 @@ const FiveD = () => {
                 className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2 rounded-t-md ${
                   selectTab == "b"
                     ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-[#E6EBF0] text-whites"
+                    : "bg-popup-nav"
                 }`}
                 onClick={() => {
                   setSelectTab("b");
@@ -1751,7 +1731,7 @@ const FiveD = () => {
                 className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2 rounded-t-md ${
                   selectTab == "c"
                     ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-[#E6EBF0] text-whites"
+                    : "bg-popup-nav"
                 }`}
                 onClick={() => {
                   setSelectTab("c");
@@ -1763,7 +1743,7 @@ const FiveD = () => {
                 className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2  rounded-t-md ${
                   selectTab == "d"
                     ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-[#E6EBF0] text-whites"
+                    : "bg-popup-nav"
                 }`}
                 onClick={() => {
                   setSelectTab("d");
@@ -1775,7 +1755,7 @@ const FiveD = () => {
                 className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2  rounded-t-md ${
                   selectTab == "e"
                     ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-[#E6EBF0] text-whites"
+                    : "bg-popup-nav"
                 }`}
                 onClick={() => {
                   setSelectTab("e");
@@ -1787,7 +1767,7 @@ const FiveD = () => {
                 className={` text-lg font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2  rounded-t-md ${
                   selectTab == "f"
                     ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-[#E6EBF0] text-whites"
+                    : "bg-popup-nav"
                 }`}
                 onClick={() => {
                   setSelectTab("f");
@@ -1799,7 +1779,7 @@ const FiveD = () => {
                 className={` text-md font-bold  w-10 h-10  flex justify-center items-center abc-select relative mr-2  rounded-t-md ${
                   selectTab == "total"
                     ? "bg-color-l2 text-white after:bg-custom-radial-gradient"
-                    : "bg-[#E6EBF0] text-whites"
+                    : "bg-popup-nav"
                 }`}
                 onClick={() => {
                   setSelectTab("total");
@@ -1815,37 +1795,37 @@ const FiveD = () => {
                     className={`col-span-3 cursor-pointer text-white  rounded-md font-medium text-base p-1 flex justify-between items-center ${
                       selectedNumbers.includes("b")
                         ? "bg-yellow text-white"
-                        : "bg-[#E6EBF0] text-whites"
+                        : "bg-popup-nav"
                     }`}
                     onClick={() => handleSelectNumber3("b")}
                   >
                     <span>Big</span> <span>1.98</span>
                   </div>
                   <div
-                    className={`col-span-3 cursor-pointer text-white rounded-md font-medium text-base p-1 flex justify-between items-center ${
+                    className={`col-span-3 cursor-pointer  rounded-md font-medium text-base p-1 flex justify-between items-center ${
                       selectedNumbers.includes("s")
                         ? "bgs-blue-500 text-white"
-                        : "bg-[#E6EBF0] text-whites"
+                        : "bg-popup-nav"
                     }`}
                     onClick={() => handleSelectNumber3("s")}
                   >
                     <span>Small</span> <span>1.98</span>
                   </div>
                   <div
-                    className={`col-span-3 cursor-pointer text-white rounded-md font-medium text-base p-1 flex justify-between items-center ${
+                    className={`col-span-3 cursor-pointer  rounded-md font-medium text-base p-1 flex justify-between items-center ${
                       selectedNumbers.includes("l")
                         ? "bgs-red-200 text-white"
-                        : "bg-[#E6EBF0] text-whites"
+                        : "bg-popup-nav"
                     }`}
                     onClick={() => handleSelectNumber3("l")}
                   >
                     <span>Odd</span> <span>1.98</span>
                   </div>
                   <div
-                    className={`col-span-3 cursor-pointer text-white rounded-md font-medium text-base p-1 flex justify-between items-center ${
+                    className={`col-span-3 cursor-pointer  rounded-md font-medium text-base p-1 flex justify-between items-center ${
                       selectedNumbers.includes("c")
                         ? "bgs-green text-white"
-                        : "bg-[#E6EBF0] text-whites"
+                        : "bg-popup-nav"
                     }`}
                     onClick={() => handleSelectNumber3("c")}
                   >
@@ -1862,7 +1842,7 @@ const FiveD = () => {
                         className={`flex flex-col justify-center items-center cursor-pointer w-10 h-10 rounded-full border border-[--gray-400] ${
                           selectedNumbers.includes(number)
                             ? "bgs-blue-500 text-white"
-                            : "text-whites text-whites"
+                            : "text-whites"
                         }`}
                         onClick={() => handleSelectNumber3(number)}
                       >
@@ -1879,7 +1859,7 @@ const FiveD = () => {
                   className={`col-span-3 cursor-pointer  rounded-md font-medium text-base p-1 flex justify-between items-center ${
                     selectedNumbers.includes("b")
                       ? "bg-yellow text-white"
-                      : "bg-[#E6EBF0] text-whites"
+                      : "bg-popup-nav"
                   }`}
                   onClick={() => handleSelectNumber3("b")}
                 >
@@ -1889,7 +1869,7 @@ const FiveD = () => {
                   className={`col-span-3 cursor-pointer  rounded-md font-medium text-base p-1 flex justify-between items-center ${
                     selectedNumbers.includes("s")
                       ? "bgs-blue-500 text-white"
-                      : "bg-[#E6EBF0] text-whites"
+                      : "bg-popup-nav"
                   }`}
                   onClick={() => handleSelectNumber3("s")}
                 >
@@ -1899,7 +1879,7 @@ const FiveD = () => {
                   className={`col-span-3 cursor-pointer  rounded-md font-medium text-base p-1 flex justify-between items-center ${
                     selectedNumbers.includes("l")
                       ? "bgs-red-200 text-white"
-                      : "bg-[#E6EBF0] text-whites"
+                      : "bg-popup-nav"
                   }`}
                   onClick={() => handleSelectNumber3("l")}
                 >
@@ -1909,7 +1889,7 @@ const FiveD = () => {
                   className={`col-span-3 cursor-pointer  rounded-md font-medium text-base p-1 flex justify-between items-center ${
                     selectedNumbers.includes("c")
                       ? "bgs-green text-white"
-                      : "bg-[#E6EBF0] text-whites"
+                      : "bg-popup-nav"
                   }`}
                   onClick={() => handleSelectNumber3("c")}
                 >
@@ -1929,8 +1909,8 @@ const FiveD = () => {
                     onClick={() => setBalance(value)}
                     className={` text-base mx-1 px-2 py-[3px]  rounded-md ${
                       balance === value
-                        ? "bg-color-l2 text-white"
-                        : "bg-[#E6EBF0] text-whites"
+                        ? "bg-color-l2 text-black"
+                        : "bg-popup-nav text-whites"
                     }`}
                   >
                     {value}
@@ -1976,7 +1956,7 @@ const FiveD = () => {
                   className={`text-base mx-1 px-2 py-[3px]  rounded-md ${
                     activeX === i
                       ? "bg-color-l2 text-white"
-                      : "bg-[#E6EBF0] text-whites"
+                      : "bg-popup-nav text-whites"
                   }`}
                   key={i}
                   onClick={() => {
@@ -1997,9 +1977,9 @@ const FiveD = () => {
                   checked={isChecked}
                   onChange={handleCheckboxChange}
                 />
-                <div className="w-6 h-6 rounded-full border-2 border-[#dd9138] flex items-center justify-center peer-checked:bg-[#dd9138]">
+                <div className="w-6 h-6 rounded-full border-2 border-black flex items-center justify-center peer-checked:bg-cyan-400">
                   <svg
-                    className={`w-4 h-4 text-white ${
+                    className={`w-4 h-4 text-black ${
                       isChecked ? "block" : "hidden"
                     }`}
                     viewBox="0 0 20 20"
@@ -2012,7 +1992,7 @@ const FiveD = () => {
                     />
                   </svg>
                 </div>
-                <span className="text-white ms-2 mr-2 text-sm cursor-pointer">
+                <span className="text-whites ms-2 mr-2 text-sm cursor-pointer">
                   I agree
                 </span>{" "}
                 <Link className="color-red-200 fs-sm flex items-center">
@@ -2024,7 +2004,7 @@ const FiveD = () => {
           </div>
           <div className="flex justify-between items-center">
             <button
-              className="bg-[#E6EBF0] gray-100 w-[40%] p-2 text-sm font-medium"
+              className="bg-popup-nav gray-text w-[40%] p-2 text-sm font-medium"
               onClick={() => {
                 setOpenPopup(false);
                 setSelectedNumbers([]);
@@ -2033,7 +2013,7 @@ const FiveD = () => {
               Cancel
             </button>
             <button
-              className={` w-[60%] p-2 bg-color-l2 text-white text-sm font-medium`}
+              className={` w-[60%] p-2 bg-color-l2 text-black text-sm font-medium`}
               disabled={loader ? true : false}
               onClick={handleBet}
             >
@@ -2181,8 +2161,8 @@ const FiveD = () => {
       <div className={openHowtoPlay ? "overlay-section block" : "hidden"}></div>
 
       {openHowtoPlay ? (
-        <div className="fixed top-32 bg-light w-[270px] flex flex-col justify-center items-center m-auto left-0 right-0 rounded-t-2xl rounded-b-2xl z-30">
-          <div className=" blue-linear w-full text-center text-wihte text-xl py-2  rounded-t-2xl">
+        <div className="fixed top-32 nav-bg w-[270px] flex flex-col justify-center items-center m-auto left-0 right-0 rounded-t-2xl rounded-b-2xl z-30">
+          <div className=" blue-linear w-full text-center text-black text-xl py-2  rounded-t-2xl">
             How to play
           </div>
           <div className="h-[300px] overflow-auto p-2 fs-sm leading-6 text-whites">
@@ -2238,9 +2218,9 @@ const FiveD = () => {
               <span>(98*2)=196</span>
             </p>
           </div>
-          <div className="flex justify-center items-center bg-light w-full py-3 rounded-b-2xl">
+          <div className="flex justify-center items-center nav-bg w-full py-3 rounded-b-2xl">
             <button
-              className="blue-linear rounded-full w-40 py-2 text-white"
+              className="blue-linear rounded-full w-40 py-2"
               onClick={() => setHowtoPlay(false)}
             >
               Close

@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
-import { IoIosArrowBack } from "react-icons/io";
+import { useEffect, useState } from "react";
 
-import { MdSportsBasketball, MdSportsSoccer } from "react-icons/md";
-import { PiApplePodcastsLogo, PiTelevisionSimpleFill } from "react-icons/pi";
+import { AiOutlineSmallDash } from "react-icons/ai";
 import { BiHeartCircle } from "react-icons/bi";
 import { FaRegDotCircle } from "react-icons/fa";
-import { AiOutlineSmallDash } from "react-icons/ai";
-import FilterType from "../../components/FilterType";
+import { MdSportsBasketball, MdSportsSoccer } from "react-icons/md";
+import { PiApplePodcastsLogo, PiTelevisionSimpleFill } from "react-icons/pi";
 import CustomeNavbar from "../../components/CustomeNavbar";
+import FilterType from "../../components/FilterType";
 
 const RebateRatio = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -47,9 +45,9 @@ const RebateRatio = () => {
       <div className="container-section">
         {activeIndex == 1 || activeIndex == 2 || activeIndex == 3
           ? RebateData2.map((data, i) => (
-              <div className="bg-body rounded-md p-3 mb-3" key={i}>
+              <div className="nav-bg rounded-md p-3 mb-3" key={i}>
                 <div className="flex items-center">
-                  <h3 className="heading-h3 mb-2 gray-100">Rebate level</h3>{" "}
+                  <h3 className="heading-h3 mb-2 text-whites">Rebate level</h3>{" "}
                   <span className="text-xl ms-2 font-bold blue-color-300 italic">
                     L{i}
                   </span>
@@ -66,11 +64,11 @@ const RebateRatio = () => {
                             ""
                           )}
                         </div>
-                        <p className="gray-100 text-sm ">
+                        <p className="text-whites text-sm ">
                           {i + 1} level lower level commission Rebate
                         </p>
                       </div>
-                      <span className=" text-sm text-whites">
+                      <span className=" text-sm text-gray-500">
                         {datas.number}%
                       </span>
                     </li>
@@ -79,9 +77,9 @@ const RebateRatio = () => {
               </div>
             ))
           : RebateData.map((data, i) => (
-              <div className="bg-body rounded-md p-3 mb-3" key={i}>
+              <div className="nav-bg rounded-md p-3 mb-3" key={i}>
                 <div className="flex items-center">
-                  <h3 className="heading-h3 mb-2 gray-100">Rebate level</h3>{" "}
+                  <h3 className="heading-h3 mb-2 text-whites">Rebate level</h3>{" "}
                   <span className="text-xl ms-2 font-bold blue-color-300 italic">
                     L{i}
                   </span>
@@ -91,18 +89,18 @@ const RebateRatio = () => {
                     <li className="flex  justify-between" key={i}>
                       <div className="flex ">
                         <div className="flex  flex-col items-center mt-[3px] mr-1">
-                          <FaRegDotCircle className="blue-color-300 bg-white rounded-full fs-sm mr-1 border-b" />
+                          <FaRegDotCircle className="blue-color-300  rounded-full fs-sm mr-1 border-b" />
                           {i < 5 ? (
                             <AiOutlineSmallDash className="rotate-90 mt-[2px] mr-1 blue-color-300 fs-sm" />
                           ) : (
                             ""
                           )}
                         </div>
-                        <p className="gray-100 text-sm ">
+                        <p className="gray-text text-sm ">
                           {i + 1} level lower level commission Rebate
                         </p>
                       </div>
-                      <span className=" text-sm text-whites">
+                      <span className=" text-sm text-white">
                         {datas.number}%
                       </span>
                     </li>

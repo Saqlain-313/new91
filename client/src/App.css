@@ -7,7 +7,6 @@ body {
   height: 100%;
   padding: 0;
   margin: 0;
-  /* font-family: math; */
 
   display: -webkit-box;
   display: -webkit-flex;
@@ -16,39 +15,39 @@ body {
   -webkit-justify-content: center;
   justify-content: center !important;
 
-  font-family: "Bahnschrift";
+  /* This line is changed to use Roboto */
+  font-family: "Roboto", sans-serif;
 }
-
 p,
 h2,
 h3 {
   /* font-family: arial !important; */
 }
-
 :root {
   --bgbody: #15131e;
   --text-whites: #e6ebf0;
   --whites: #fff;
   --grey-200: #70798b;
   --grey-50: #181818;
-  --grey-100: black;
+  --grey-100: #181818;
   --bg-light: #fff;
-  --main-color: #f95959;
-  --bg_color_L3: #f6f6f6;
+  --main-color: rgb(7, 221, 209);
+  --bg_color_L3: #38374b;
   --light-gray: #ced6e1;
-  --sheet_nva_color: #f95959;
+  --sheet_nva_color: #3a3947;
   --bgdark: rgb(34 197 94);
-  --bgblue: #f6f6f6;
-  --darkBlue: #08d781;
-  --white: #001534;
-  --mediam-blue: #3baf4c;
+  --bgblue: #21d9cc;
+  --darkBlue: #26aee8;
+  --white: #201d2b;
+  --mediam-blue: #26aee8;
   --red-color: red;
-  --bg-nav: linear-gradient(90deg, #3baf4c 0%, #00d08a 100%);
-  --text-linear: linear-gradient(90deg, #f95959 0%, #bed921 100%);
+  --bg-nav: linear-gradient(90deg, #26aee8 0%, #00d08a 100%);
+  --text-linear: linear-gradient(90deg, #21d9cc 0%, #26aee8 100%);
   --red-color-200: #d23838;
   --red-color-100: #f7602b;
-  --yellow-200: #feaa57;
-  --bg-color-l: #fa6f6b;
+  --yellow-200: #dd9138;
+  --bg-color-l: rgb(7, 221, 209);
+  --bg-color-l1: #282730;
   --bg-blue-500: #3c9cf6;
   --bg-blue-300: #5088d3;
   --red-bg-500: #e52c2f;
@@ -56,53 +55,45 @@ h3 {
   --yellow-1: #fffba9;
   --yellow-2: #fff670;
   --yellow-3: #ffd180;
+  --yellow-4: #eb9f55;
   --gray-1: #454456;
   --stale-500: rgb(101 118 142);
   --green: #18b660;
-  --green-500: #f95959;
+  --green-500: rgb(7, 221, 209);
   --green-800: #003c26;
   --gray-500: #666462;
   --violet: #9b48db;
-  --bg-popup: #fff;
+  --bg-popup: #15131e;
   --slate-500: #6889b1;
   --aqua: #17a2b8;
   --bggrays: #fff;
   --oranges: #8f5206;
-  --sky: #e1e1e1;
+  --sky: #525167;
   --gray-400: #d8d8d8;
   --red-500: #d23838;
   --gray-170: #525167;
   --bg-yellows: #f2ca33;
   --bg-yellows1: #f5cc2c;
-  --black-2: #768096;
-  --bgs-grays: #f0f2f4;
+  --black-2: #b3b3b3;
+  --bgs-grays: #f6f6f6;
   --Dividing-line_color: #e1e1e1;
   --text_color_L2: #768096;
   --norm_secondary-color: #feaa57;
-  --text_color_L3: #768096;
+  --text_color_L3: #9ea2a8;
 
   --text_color_L4: #696a6b;
   /* --main_gradient-color: ; */
-  --button_dis_color: linear-gradient(90deg, #d4d5de 15.38%, #dbdce3 98.73%);
-  --main_gradient-color: linear-gradient(90deg, #f5cc2c 0%, #f2ca33 100%);
-  --main_gradient-color2:
-    linear-gradient(180deg, rgba(247, 248, 255, 0) 0%),
-    linear-gradient(
-      134deg,
-      rgba(255, 137, 137, 0.3) -3.06%,
-      rgba(255, 186, 147, 0.3) 84.86%
-    );
-  --tab1: #f95959;
-  --tab2: #bed921;
+  --button_dis_color: linear-gradient(90deg, #cccedc 15.38%, #cdcfdd 98.73%);
+  --light-main_gradient-color: var(--main_gradient-color);
+  --main_gradient-color2: linear-gradient(180deg, #49c755 0%, #0f9957 100%);
+  --tab1: #21d9cc;
+  --tab2: #26aee8;
   --bg_color_L2: black;
-  --calederbgcolor: linear-gradient(90deg, #f5cc2c 0%, #59adff 100%)
-    /* background: linear-gradient(180deg,  #fffba9 0%, #fff670 56.13%, #ffd180 100%); */;
+  /* background: linear-gradient(180deg,  #fffba9 0%, #fff670 56.13%, #ffd180 100%); */
 }
-
 body {
   user-select: none;
 }
-
 .z-index {
   z-index: 10;
 }
@@ -110,7 +101,6 @@ body {
 #root {
   width: 100%;
 }
-
 .root-main {
   position: relative;
   width: 24.7rem;
@@ -122,82 +112,51 @@ body {
   padding-bottom: 6rem;
   color: var(--whites);
 }
-
 input {
-  color: var(--grey-50) !important;
+  color: var(--whites) !important;
 }
-
-.top_bg {
-  /* height: 12rem; */
-  /* width: 100%; */
-  /* top: 0;
-    left: 0; */
-  /* opacity: .9; */
-  background: linear-gradient(90deg, #f5cc2c 0%, #59adff 100%);
-  /* backdrop-filter: blur(.10667rem);
-    z-index: 0; */
-}
-
-.calenderbutton {
-  background-color: var(--calederbgcolor);
-}
-
-.calenderbg {
-  background-color: #333332;
-}
-
 .gray-color-100 {
   color: var(--bggrays);
 }
-
 .bg-gray-color-100 {
   color: var(--bggrays);
 }
-
 .svg-white {
-  color: white;
+  color: black;
 }
-
 .gray-500 {
   color: var(--gray-500);
 }
-
 .text-whites {
-  color: var(--white);
+  color: var(--text-whites);
 }
-
 .text-blue {
-  color: #fb5959;
+  color: var(--main-color);
 }
-
+.bg-main {
+  background: var(--main-color);
+}
 .sheet_nav_bg {
   background: var(--sheet_nva_color);
 }
-
 .bg-darks {
-  background-color: #f95959;
+  background-color: var(--darkBlue);
 }
-
 .bg-gray-400 {
   background-color: var(--gray-400);
 }
-
 .bg-red-500 {
   background-color: var(--red-500);
 }
-
 .black-2 {
   color: var(--black-2);
 }
-
 .bgs-body {
   background-color: var(--bgbody);
 }
-
 .bg-rule {
   background-color: var(--bg-color-l1);
 }
-
 .bg-grays {
   background-color: var(--bgs-grays);
 }
@@ -208,64 +167,51 @@ input {
     width: 100%;
     min-height: 100vh;
   }
-
   .filter-section {
     width: 100% !important;
   }
 }
-
-.active_btn-bg {
-  background: linear-gradient(90deg, #cccedc 15.38%, #cdcfdd 98.73%);
+@media screen and (min-width: 500px) {
+  .min-w-content {
+    width: 24.7rem !important;
+  }
 }
-
 .color-orange {
-  color: var(--whites);
+  color: var(--grey-100);
 }
-
 .sky-border {
   border-color: var(--sky);
 }
-
 .color-sky {
   color: var(--sky);
 }
-
 .filter-img {
   filter: hue-rotate(174deg);
 }
-
 .border-color-red {
   border-color: var(--red-color-200);
 }
-
 .border-color-green {
   border-color: var(--main-color);
 }
-
 .border-color-blue {
   border-color: var(--bg-blue-500);
 }
-
 .border-color-slat {
   border-color: var(--gray-170);
 }
-
 .slate-500 {
   color: var(--stale-500);
 }
-
 .color-violet {
   color: var(--violet);
 }
-
 .bgs-violet {
   background: var(--violet);
 }
-
 .bg-body {
   background-color: var(--whites);
 }
-
 .more-l2 {
   background: linear-gradient(
     180deg,
@@ -273,89 +219,72 @@ input {
     #38374b 57.97%
   );
 }
-
 .container-section {
   width: 93%;
   margin: auto;
 }
-
 .color-blue-500 {
-  color: var(--text_color_L3);
+  color: var(--bggrays);
 }
-
 .bgs-blue-500 {
   background: var(--bg-blue-500);
 }
-
 .fs-sm {
-  font-size: 12.8px;
+  font-size: 12px;
   line-height: 1;
 }
-
 .gray-50 {
   color: var(--text_color_L2);
 }
-
 .gray-1 {
   background-color: var(--gray-1);
 }
-
 .text-L3 {
   background-color: var(--bgs-grays);
 }
-
 .gray-text {
   color: var(--text_color_L3);
 }
-
 .gray-100 {
   color: var(--grey-100);
 }
-
 .bg-aqua {
   background-color: var(--aqua);
 }
-
 .color-red-200 {
   color: var(--red-color-100);
 }
-
 .bgs-red-200 {
   background: var(--red-color-200);
 }
-
 .color-yellow-200 {
   color: var(--yellow-200);
 }
-
 .bgs-green {
   background-color: var(--green);
 }
 
+.graytext {
+  color: var(--gray-1);
+}
 .color-green {
   color: var(--green);
 }
-
 .wallet-color {
-  color: var(--bgblue);
+  color: var(--bg_color_L3);
 }
-
 .color-yellow-bg-200 {
   background-color: var(--yellow-200);
 }
-
 .color-slate-500 {
   color: var(--slate-500);
 }
-
 .bgs-slate-500 {
   background-color: var(--slate-500);
 }
-
 .bgs-yellow-600 {
   background-color: var(--red-color-100);
 }
-
 .bgs-yellow-500 {
   background: linear-gradient(
     180deg,
@@ -363,7 +292,6 @@ input {
     var(--red-color-100) 100%
   );
 }
-
 .bg-red-voilet {
   background: linear-gradient(
     to bottom right,
@@ -371,7 +299,6 @@ input {
     var(--violet) 0
   );
 }
-
 .bg-green-voilet {
   background: linear-gradient(
     to bottom right,
@@ -379,7 +306,6 @@ input {
     var(--violet) 0
   );
 }
-
 .color-yellow-linear {
   background: linear-gradient(
     180deg,
@@ -389,7 +315,6 @@ input {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
 .color-red-voilet {
   background: linear-gradient(
     to bottom right,
@@ -399,7 +324,6 @@ input {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
 .color-green-voilet {
   background: linear-gradient(
     to bottom right,
@@ -409,39 +333,28 @@ input {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
 .color-blue {
   color: var(--bgblue);
 }
-
 .bg-blues {
   background-color: var(--bgblue);
 }
-
 .bg-home-lg {
-  background: linear-gradient(to bottom, #59adff, #598fff, #f5cc2c);
+  background: var(--bgDark, rgba(255, 255, 255, 0.3));
 }
 
 .slick-next {
   right: 85px !important;
   top: 24px !important;
 }
-
 .bgclr:hover {
   background: linear-gradient(90deg, #f5cc2c 0%, #f2ca33 100%);
-}
-
-.home-bg {
-  background: var(--main_gradient-color2);
 }
 
 /* .slick-prev {
   left: -25px;
   display: none !important;
 } */
-.wingo-bg {
-  background: linear-gradient(110deg, #ff8e89 -5%, #ffc3a2 73%);
-}
 
 .slick-next:hover,
 .slick-next:focus {
@@ -467,7 +380,6 @@ input {
   background: url(http://localhost:3002/static/media/right-arrow.0a88e25….svg);
   object-fit: scale-down;
 }
-
 .slick-prev:hover,
 .slick-prev:focus,
 .slick-next:hover,
@@ -475,11 +387,9 @@ input {
   color: transparent;
   outline: none;
 }
-
 .add-desktop {
   background: linear-gradient(180deg, #49c755 0%, #0f9957 100%);
 }
-
 /* .slick-next:hover, .slick-next:focus {
   color: transparent;
   outline: none;
@@ -490,8 +400,7 @@ input {
 /* You can use Tailwind classes directly. */
 .picker-container {
   width: 100%;
-  max-width: 300px;
-  /* Adjust based on your design */
+  max-width: 300px; /* Adjust based on your design */
 }
 
 .picker-wrapper {
@@ -500,35 +409,28 @@ input {
 }
 
 .picker-item {
-  flex: 1 0 33.33%;
-  /* Each item takes up one-third of the container */
+  flex: 1 0 33.33%; /* Each item takes up one-third of the container */
   text-align: center;
   padding: 10px;
   cursor: pointer;
 }
 
 .nav-bg {
-  background: linear-gradient(90deg, #f96160 0%, #fb746f 50%, #fe9187 100%);
-  /* background-color: linear-gradient(90deg, #3BAF4C 0%, #00D08A 100%); */
+  background-color: var(--white);
+  /* background-color: linear-gradient(90deg, #26aee8 0%, #00D08A 100%); */
 }
-
 .bg-color-l {
   background: var(--bg-color-l);
 }
-
 .color-l {
   color: var(--bg-color-l);
-  fill: currentColor;
 }
-
 .bg-color-l2 {
   background-color: var(--bg-color-l);
 }
-
 .blue-color-300 {
-  color: var(--main-color);
+  color: var(--bgblue);
 }
-
 .red-linear {
   background: linear-gradient(
     90deg,
@@ -544,37 +446,30 @@ input {
 .bg-yellow {
   background-color: var(--yellow-200);
 }
-
 .bg-popup {
   background: var(--bg-popup);
 }
-
 .bg-popup-nav {
-  background: var(--whites, var(--bgs-grays));
+  background: var(--bg_color_L3);
 }
-
 .gray-color {
   color: var(--grey-200);
 }
-
 .heading-h2 {
-  font-size: 19.2px;
+  font-size: 19px;
 }
-
 .bg-light {
   background-color: var(--bg-light);
 }
-
 .main-loadar {
-  background: linear-gradient(0deg, #59adff 0%, #f5cc2c 50%, #598fff 100%);
+  background: linear-gradient(0deg, #15131e 0%, #2e3961 50%, #15131e 100%);
 }
-
 .blue-linear {
-  background: #fa6f6b;
+  /* background: linear-gradient(90deg, #21D9CC 0%, #26aee8 100%); */
+  background: linear-gradient(90deg, #21d9cc 0%, #26aee8 100%);
 }
-
 .text-linear {
-  color: linear-gradient(90deg, #f95959 0%, #bed921 100%);
+  color: linear-gradient(90deg, #21d9cc 0%, #26aee8 100%);
 }
 
 .gray-linear {
@@ -582,35 +477,27 @@ input {
 }
 
 .blue-linear2 {
-  background: #fc7e77;
+  /* background:  linear-gradient(180deg, #21D9CC 0%, #26aee8 100%); */
+  background: linear-gradient(180deg, #21d9cc 0%, #26aee8 100%);
 }
-
 .text-font {
   /* line-height: .34667rem; */
   font-weight: 400;
   font-size: 12px;
   color: var(--grey-200);
 }
-
 .heading-h3 {
-  font-size: 16px;
-}
-
-.heading-h5 {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.heading-h4 {
   font-size: 15px;
 }
-
+.heading-h5 {
+  font-size: 13px;
+  font-weight: 600;
+}
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
 .swiper {
   width: 100%;
   height: 100%;
@@ -632,7 +519,6 @@ input[type="number"]::-webkit-outer-spin-button {
   height: 12rem;
   /* object-fit: cover; */
 }
-
 .overlay-section {
   width: 100%;
   height: 100vh;
@@ -642,9 +528,8 @@ input[type="number"]::-webkit-outer-spin-button {
   left: 0;
   bottom: 0;
   right: 0;
-  z-index: 50;
+  z-index: 11;
 }
-
 .overlay-section2 {
   width: 100%;
   height: 100%;
@@ -675,7 +560,6 @@ input[type="number"]::-webkit-outer-spin-button {
   );
   border-radius: 0.26667rem;
 }
-
 .info-dialog-header.left-arrow {
   background: -webkit-linear-gradient(
     left,
@@ -691,7 +575,6 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-transform: matrix(-1, 0, 0, 1, 0, 0);
   transform: scaleX(-1);
 }
-
 .copy-popup {
   background-color: rgba(0, 0, 0, 0.7);
   position: fixed;
@@ -717,21 +600,19 @@ input[type="number"]::-webkit-outer-spin-button {
   visibility: hidden;
   z-index: 20;
 }
-
 .copy-popup.active {
   visibility: visible;
   opacity: 1;
   transition: all 0.5s linear;
 }
-
 .copy-popup svg {
   font-size: 26px;
   margin-bottom: 10px;
 }
 
-/* svg {
-  color: var(--bgdark);
-} */
+.darkgreen {
+  color: var(--green);
+}
 .place-bet-popup {
   background-color: rgba(0, 0, 0, 0.7);
   position: fixed;
@@ -748,7 +629,6 @@ input[type="number"]::-webkit-outer-spin-button {
   opacity: 0;
   transition: all 0.5s linear;
 }
-
 .place-bet-popup.active {
   opacity: 1;
   transition: all 0.5s linear;
@@ -763,23 +643,18 @@ input[type="number"]::-webkit-outer-spin-button {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
 .withdrawitem::after {
   content: " ";
   position: absolute;
   left: 0;
   bottom: 370px;
   right: 0;
-  height: 0.05rem;
-  /* Increase height */
-  border-bottom: 0.05rem solid var(--Dividing-line_color);
-  /* Increase thickness */
+  height: 0.05rem; /* Increase height */
+  border-bottom: 0.05rem solid var(--Dividing-line_color); /* Increase thickness */
   color: #e6e8e8;
   transform-origin: 0 100%;
-  transform: scaleY(1);
-  /* Remove or adjust scaling */
+  transform: scaleY(1); /* Remove or adjust scaling */
 }
-
 .tabbar__container-item svg[data-v-fb80cf49] {
   display: block;
   width: 0.53333rem;
@@ -798,12 +673,10 @@ input[type="number"]::-webkit-outer-spin-button {
   background: linear-gradient(90deg, #ff9000, #ffd000);
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
 }
-
 .car-green {
   background: linear-gradient(90deg, #00be50, #9bdf00);
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);
 }
-
 .car-red {
   background: linear-gradient(90deg, #fd0261, #ff8a96);
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.15);

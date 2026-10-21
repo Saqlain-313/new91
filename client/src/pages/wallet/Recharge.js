@@ -1,15 +1,13 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { FaSquare } from "react-icons/fa";
 import { GiSwipeCard, GiWhiteBook } from "react-icons/gi";
 import { IoMdWallet } from "react-icons/io";
-import { useLocation, useNavigate } from "react-router-dom";
-import Wallet from "../../assets/balance.png";
+import { useNavigate } from "react-router-dom";
 import bonus from "../../assets/gift.png";
 import UpiIcon from "../../assets/mp1.png";
 import PaytmIcon from "../../assets/qr2.png";
 import RefereshImg from "../../assets/refresh.png";
 import EWalletIcon from "../../assets/upi1.png";
-import UPIQR from "../../assets/UpiQr.png";
 import UsdtIcon from "../../assets/usdt.png";
 import USDt1Img from "../../assets/usdt1.png";
 import CopyCopmponent from "../../components/CopyCopmponent";
@@ -17,70 +15,51 @@ import { userDetail } from "../../store/reducer/authReducer";
 import {
   bannerGet,
   recharge,
-  recharge3,
-  TrexoPayment,
   zilpayRecharge,
 } from "../../store/reducer/userReducer";
 
-import Marquee from "react-fast-marquee";
 import { useDispatch, useSelector } from "react-redux";
 import AlertCopmponent from "../../components/AlertComponent";
 import CustomeNavbar from "../../components/CustomeNavbar";
+import DepositHistoryLite from "./DepositHistoryLite";
 
 const AR = "https://i.ibb.co/DPSRWVbF/pay-Name-Icon.png";
-
 export default function Recharge() {
   const { bannergetData } = useSelector((state) => state.user);
   const { userInfo, loader } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [amount, setAmount] = useState();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("UPI-QR"); // Default UPI-QR
-  const [activeTab2, setActiveTab2] = useState("UPI-QR"); // Changed from "TY-QRpay" to "UPI-QR"
+  const [activeTab, setActiveTab] = useState("Online Pay");
+  const [activeTab2, setActiveTab2] = useState("LuckyPay-APP");
   const [activeIndex, setActiveIndex] = useState(0);
   const [copyPopup, setCopyPopup] = useState(false);
   const [alerts, setAlerts] = useState(false);
   const [alertsuccess, setAlertsuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const hasAutoSubmitted = useRef(false);
-
   const tabs = [
-    { label: "UPI-QR", Icons: UPIQR, g: false },
-    { label: "UPI-QRpay", Icons: EWalletIcon, g: false },
-    { label: "Wake UP-APP", Icons: PaytmIcon, g: false },
-    { label: "UPI-PayTM", Icons: UpiIcon, g: false },
+    { label: "Online Pay", Icons: EWalletIcon, g: false },
+    { label: "NOW UPI", Icons: PaytmIcon, g: false },
+    { label: "QR Pay", Icons: UpiIcon, g: false },
     { label: "USDT", Icons: UsdtIcon, g: true },
     { label: "ARPay", Icons: AR, g: false },
   ];
-
-  // ✅ FIX: Sync activeIndex with activeTab2
-  useEffect(() => {
-    const currentChannel = channels.find(
-      (channel) => channel.label === activeTab,
-    );
-    if (currentChannel) {
-      const index = currentChannel.channelItem.findIndex(
-        (item) => item.label === activeTab2,
-      );
-      if (index !== -1 && index !== activeIndex) {
-        setActiveIndex(index);
-      }
-    }
-  }, [activeTab, activeTab2]);
 
   const handleSubmit = async () => {
     const type = activeTab2;
     const formData = new FormData();
     formData.append("amount", amount);
-    formData.append("type", type);
+    formData.append("type", activeTab2);
+    formData.append("detail", type);
 
-    if (activeTab2 === "7Day-QRpay" || activeTab2 === "UPI-QR") {
-      if (bannergetData?.chennal?.status1 == 1) {
-        dispatch(TrexoPayment({ amount, type })).then((res) => {
+    if (activeTab === "Online Pay") {
+      if (bannergetData.chennal.status1 == 1) {
+        dispatch(zilpayRecharge({ amount, type })).then((res) => {
           setSuccessMessage(res.payload.message);
           if (res.payload.status) {
             setAlertsuccess(true);
-            window.location.href = res.payload.data.payment_url;
+            // Redirect to the URL provided in the response
+            window.location.href = res.payload.data.url;
           } else {
             setAlerts(true);
           }
@@ -89,11 +68,11 @@ export default function Recharge() {
           }, 3000);
         });
       } else {
-        dispatch(zilpayRecharge({ amount, type })).then((res) => {
+        dispatch(recharge(formData)).then((res) => {
           setSuccessMessage(res.payload.message);
           if (res.payload.status) {
             setAlertsuccess(true);
-            window.location.href = res.payload.data.url;
+            navigate("/wallet/Recharge/pay3");
           } else {
             setAlerts(true);
           }
@@ -102,25 +81,13 @@ export default function Recharge() {
           }, 3000);
         });
       }
-    } else if (activeTab2 === "TY-QRpay") {
-      if (bannergetData?.chennal?.status2 == 1) {
-        dispatch(recharge3({ amount, type })).then((res) => {
-          setSuccessMessage(res?.payload?.message);
-
-          if (res?.payload?.status) {
-            setAlertsuccess(true);
-            window.open(res?.payload?.data?.payData, "_blank");
-          } else {
-            setAlerts(true);
-          }
-
-          setTimeout(() => setSuccessMessage(""), 2000);
-        });
-      } else {
+    } else if (activeTab === "NOW UPI") {
+      if (bannergetData.chennal.status2 == 1) {
         dispatch(zilpayRecharge({ amount, type })).then((res) => {
           setSuccessMessage(res.payload.message);
           if (res.payload.status) {
             setAlertsuccess(true);
+            // Redirect to the URL provided in the response
             window.location.href = res.payload.data.url;
           } else {
             setAlerts(true);
@@ -129,27 +96,12 @@ export default function Recharge() {
             setSuccessMessage("");
           }, 3000);
         });
-      }
-    } else if (activeTab2 === "7Day-UPI" || activeTab2 === "51-APPpay") {
-      if (bannergetData?.chennal?.status3 == 1) {
-        dispatch(TrexoPayment({ amount, type })).then((res) => {
-          setSuccessMessage(res.payload.message);
-          if (res.payload.status) {
-            setAlertsuccess(true);
-            window.location.href = res.payload.data.payment_url;
-          } else {
-            setAlerts(true);
-          }
-          setTimeout(() => {
-            setSuccessMessage("");
-          }, 3000);
-        });
       } else {
-        dispatch(zilpayRecharge({ amount, type })).then((res) => {
+        dispatch(recharge(formData)).then((res) => {
           setSuccessMessage(res.payload.message);
           if (res.payload.status) {
             setAlertsuccess(true);
-            window.location.href = res.payload.data.url;
+            navigate("/wallet/Recharge/pay3");
           } else {
             setAlerts(true);
           }
@@ -159,76 +111,47 @@ export default function Recharge() {
         });
       }
     } else {
-      dispatch(zilpayRecharge({ amount, type })).then((res) => {
-        setSuccessMessage(res.payload.message);
-        if (res.payload.status) {
-          setAlertsuccess(true);
-          window.location.href = res.payload.data.url;
-        } else {
-          setAlerts(true);
-        }
-        setTimeout(() => {
-          setSuccessMessage("");
-        }, 3000);
-      });
+      if (bannergetData.chennal.status3 == 1) {
+        dispatch(zilpayRecharge({ amount, type })).then((res) => {
+          setSuccessMessage(res.payload.message);
+          if (res.payload.status) {
+            setAlertsuccess(true);
+            // Redirect to the URL provided in the response
+            window.location.href = res.payload.data.url;
+          } else {
+            setAlerts(true);
+          }
+          setTimeout(() => {
+            setSuccessMessage("");
+          }, 3000);
+        });
+      } else {
+        dispatch(recharge(formData)).then((res) => {
+          setSuccessMessage(res.payload.message);
+          if (res.payload.status) {
+            setAlertsuccess(true);
+            navigate("/wallet/Recharge/pay3");
+          } else {
+            setAlerts(true);
+          }
+          setTimeout(() => {
+            setSuccessMessage("");
+          }, 3000);
+        });
+      }
     }
   };
-
-  // const handleSubmit = async () => {
-  //   const type = activeTab2;
-
-  //   if (bannergetData?.chennal?.status1 == 1) {
-  //     dispatch(TrexoPayment({ amount, type })).then((res) => {
-  //       console.log("res", res.payload);
-
-  //       setSuccessMessage(res?.payload?.message);
-
-  //       if (res?.payload?.status) {
-  //         setAlertsuccess(true);
-  //         window.location.href = res?.payload?.data?.payment_url;
-  //       } else {
-  //         setAlerts(true);
-  //       }
-
-  //       setTimeout(() => {
-  //         setSuccessMessage("");
-  //       }, 3000);
-  //     });
-  //   } else {
-  //     dispatch(zilpayRecharge({ amount, type })).then((res) => {
-  //       console.log("res", res.payload);
-
-  //       setSuccessMessage(res?.payload?.message);
-
-  //       if (res?.payload?.status) {
-  //         setAlertsuccess(true);
-  //         window.location.href = res?.payload?.data?.url;
-  //       } else {
-  //         setAlerts(true);
-  //       }
-
-  //       setTimeout(() => {
-  //         setSuccessMessage("");
-  //       }, 3000);
-  //     });
-  //   }
-  // };
 
   const handleSubmitUSDT = async () => {
     const type = "USDT";
     const formData = new FormData();
     formData.append("amount", amount * 93);
     formData.append("type", type);
-
     dispatch(recharge(formData)).then((res) => {
       setSuccessMessage(res.payload.message);
       if (res.payload.status) {
         setAlertsuccess(true);
-        if (activeTab2 === "Upay-USDT") {
-          navigate("/wallet/Recharge/usdt");
-        } else {
-          navigate("/wallet/Recharge/usdt2");
-        }
+        navigate("/wallet/Recharge/usdt");
       } else {
         setAlerts(true);
       }
@@ -245,7 +168,6 @@ export default function Recharge() {
       setCopyPopup(false);
     }, 1500);
   };
-
   useEffect(() => {
     dispatch(userDetail());
     dispatch(bannerGet());
@@ -256,58 +178,13 @@ export default function Recharge() {
     window.scrollTo(0, 0);
   }, [dispatch, userInfo?.length, successMessage, alerts, alertsuccess]);
 
-  const location = useLocation();
-
-  // Set initial state from location
-  useEffect(() => {
-    if (location.state?.autoPay) {
-      setAmount(location.state.amount);
-      setActiveTab2(location.state.type);
-      // Also set activeTab to match the type if needed
-      const parentTab = tabs.find((tab) =>
-        channels
-          .find((channel) => channel.label === tab.label)
-          ?.channelItem.some((item) => item.label === location.state.type),
-      );
-      if (parentTab) {
-        setActiveTab(parentTab.label);
-      }
-    }
-  }, []);
-
-  // FIXED: Auto-submit only once, not on back navigation
-  useEffect(() => {
-    if (
-      location.state?.autoPay &&
-      amount &&
-      activeTab2 &&
-      !hasAutoSubmitted.current
-    ) {
-      hasAutoSubmitted.current = true;
-      handleSubmit();
-
-      // Clear the state to prevent re-triggering on back button
-      navigate(location.pathname, {
-        replace: true,
-        state: {},
-      });
-    }
-  }, [amount, activeTab2]);
-
-  // Reset autoSubmit ref when user manually changes tab or amount
-  useEffect(() => {
-    // Reset the flag when user manually interacts
-    if (!location.state?.autoPay) {
-      hasAutoSubmitted.current = false;
-    }
-  }, [activeTab, activeTab2, amount]);
-
   // Inside your Recharge component, before the return statement:
-  const selectedchennalGroup = channels.find(
+
+  const selectedchennalGroup = chennals.find(
     (chennal) => chennal.label === activeTab,
   );
 
-  const selectedchennalItem = selectedchennalGroup?.channelItem.find(
+  const selectedchennalItem = selectedchennalGroup?.chennalItem.find(
     (item) => item.label === activeTab2,
   );
 
@@ -319,11 +196,11 @@ export default function Recharge() {
         link="/wallet/RechargeHistory"
       />
 
-      <div className="container-section mt-1 color-orange ">
-        <div className="total-img p-4">
+      <div className="container-section mt-5  text-white ">
+        <div className="total-img rounded p-4">
           <div className="flex items-center">
-            <img src={Wallet} alt="" className="w-4 mr-2 mb-[2px]" />
-            <p className="fs-sm">Balance</p>
+            {/* <img src="https://i.ibb.co/tMyLSYzh/background1.png" alt="" className="w-4 mr-2 mb-[2px]" /> */}
+            <p className="fs-sm text-white ml-7 mt-2 ">Balance</p>
           </div>
           <div className="flex items-center ms-2 mt-2">
             <h3 className="heaing-h3 text-xl font-bold">
@@ -344,34 +221,31 @@ export default function Recharge() {
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-2">
+        <div className="grid grid-cols-12 gap-2 mt-2">
           {tabs.map((tab) => (
             <button
               key={tab.label}
-              className={`col-span-3 py-3 relative text-sm flex justify-center flex-col items-center rounded ${
+              className={`col-span-3 py-5 nav-bg gray-text relative text-sm flex justify-center flex-col items-center rounded ${
                 activeTab === tab.label
-                  ? "bg-[#FA6F6B] text-white"
-                  : "bg-light gray-100"
+                  ? "blue-linear text-black"
+                  : "nav-bg gray-text"
               }`}
               onClick={() => {
-                setActiveTab(tab.label);
-                setActiveIndex(0);
-
-                const firstChannel = channels.find(
-                  (channel) => channel.label === tab.label,
-                );
-
-                if (firstChannel && firstChannel.channelItem.length > 0) {
-                  setActiveTab2(firstChannel.channelItem[0].label);
+                setActiveTab(tab.label); // Update the active tab
+                setActiveIndex(0); // Reset index to 0
+                const firstchennal = chennals.find(
+                  (chennal) => chennal.label === tab.label,
+                ); // Find the matching chennal
+                if (firstchennal && firstchennal.chennalItem.length > 0) {
+                  setActiveTab2(firstchennal.chennalItem[0].label); // Update setActiveTab2 to the first item's label
                 }
               }}
             >
               <img src={tab.Icons} alt="" className="w-10" />
-              <span>{tab.label}</span>
-
+              <span> {tab.label}</span>
               {tab.g && (
                 <span
-                  className="absolute top-0 w-[37px] h-[35px] right-0 bg-cover bg-center text-white text-[11px] pt-[10px]"
+                  className="absolute top-0 w-[37px] h-[35px]  right-0 bg-cover bg-center text-white text-[11px] pt-[10px]  "
                   style={{ backgroundImage: `url(${bonus})` }}
                 >
                   2%
@@ -382,37 +256,53 @@ export default function Recharge() {
         </div>
         <div className="mt-4">
           <>
+            {/* {activeTab === "ARPay" && (<Marquee className="text-white">Comming soon <Marquee className="text-red-400">Comming soon</Marquee></Marquee>)} */}
             {activeTab === "ARPay" && (
-              <Marquee className="text-black">
-                Comming soon{" "}
-                <Marquee className="text-red-400">Comming soon</Marquee>
-              </Marquee>
+              <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 ">
+                <div className=" text-center p-6 blue-linear rounded-xl shadow-xl w-[90%] max-w-sm ">
+                  <h2 className="text-2xl font-bold text-blue-900 mb-2">
+                    🚧 Coming Soon!
+                  </h2>
+                  <p className="text-gray-700">
+                    This feature is under development. Stay tuned!
+                  </p>
+                  <button
+                    onClick={() => setActiveTab("")} // This is the key to closing it
+                    className="mt-4 px-4 py-2 bg-[#171B34] text-white rounded-full hover:bg-blue-900"
+                  >
+                    Go Back
+                  </button>
+                </div>
+              </div>
             )}
-            <div className="bg-light  p-2 py-3 pb-5 rounded-lg">
+
+            <div className="nav-bg  p-2 py-3 pb-5 rounded-lg">
               <h2 className="text-lg mb-2 flex items-center text-whites">
-                <GiSwipeCard className="text-blue border-b border-[#e9be89] mr-2" />{" "}
-                Select channel
+                <GiSwipeCard className="color-blue border-b border-[#21D9CC] mr-2" />{" "}
+                Select chennal
               </h2>
               <div className="grid grid-cols-2 gap-2">
-                {channels.map(
-                  (channel, i) =>
-                    activeTab === channel.label && (
+                {chennals.map(
+                  (chennal, i) =>
+                    activeTab === chennal.label && (
                       <Fragment key={i}>
-                        {channel.channelItem.map((item, index) => (
+                        {chennal.chennalItem.map((item, index) => (
                           <div
                             key={index}
-                            className={`p-2 rounded-md cursor-pointer ${
+                            className={` p-2 rounded-md cursor-pointer ${
                               index === activeIndex
-                                ? "bg-[#FA6F6B] text-white"
-                                : "bg-blues gray-100"
-                            }`}
+                                ? "blue-linear whites"
+                                : "bg-popup-nav gray-text"
+                            } `}
                             onClick={() => {
                               setActiveTab2(item.label);
                               setActiveIndex(index);
                             }}
                           >
-                            <p className="text-base">{item.label}</p>
-                            <p className="text-base">Balance: {item.balance}</p>
+                            <p className={` text-base  `}>{item.label}</p>
+                            <p className={`text-base  `}>
+                              Balance: {item.balance}
+                            </p>
                           </div>
                         ))}
                       </Fragment>
@@ -422,15 +312,15 @@ export default function Recharge() {
             </div>
 
             {activeTab === "USDT" ? (
-              <div className="bg-light p-2 py-3 pb-5 mt-4 rounded-lg">
-                <h2 className="text-lg mb-2 flex items-center gray-100">
-                  <IoMdWallet className="text-blue text-lg mr-2" /> Select
+              <div className="nav-bg p-2 py-3 pb-5 mt-4 rounded-lg">
+                <h2 className="text-lg mb-2 flex items-center gray-50">
+                  <IoMdWallet className="color-blue text-lg mr-2" /> Select
                   amount of USDT
                 </h2>
                 <div className="grid grid-cols-12 gap-2">
-                  {channels.map((channel, i) => (
+                  {chennals.map((chennal, i) => (
                     <Fragment key={i}>
-                      {channel.channelItem.map(
+                      {chennal.chennalItem.map(
                         (item, index) =>
                           activeTab2 === item.label && (
                             <Fragment key={index}>
@@ -439,8 +329,8 @@ export default function Recharge() {
                                   key={index2}
                                   className={`flex items-center justify-center col-span-4 p-1 rounded font-semibold  ${
                                     amount == data.am
-                                      ? "blue-linear text-white"
-                                      : "border text-blue sky-border"
+                                      ? "blue-linear color-orange"
+                                      : "border color-blue sky-border"
                                   }`}
                                   onClick={() => setAmount(data.am)}
                                 >
@@ -466,17 +356,17 @@ export default function Recharge() {
 
                   <input
                     type="number"
-                    className="w-full  bgs-body  p-2  ps-6 flex items-center  focus:outline-none text-blue placeholder:text-sm placeholder:text-gray-text"
+                    className="w-full  bgs-body  p-2  ps-6 flex items-center  focus:outline-none color-blue placeholder:text-sm placeholder:text-gray-text"
                     placeholder="Please enter deposit amount"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                   />
                 </div>
                 <div className="bgs-body flex items-center px-5 py-1 rounded-lg mt-3">
-                  <span className="text-blue text-lg font-bold">₹</span>
+                  <span className="color-blue text-lg font-bold">₹</span>
                   <input
                     type="number"
-                    className="w-full  bgs-body  p-2  ps-6 flex items-center  focus:outline-none text-blue placeholder:text-sm placeholder:text-gray-text"
+                    className="w-full  bgs-body  p-2  ps-6 flex items-center  focus:outline-none color-blue placeholder:text-sm placeholder:text-gray-text"
                     placeholder="Please enter USDT amount"
                     value={Number(Number(amount) * 93).toFixed(2)}
                     onChange={(e) => setAmount(e.target)}
@@ -486,8 +376,8 @@ export default function Recharge() {
                 <button
                   className={`  w-full rounded-full p-2 mt-4  ${
                     amount > 9
-                      ? "blue-linear text-white"
-                      : "bg-[#FA6F6B] text-whites"
+                      ? "blue-linear color-orange"
+                      : "bg-gray-400 gray-50"
                   }`}
                   disabled={loader ? true : false}
                   onClick={handleSubmitUSDT}
@@ -497,15 +387,15 @@ export default function Recharge() {
               </div>
             ) : (
               activeTab !== "ARPay" && (
-                <div className="bg-light p-2 py-3 pb-5 mt-4 rounded-lg">
+                <div className="nav-bg p-2 py-3 pb-5 mt-4 rounded-lg">
                   <h2 className="text-lg mb-2 flex items-center text-whites">
-                    <IoMdWallet className="text-[#FB5959] size-6 text-lg mr-2" />{" "}
-                    Deposit amount
+                    <IoMdWallet className="color-blue text-lg mr-2" /> Deposit
+                    amount
                   </h2>
                   <div className="grid grid-cols-12 gap-2">
-                    {channels.map((channel, i) => (
+                    {chennals.map((chennal, i) => (
                       <Fragment key={i}>
-                        {channel.channelItem.map(
+                        {chennal.chennalItem.map(
                           (item, index) =>
                             activeTab2 === item.label && (
                               <Fragment key={index}>
@@ -514,14 +404,16 @@ export default function Recharge() {
                                     key={index2}
                                     className={` col-span-4 p-1 rounded font-semibold  ${
                                       amount == data.am
-                                        ? "blue-linear text-white"
-                                        : "border text-blue sky-border"
+                                        ? "blue-linear color-orange"
+                                        : "border color-blue sky-border"
                                     }`}
                                     onClick={() => setAmount(data.am)}
                                   >
                                     <span
                                       className={` mx-2 ${
-                                        amount == data.am ? "text-white" : ""
+                                        amount == data.am
+                                          ? "text-white"
+                                          : "gray-text"
                                       } `}
                                     >
                                       ₹
@@ -539,72 +431,60 @@ export default function Recharge() {
                   </div>
 
                   <div className="bgs-body flex items-center mt-4 px-5 py-1 rounded-full">
-                    <span className="text-blue text-lg font-bold ">₹</span>{" "}
+                    <span className="color-blue text-lg font-bold ">₹</span>{" "}
                     <span className="border-r border-[#bdbdbd] ml-2 w-2 h-4"></span>
                     <input
                       type="number"
                       className="w-full  bgs-body p-2  ps-6 flex items-center  focus:outline-none placeholder:text-sm placeholder:text-[var(--text_color_L3)]"
-                      placeholder="Please enter the amount"
+                      placeholder="Enter amount"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                     />
                   </div>
-
-                  <button
-                    className={`  w-full rounded-full p-2 mt-4  ${
-                      amount > 99
-                        ? "blue-linear text-white"
-                        : "bg-[#FB5959] color-orange"
-                    }`}
-                    disabled={loader ? true : false}
-                    onClick={handleSubmit}
-                  >
-                    Deposit
-                  </button>
                 </div>
               )
             )}
           </>
         </div>
 
-        <div className="bg-light mt-5 p-2 py-3">
+        <div className="nav-bg mt-5 p-2 py-3">
           <h3 className="headinng-h3 flex text-whites text-lg mb-2">
-            <GiWhiteBook className="text-blue mt-[2px] mr-1 text-lg" />
+            <GiWhiteBook className="color-blue mt-[2px] mr-1 text-lg" />
             Recharge instructions
           </h3>
-          <ul className="border border-[#E1E1E1] p-3 rounded-lg">
+          <ul className="border border-[#525167] p-3 rounded-lg">
             <li className=" flex mt-2">
               <span>
-                <FaSquare className="rotate-45 text-[7px] text-blue mr-2 mt-[2px]" />
+                <FaSquare className="rotate-45 text-[7px] color-blue mr-2 mt-[2px]" />
               </span>
-              <p className="text-sm gray-100 leading-[18px] ">
+              <p className="text-sm gray-text leading-[18px] ">
                 If the transfer time is up, please fill out the deposit from
                 again.
               </p>
             </li>
             <li className=" flex mt-2">
               <span>
-                <FaSquare className="rotate-45 text-[7px] text-blue mr-2 mt-[2px]" />
+                <FaSquare className="rotate-45 text-[7px] color-blue mr-2 mt-[2px]" />
               </span>
-              <p className="text-sm gray-100 leading-[18px] ">
+              <p className="text-sm gray-text leading-[18px] ">
                 The transfer amount must match the order you created, otherwise
                 the money cannot be credited successfully.
               </p>
             </li>
             <li className=" flex mt-2">
               <span>
-                <FaSquare className="rotate-45 text-[7px] text-blue mr-2 mt-[2px]" />
+                <FaSquare className="rotate-45 text-[7px] color-blue mr-2 mt-[2px]" />
               </span>
-              <p className="text-sm gray-100 leading-[18px] ">
+              <p className="text-sm gray-text leading-[18px] ">
                 If you transfer the wrong amount, our company will not be
                 responsible for the lost amount!
               </p>
             </li>
             <li className=" flex mt-2">
               <span>
-                <FaSquare className="rotate-45 text-[7px] text-blue mr-2 mt-[2px]" />
+                <FaSquare className="rotate-45 text-[7px] color-blue mr-2 mt-[2px]" />
               </span>
-              <p className="text-sm gray-100 leading-[18px] ">
+              <p className="text-sm gray-text leading-[18px] ">
                 Note: do not cancel the depsot order after the money has bess
                 transferred.
               </p>
@@ -613,35 +493,35 @@ export default function Recharge() {
         </div>
       </div>
 
-      {/* New Deposit Button */}
-      <div className="fixed bottom-0  bg-body left-0 right-0 m-auto filter-section w-[25rem]  items-center justify-center shadow-lg border-t border-gray-300 z-50 p-4">
+      <div className="fixed bottom-0  bg-[#1E2530] left-0 right-0 m-auto w-[24.7rem] items-center justify-center shadow-lg border-t border-gray-700 z-50 p-4">
         <div className="flex justify-between items-center max-w-md mx-auto">
           <div className="flex-1">
-            <p className="text-xs text-gray-600">Recharge Method:</p>
-            <h2 className="text-lg font-semibold text-black">
+            <p className="text-xs text-gray-400">Recharge Method:</p>
+            <h2 className="text-lg font-semibold text-white">
               {selectedchennalItem?.label || "Select Method"}
             </h2>
           </div>
           <button
             className={`font-bold py-3 px-6 rounded shadow-md hover:opacity-90 transition-opacity p-2 ${
-              (activeTab === "USDT" && amount > 9) ||
-              (activeTab !== "USDT" && amount > 99)
-                ? "blue-linear text-white"
-                : "bg-[#d1d5dd] gray-100"
+              (activeTab === "USDT" ? amount > 9 : amount > 299)
+                ? "blue-linear text-black"
+                : "bg-gray-500 text-black"
             }`}
-            disabled={activeTab === "USDT" ? amount < 10 : amount < 100}
+            disabled={activeTab === "USDT" ? amount < 10 : amount < 300}
             onClick={activeTab === "USDT" ? handleSubmitUSDT : handleSubmit}
           >
             Deposit ₹
             {activeTab === "USDT"
-              ? amount
-                ? Number(amount * 93).toFixed(2)
-                : "" // amount na ho to blank
+              ? Number(amount * 93).toFixed(2)
               : amount >= 1000
                 ? `${amount / 1000}k`
                 : amount || ""}
           </button>
         </div>
+      </div>
+
+      <div>
+        <DepositHistoryLite />
       </div>
 
       <CopyCopmponent copyPopup={copyPopup} message="Refesh successfully" />
@@ -655,20 +535,14 @@ export default function Recharge() {
   );
 }
 
-const channels = [
+const chennals = [
   {
-    label: "UPI-QR",
-    channelItem: [
+    label: "Online Pay",
+    chennalItem: [
       {
-        label: "UPI-QR",
-        balance: "100 - 50K",
+        label: "LuckyPay-APP",
+        balance: "300 - 50K",
         depositAmount: [
-          {
-            am: 100,
-          },
-          {
-            am: 200,
-          },
           {
             am: 300,
           },
@@ -677,521 +551,6 @@ const channels = [
           },
           {
             am: 500,
-          },
-          {
-            am: 600,
-          },
-          {
-            am: 1000,
-          },
-          {
-            am: 2000,
-          },
-          {
-            am: 5000,
-          },
-        ],
-      },
-      {
-        label: "TY-QRpay",
-        balance: "100 - 10K",
-        depositAmount: [
-          {
-            am: 200,
-          },
-          {
-            am: 500,
-          },
-          {
-            am: 1000,
-          },
-          {
-            am: 3000,
-          },
-          {
-            am: 5000,
-          },
-          {
-            am: 10000,
-          },
-        ],
-      },
-      {
-        label: "7Day-QRpay",
-        balance: "500 - 50K",
-        depositAmount: [
-          // {
-          //   am: 500,
-          // },
-          // {
-          //   am: 1000,
-          // },
-          // {
-          //   am: 10000,
-          // },
-          // {
-          //   am: 50000,
-          // },
-        ],
-      },
-      {
-        label: "Easy-QRpay",
-        balance: "200 - 50K",
-        depositAmount: [
-          // {
-          //   am: 200,
-          // },
-          // {
-          //   am: 300,
-          // },
-          // {
-          //   am: 500,
-          // },
-          // {
-          //   am: 1000,
-          // },
-          // {
-          //   am: 10000,
-          // },
-          // {
-          //   am: 50000,
-          // },
-        ],
-      },
-    ],
-  },
-  {
-    label: "UPI-QRpay",
-    channelItem: [
-      {
-        label: "FlyPay-QRpay",
-        balance: "100 - 50K",
-        depositAmount: [
-          {
-            am: 100,
-          },
-          {
-            am: 500,
-          },
-          {
-            am: 1000,
-          },
-          {
-            am: 3000,
-          },
-          {
-            am: 5000,
-          },
-          {
-            am: 10000,
-          },
-        ],
-      },
-      // {
-      //   label: "TY-QRpay",
-      //   balance: "100 - 10K",
-      //   depositAmount: [
-      //     {
-      //       am: 100,
-      //     },
-      //     {
-      //       am: 500,
-      //     },
-      //     {
-      //       am: 1000,
-      //     },
-      //     {
-      //       am: 3000,
-      //     },
-      //     {
-      //       am: 5000,
-      //     },
-      //     {
-      //       am: 10000,
-      //     },
-      //   ],
-      // },
-      {
-        label: "7Day-QRpay",
-        balance: "500 - 50K",
-        depositAmount: [
-          {
-            am: 500,
-          },
-          {
-            am: 1000,
-          },
-          {
-            am: 10000,
-          },
-          {
-            am: 50000,
-          },
-        ],
-      },
-      {
-        label: "Easy-QRpay",
-        balance: "200 - 50K",
-        depositAmount: [
-          {
-            am: 200,
-          },
-          {
-            am: 300,
-          },
-          {
-            am: 500,
-          },
-          {
-            am: 1000,
-          },
-          {
-            am: 10000,
-          },
-          {
-            am: 50000,
-          },
-        ],
-      },
-      // {
-      //   label: "Magic-QRpay",
-      //   balance: "200 - 50K",
-      //   depositAmount: [
-      //     {
-      //       am: 200,
-      //     },
-      //     {
-      //       am: 300,
-      //     },
-      //     {
-      //       am: 500,
-      //     },
-      //     {
-      //       am: 1000,
-      //     },
-      //     {
-      //       am: 10000,
-      //     },
-      //     {
-      //       am: 50000,
-      //     },
-      //   ],
-      // },
-      // {
-      //   label: "UM-QRpay",
-      //   balance: "200 - 50K",
-      //   depositAmount: [
-      //     {
-      //       am: 200,
-      //     },
-      //     {
-      //       am: 300,
-      //     },
-      //     {
-      //       am: 500,
-      //     },
-      //     {
-      //       am: 1000,
-      //     },
-      //     {
-      //       am: 10000,
-      //     },
-      //     {
-      //       am: 50000,
-      //     },
-      //   ],
-      // },
-      // {
-      //   label: "51-QRpay",
-      //   balance: "200 - 50K",
-      //   depositAmount: [
-      //     {
-      //       am: 200,
-      //     },
-      //     {
-      //       am: 300,
-      //     },
-      //     {
-      //       am: 500,
-      //     },
-      //     {
-      //       am: 1000,
-      //     },
-      //     {
-      //       am: 10000,
-      //     },
-      //     {
-      //       am: 50000,
-      //     },
-      //   ],
-      // },
-      // {
-      //   label: "YaYa-QRpay",
-      //   balance: "200 - 50K",
-      //   depositAmount: [
-      //     {
-      //       am: 200,
-      //     },
-      //     {
-      //       am: 300,
-      //     },
-      //     {
-      //       am: 500,
-      //     },
-      //     {
-      //       am: 1000,
-      //     },
-      //     {
-      //       am: 10000,
-      //     },
-      //     {
-      //       am: 50000,
-      //     },
-      //   ],
-      // },
-      // {
-      //   label: "CECO-QRpay",
-      //   balance: "200 - 50K",
-      //   depositAmount: [
-      //     {
-      //       am: 200,
-      //     },
-      //     {
-      //       am: 300,
-      //     },
-      //     {
-      //       am: 500,
-      //     },
-      //     {
-      //       am: 1000,
-      //     },
-      //     {
-      //       am: 10000,
-      //     },
-      //     {
-      //       am: 50000,
-      //     },
-      //   ],
-      // },
-      // {
-      //   label: "FAST-QRpay",
-      //   balance: "200 - 50K",
-      //   depositAmount: [
-      //     {
-      //       am: 200,
-      //     },
-      //     {
-      //       am: 300,
-      //     },
-      //     {
-      //       am: 500,
-      //     },
-      //     {
-      //       am: 1000,
-      //     },
-      //     {
-      //       am: 10000,
-      //     },
-      //     {
-      //       am: 50000,
-      //     },
-      //   ],
-      // },
-      // {
-      //   label: "AG-QRpay",
-      //   balance: "200 - 50K",
-      //   depositAmount: [
-      //     {
-      //       am: 200,
-      //     },
-      //     {
-      //       am: 300,
-      //     },
-      //     {
-      //       am: 500,
-      //     },
-      //     {
-      //       am: 1000,
-      //     },
-      //     {
-      //       am: 10000,
-      //     },
-      //     {
-      //       am: 50000,
-      //     },
-      //   ],
-      // },
-    ],
-  },
-  {
-    label: "Wake UP-APP",
-    channelItem: [
-      {
-        label: "7Day-UPI",
-        balance: "200 - 50K",
-        depositAmount: [
-          {
-            am: 200,
-          },
-          {
-            am: 300,
-          },
-          {
-            am: 500,
-          },
-          {
-            am: 1000,
-          },
-          {
-            am: 10000,
-          },
-          {
-            am: 50000,
-          },
-        ],
-      },
-      {
-        label: "UPI-APPpay",
-        balance: "200 - 50K",
-        depositAmount: [
-          {
-            am: 200,
-          },
-          {
-            am: 300,
-          },
-          {
-            am: 500,
-          },
-          {
-            am: 1000,
-          },
-          {
-            am: 5000,
-          },
-          {
-            am: 10000,
-          },
-          {
-            am: 50000,
-          },
-        ],
-      },
-      {
-        label: "51-APPpay",
-        balance: "500 - 50K",
-        depositAmount: [
-          {
-            am: 200,
-          },
-          {
-            am: 300,
-          },
-          {
-            am: 500,
-          },
-          {
-            am: 1000,
-          },
-          {
-            am: 10000,
-          },
-          {
-            am: 50000,
-          },
-        ],
-      },
-      {
-        label: "YaYa-APPpay",
-        balance: "300 - 50K",
-        depositAmount: [
-          {
-            am: 300,
-          },
-          {
-            am: 500,
-          },
-          {
-            am: 1000,
-          },
-          {
-            am: 5000,
-          },
-          {
-            am: 10000,
-          },
-          {
-            am: 50000,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    label: "UPI-PayTM",
-    channelItem: [
-      {
-        label: "7Day-PayTM",
-        balance: "200 - 50K",
-        depositAmount: [
-          {
-            am: 200,
-          },
-          {
-            am: 500,
-          },
-          {
-            am: 1000,
-          },
-          {
-            am: 5000,
-          },
-          {
-            am: 10000,
-          },
-          {
-            am: 50000,
-          },
-        ],
-      },
-      {
-        label: "UPI-PayTM",
-        balance: "200 - 50K",
-        depositAmount: [
-          {
-            am: 200,
-          },
-          {
-            am: 500,
-          },
-          {
-            am: 1000,
-          },
-          {
-            am: 5000,
-          },
-          {
-            am: 10000,
-          },
-          {
-            am: 50000,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    label: "USDT",
-    channelItem: [
-      {
-        label: "Upay-USDT",
-        balance: "10 - 100K",
-        depositAmount: [
-          {
-            am: 10,
-          },
-          {
-            am: 50,
           },
           {
             am: 1000,
@@ -1208,7 +567,482 @@ const channels = [
         ],
       },
       {
-        label: "Tron-USDT",
+        label: "RsPayINR",
+        balance: "300 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 400,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+
+          {
+            am: 20000,
+          },
+          {
+            am: 50000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+        ],
+      },
+      {
+        label: "OoPay APP",
+        balance: "300 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 400,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 20000,
+          },
+          {
+            am: 50000,
+          },
+        ],
+      },
+      {
+        label: "TBIndia-INR",
+        balance: "300 - 10K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 2000,
+          },
+          {
+            am: 5000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+        ],
+      },
+      {
+        label: "FunPay - APP",
+        balance: "300 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 400,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+          {
+            am: 100000,
+          },
+        ],
+      },
+      {
+        label: "Super-APPpay",
+        balance: "300 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 400,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 5000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+        ],
+      },
+      {
+        label: "HappyPayINR2app",
+        balance: "300 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 2000,
+          },
+          {
+            am: 5000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+        ],
+      },
+      {
+        label: "HappyPayINR2-app",
+        balance: "300 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 2000,
+          },
+          {
+            am: 5000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+        ],
+      },
+      {
+        label: "7days-APP",
+        balance: "300 - 100K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 400,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+          {
+            am: 100000,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    label: "NOW UPI",
+    chennalItem: [
+      {
+        label: "FunPay-NOW UPI",
+        balance: "300 - 100K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 400,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+          {
+            am: 100000,
+          },
+        ],
+      },
+      {
+        label: "LuckyINR-paytm",
+        balance: "300 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 2000,
+          },
+          {
+            am: 5000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 30000,
+          },
+          {
+            am: 50000,
+          },
+        ],
+      },
+      {
+        label: "Super-NOW UPI",
+        balance: "300 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 400,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 5000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+        ],
+      },
+      {
+        label: "7Days-NOW UPI",
+        balance: "300 - 100K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+          {
+            am: 100000,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    label: "QR Pay",
+    chennalItem: [
+      {
+        label: "OoPay-upi",
+        balance: "500 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 400,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+          {
+            am: 100000,
+          },
+        ],
+      },
+      {
+        label: "OSPayINR-upi",
+        balance: "300 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 400,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+          {
+            am: 100000,
+          },
+        ],
+      },
+      {
+        label: "Funpay-UPI",
+        balance: "300 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 400,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+          {
+            am: 100000,
+          },
+        ],
+      },
+      {
+        label: "HappyPayINR2-upi",
+        balance: "300 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 400,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+          {
+            am: 100000,
+          },
+        ],
+      },
+      {
+        label: "7Days-QR Pay",
+        balance: "300 - 50K",
+        depositAmount: [
+          {
+            am: 300,
+          },
+          {
+            am: 400,
+          },
+          {
+            am: 500,
+          },
+          {
+            am: 1000,
+          },
+          {
+            am: 10000,
+          },
+          {
+            am: 50000,
+          },
+          {
+            am: 100000,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    label: "USDT",
+    chennalItem: [
+      {
+        label: "Upay USDT",
         balance: "10 - 100K",
         depositAmount: [
           {

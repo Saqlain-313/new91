@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 
-function CalendarUpdate({ onDateSelect, selectedDates = [] }) {
+function Calendar({ onDateSelect, selectedDates = [] }) {
   const now = new Date();
+  // Reset time components for consistent comparison
   now.setHours(0, 0, 0, 0);
+
   const [isOpen, setIsOpen] = useState(false);
   const [internalSelectedDates, setInternalSelectedDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(now);
@@ -38,7 +40,7 @@ function CalendarUpdate({ onDateSelect, selectedDates = [] }) {
     if (isOpen && monthRefs.current.length > 0) {
       // Scroll to current month
       const currentMonthIndex = months.findIndex(
-        (m) => m.year === now.getFullYear() && m.month === now.getMonth()
+        (m) => m.year === now.getFullYear() && m.month === now.getMonth(),
       );
       if (currentMonthIndex !== -1) {
         const targetElement = monthRefs.current[currentMonthIndex];
@@ -143,7 +145,7 @@ function CalendarUpdate({ onDateSelect, selectedDates = [] }) {
         </div>
 
         {visibleMonth.year === year && visibleMonth.month === month && (
-          <div className="absolute inset-0 flex items-center justify-center text-9xl text-[#dd9138] opacity-80 pointer-events-none z-50">
+          <div className="absolute inset-0 flex items-center justify-center text-9xl text-white opacity-80 pointer-events-none z-50">
             {month + 1}
           </div>
         )}
@@ -163,7 +165,7 @@ function CalendarUpdate({ onDateSelect, selectedDates = [] }) {
             return (
               <div
                 key={`day-${day}`}
-                className={`h-16 flex flex-col rounded items-center text-black justify-center text-md cursor-pointer
+                className={`h-16 flex flex-col items-center text-white justify-center text-md cursor-pointer
                   ${(() => {
                     if (internalSelectedDates.length === 2) {
                       const [start, end] = internalSelectedDates;
@@ -171,20 +173,20 @@ function CalendarUpdate({ onDateSelect, selectedDates = [] }) {
                         date.getTime() === start.getTime() ||
                         date.getTime() === end.getTime()
                       ) {
-                        return "bg-gray-300 text-black rounded my-0.5 ";
+                        return "blue-linear text-white rounded my-0.5";
                       }
                       if (date > start && date < end) {
-                        return "bg-gray-200 text-black my-0.5";
+                        return "bg-[#393838] text-white my-0.5";
                       }
                     } else if (
                       internalSelectedDates.length === 1 &&
                       date.getTime() === internalSelectedDates[0].getTime()
                     ) {
-                      return "bg-gray-300 text-black my-0.5 ";
+                      return "blue-linear text-white my-0.5";
                     }
                     return "";
                   })()}
-                  ${isDisabled ? "opacity-80 cursor-not-allowed" : ""}
+                  ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
                 `}
                 onClick={() => !isDisabled && handleDateClick(date)}
                 role="gridcell"
@@ -194,12 +196,12 @@ function CalendarUpdate({ onDateSelect, selectedDates = [] }) {
 
                 {internalSelectedDates.length > 0 &&
                   date.getTime() === internalSelectedDates[0].getTime() && (
-                    <span className="text-xs text-black ">Start</span>
+                    <span className="text-xs text-gray-100">Start</span>
                   )}
 
                 {internalSelectedDates.length === 2 &&
                   date.getTime() === internalSelectedDates[1].getTime() && (
-                    <span className="text-xs text-black ">End</span>
+                    <span className="text-xs text-gray-100">End</span>
                   )}
               </div>
             );
@@ -212,43 +214,44 @@ function CalendarUpdate({ onDateSelect, selectedDates = [] }) {
   return (
     <div>
       <div
-        className="bg-light cursor-pointer flex justify-between items-center p-2 rounded-md  "
+        className="nav-bg cursor-pointer flex justify-between items-center p-2 rounded-md  "
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="w-full gray-50 text-left">
+        <span className="w-full text-sm text-left px-1 py-1">
           {internalSelectedDates.length > 0
-            ? `${internalSelectedDates[0].toLocaleDateString()}`
+            ? `${internalSelectedDates[0].toLocaleDateString().replace(/\//g, "-")}`
             : "Select Date"}
           {internalSelectedDates.length === 2 &&
-            ` to ${internalSelectedDates[1].toLocaleDateString()}`}
+            ` / ${internalSelectedDates[1].toLocaleDateString().replace(/\//g, "-")}`}
         </span>
-        <IoIosArrowDown className="text-base gray-100" />
+
+        <IoIosArrowDown className="text-base text-gray" />
       </div>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 bg-black bg-opacity-50 z-40"></div>
-          <div className="fixed inset-x-0 bottom-0 bg-[#f6f6f6] max-w-[25rem] mx-auto z-50 rounded-t-3xl shadow-lg">
+          <div className="fixed inset-x-0 bottom-0 bg-[#131111] max-w-[25rem] mx-auto z-50 rounded-t-3xl shadow-lg">
             <div className="flex flex-col h-[75vh]">
-              <div className="p-4 bg-light shadow-md sticky top-0 z-50 rounded-t-3xl text-black">
+              <div className="p-4 calenderbg sticky top-0 z-50 rounded-t-3xl text-white">
                 <div className="text-lg font-semibold text-center">
                   Calendar
                 </div>
-                <div className="text-sm text-black text-center">
+                <div className="text-sm text-gray-400 text-center">
                   {visibleMonth.year}/{visibleMonth.month + 1}
                 </div>
                 <div className="van-calendar__weekdays grid grid-cols-7 py-2">
                   {weekdays.map((day) => (
                     <span
                       key={day}
-                      className="text-xs text-center text-black"
+                      className="text-xs text-center text-gray-50"
                     >
                       {day}
                     </span>
                   ))}
                 </div>
                 <button
-                  className="absolute top-2 right-2 text-3xl gray-100"
+                  className="absolute top-2 right-2 text-3xl text-white"
                   onClick={() => setIsOpen(false)}
                 >
                   ×
@@ -267,14 +270,21 @@ function CalendarUpdate({ onDateSelect, selectedDates = [] }) {
                 onScroll={handleScroll}
               >
                 {months.map(({ year, month }, index) =>
-                  renderMonth(year, month, index)
+                  renderMonth(year, month, index),
                 )}
               </div>
 
               <div className="p-2 flex gap-2">
                 <button
                   type="button"
-                  className="flex-1 w-full calenderbutton blue-linear color-orange py-2 rounded-full font-medium"
+                  className="flex-1 bg-gray-600 text-white py-2 rounded-full font-medium"
+                  onClick={handleClear}
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  className="flex-1 calenderbutton blue-linear text-white py-2 rounded-full font-medium"
                   onClick={handleConfirm}
                 >
                   Confirm
@@ -288,4 +298,4 @@ function CalendarUpdate({ onDateSelect, selectedDates = [] }) {
   );
 }
 
-export default CalendarUpdate;
+export default Calendar;

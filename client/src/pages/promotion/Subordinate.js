@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { useSelector, useDispatch } from "react-redux";
-import { newSubordinate } from "../../store/reducer/promotionReducer";
+import { useDispatch, useSelector } from "react-redux";
 import CustomeNavbar from "../../components/CustomeNavbar";
-import EmptyData from "../activity/EmptyData";
+import { newSubordinate } from "../../store/reducer/promotionReducer";
 export default function Subordinate() {
   const { newSubordinateData } = useSelector((state) => state.promotion);
 
@@ -16,7 +15,7 @@ export default function Subordinate() {
     const startOfToday = new Date(
       today.getFullYear(),
       today.getMonth(),
-      today.getDate()
+      today.getDate(),
     );
     const startOfYesterday = new Date(startOfToday);
     startOfYesterday.setDate(startOfToday.getDate() - 1);
@@ -89,9 +88,9 @@ export default function Subordinate() {
               <button
                 className={`${
                   activeTabs == "today"
-                    ? "blue-linear text-white"
-                    : "bg-light text-[#80849C]"
-                }  rounded-lg py-3 w-[33%] text-sm p-2 flex items-center justify-center `}
+                    ? "blue-linear font-bold text-black"
+                    : "nav-bg"
+                }  rounded-lg p w-[30%] text-sm gray-text p-2 flex items-center justify-center `}
                 onClick={() => setActiveTabs("today")}
               >
                 Today
@@ -99,9 +98,9 @@ export default function Subordinate() {
               <button
                 className={`${
                   activeTabs == "yesterday"
-                    ? "blue-linear text-white"
-                    : "bg-light text-[#80849C]"
-                }  rounded-lg  py-3 w-[30%] text-sm p-2  flex items-center justify-center`}
+                    ? "blue-linear font-bold text-black"
+                    : "nav-bg "
+                }  rounded-lg  p w-[30%] text-sm gray-text p-2  flex items-center justify-center`}
                 onClick={() => setActiveTabs("yesterday")}
               >
                 Yesterday
@@ -110,9 +109,9 @@ export default function Subordinate() {
               <button
                 className={`${
                   activeTabs == "thismonth"
-                    ? "blue-linear text-white"
-                    : "bg-light text-[#80849C]"
-                }  rounded-lg  py-3 w-[30%] text-sm p-2  flex items-center justify-center`}
+                    ? "blue-linear font-bold text-black"
+                    : "nav-bg "
+                }  rounded-lg  p w-[30%] text-sm gray-text p-2  flex items-center justify-center`}
                 onClick={() => setActiveTabs("thismonth")}
               >
                 This month
@@ -120,14 +119,13 @@ export default function Subordinate() {
             </div>
             {activeTabs === "today" && (
               <div>
-                {filteredData?.length > 0 ? (
-                  Array.isArray(filteredData) &&
+                {Array.isArray(filteredData) &&
                   filteredData?.map((item, i) => (
                     <div
-                      className="bg-light text-[#626678] rounded-md mt-3 pb-7 px-3 pt-1 border-2 border-[#FFF]"
+                      className="nav-bg rounded-md mt-3 pb-7 px-3 pt-1 "
                       key={i}
                     >
-                      <div className="mt-3 flex justify-between items-center text-sm">
+                      <div className="mt-3 flex justify-between items-center gray-text text-sm">
                         <span className="text-sm font-medium">
                           {formatPhoneNumber(item.phone)}
                         </span>
@@ -135,7 +133,7 @@ export default function Subordinate() {
                           UID:{item?.id_user}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center mt-3 text-sm">
+                      <div className="flex justify-between items-center mt-3 gray-text text-sm">
                         <span className="text-sm font-medium">
                           Direct Subordinate
                         </span>
@@ -144,22 +142,18 @@ export default function Subordinate() {
                         </span>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <EmptyData />
-                )}
+                  ))}
               </div>
             )}
             {activeTabs === "yesterday" && (
               <div>
-                {filteredData?.length > 0 ? (
-                  Array.isArray(filteredData) &&
+                {Array.isArray(filteredData) &&
                   filteredData?.map((item, i) => (
                     <div
-                      className="bg-light text-[#626678] rounded-md mt-3 pb-7 px-3 pt-1 border-2 border-[#FFF]"
+                      className="nav-bg rounded-md mt-3 pb-7 px-3 pt-1 "
                       key={i}
                     >
-                      <div className="mt-3 flex justify-between items-center text-sm">
+                      <div className="mt-3 flex justify-between items-center gray-text text-sm">
                         <span className="text-sm font-medium">
                           {formatPhoneNumber(item.phone)}
                         </span>
@@ -167,7 +161,7 @@ export default function Subordinate() {
                           UID:{item?.id_user}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center mt-3 text-sm">
+                      <div className="flex justify-between items-center mt-3 gray-text text-sm">
                         <span className="text-sm font-medium">
                           Direct Subordinate
                         </span>
@@ -176,22 +170,18 @@ export default function Subordinate() {
                         </span>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <EmptyData />
-                )}
+                  ))}
               </div>
             )}
             {activeTabs === "thismonth" && (
               <div>
-                {filteredData?.length > 0 ? (
-                  Array.isArray(filteredData) &&
+                {Array.isArray(filteredData) &&
                   filteredData?.map((item, i) => (
                     <div
-                      className="bg-light text-[#626678] rounded-md mt-3 pb-7 px-3 pt-1 border-2 border-[#FFF]"
+                      className="nav-bg rounded-md mt-3 pb-7 px-3 pt-1 "
                       key={i}
                     >
-                      <div className="mt-3 flex justify-between items-center text-sm">
+                      <div className="mt-3 flex justify-between items-center gray-text text-sm">
                         <span className="text-sm font-medium">
                           {formatPhoneNumber(item.phone)}
                         </span>
@@ -199,7 +189,7 @@ export default function Subordinate() {
                           UID:{item?.id_user}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center mt-3 text-sm">
+                      <div className="flex justify-between items-center mt-3 gray-text text-sm">
                         <span className="text-sm font-medium">
                           Direct Subordinate
                         </span>
@@ -208,10 +198,7 @@ export default function Subordinate() {
                         </span>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <EmptyData />
-                )}
+                  ))}
               </div>
             )}
           </div>

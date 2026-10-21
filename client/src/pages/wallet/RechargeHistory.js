@@ -9,12 +9,12 @@ import wallet from "../../assets/e-wallet.png";
 import paytm from "../../assets/paytm.jpg";
 import upi from "../../assets/upi.png";
 import usd from "../../assets/usdt.png";
-import CalendarUpdate from "../../components/CalenderUpdate";
+import Calendar from "../../components/CalenderUpdate";
 import CopyCopmponent from "../../components/CopyCopmponent";
 import CustomeNavbar from "../../components/CustomeNavbar";
 import FilterName from "../../components/FilterName";
+import ServiceRotate from "../../components/ServiceRotate";
 import { rechargeList } from "../../store/reducer/userReducer";
-import EmptyData from "../activity/EmptyData";
 import TopFilter from "../promotion/TopFilter";
 
 const RechargeHistory = () => {
@@ -107,9 +107,9 @@ const RechargeHistory = () => {
 
   const itemss = [
     { name: "All", icon: <MdDashboard /> },
-    { name: "UPI-QRpay", icon: wallet },
-    { name: "Wake UP-APP", icon: paytm },
-    { name: "UPI-PayTM", icon: upi },
+    { name: "Online Pay", icon: wallet },
+    { name: "NOW UPI", icon: paytm },
+    { name: "QR PAY", icon: upi },
     { name: "USDT", icon: usd },
   ];
 
@@ -134,11 +134,13 @@ const RechargeHistory = () => {
     }
     // return "Select Date Range";
   };
+
   return (
     <>
       <CustomeNavbar name="Deposit history" />
 
       <TopFilter items={itemss} onActiveChange={handleActiveName} />
+      <ServiceRotate />
 
       <FilterName
         items={items}
@@ -150,18 +152,16 @@ const RechargeHistory = () => {
       <div className="container-section">
         <div className="grid grid-cols-12 gap-2 mt-2">
           <div
-            className="col-span-6 bg-body flex cursor-pointer justify-between items-center p-2 rounded-md"
+            className="col-span-6 nav-bg flex cursor-pointer justify-between items-center p-2 rounded-md"
             onClick={handleOpenAll}
           >
-            <span className="text-sm gray-50" onClick={handleOpenAll}>
-              {dataAll}
-            </span>
+            <span className="text-base gray-50">{dataAll}</span>
             <span>
-              <IoIosArrowDown className="text-sm text-black" />
+              <IoIosArrowDown className="text-base text-gray" />
             </span>
           </div>
-          <div className="col-span-6 bg-body">
-            <CalendarUpdate
+          <div className="col-span-6 nav-bg rounded-md">
+            <Calendar
               onDateSelect={handleDateSelect}
               selectedDates={
                 dateRange.startDate
@@ -172,26 +172,28 @@ const RechargeHistory = () => {
                   : []
               }
             />
+            {/* <div className="text-center text-sm mt-1 text-gray-300">
+              {formatDisplayDate()}
+            </div> */}
           </div>
         </div>
       </div>
 
       <div className="container-section mt-5">
         {filteredData?.length > 0 ? (
-          Array.isArray(rechargelistData?.recharge) &&
-          filteredData?.map((item, i) => (
-            <div className="bg-body rounded-md pb-3 mb-4 p-2" key={i}>
+          filteredData.map((item, i) => (
+            <div className="nav-bg rounded-md pb-7 mb-4 p-2" key={i}>
               <div className="flex justify-between items-center px-2 text-sm py-1 rounded-sm sky-border border-b">
-                <span className="text-sm font-medium bg-green-500 p-1 px-4 rounded-md mb-1">
+                <span className="fs-sm font-medium bg-green-500 p-2 px-4 rounded-md">
                   Deposit
                 </span>
                 <span
-                  className={`text-sm  p-1 rounded ${
+                  className={`text-sm font-medium p-1 rounded ${
                     item.status === 0
-                      ? "text-blue-400 "
+                      ? "text-blue-400 font-semibold"
                       : item.status === 1
-                        ? "text-green-500 "
-                        : "text-red-500 "
+                        ? "text-green-500 font-semibold"
+                        : "text-red-500 font-semibold"
                   }`}
                 >
                   {item.status === 0
@@ -201,30 +203,30 @@ const RechargeHistory = () => {
                       : "Failed"}
                 </span>
               </div>
-              <div className="mt-3 flex justify-between items-center gray-100 text-sm px-2">
+              <div className="mt-3 flex justify-between items-center gray-text text-sm px-2">
                 <span className="text-sm font-medium">Balance</span>
-                <span className="fs-sm font-medium color-yellow-200">
+                <span className="text-sm font-medium color-yellow-200">
                   {item.type === "USDT"
-                    ? `$${(Number(item?.money) / 93).toLocaleString("en-IN", {
+                    ? ` $${(Number(item?.money) / 93).toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}`
                     : `₹${Number(item?.money).toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      })} `}
+                      })}`}
                 </span>
               </div>
 
-              <div className="flex justify-between items-center mt-3 gray-100 text-sm px-2">
+              <div className="flex justify-between items-center mt-3 gray-text text-sm px-2">
                 <span className="text-sm font-medium">Type</span>
-                <span className="fs-sm font-medium">{item.type}</span>
+                <span className="text-sm font-medium">{item.type}</span>
               </div>
-              <div className="flex justify-between items-center mt-3 gray-100 text-sm px-2">
+              <div className="flex justify-between items-center mt-3 gray-text text-sm px-2">
                 <span className="text-sm font-medium">Time</span>
                 <span className="fs-sm font-medium">{item.today}</span>
               </div>
-              <div className="flex justify-between items-center mt-3 gray-100 text-sm px-2">
+              <div className="flex justify-between items-center mt-3 gray-text text-sm px-2">
                 <span className="text-sm font-medium">Order number</span>
                 <span className="text-sm font-medium flex items-center">
                   {item.id_order}{" "}
@@ -236,17 +238,10 @@ const RechargeHistory = () => {
               </div>
               {item.status === 0 && (
                 <Link
-                  to={`https://h5support.chennai91.co//deposite?token=${Cookies.get(
+                  to={`https://h5.workorder.support.1xclube.com/deposite?token=${Cookies.get(
                     "auth",
-                  )}&order=${item.id_order}&amount=${
-                    item.money
-                  }&data=${encodeURIComponent(
-                    JSON.stringify({
-                      id_order: item.id_order,
-                      money: item.money,
-                    }),
                   )}`}
-                  className="blue-linear w-full rounded-full text-whites py-1 mt-3 text-base font-semibold flex justify-center items-center"
+                  className="blue-linear w-full rounded-full text-black py-1 mt-3 text-lg font-semibold flex justify-center items-center"
                 >
                   Submit Receipt
                 </Link>
@@ -254,7 +249,9 @@ const RechargeHistory = () => {
             </div>
           ))
         ) : (
-          <EmptyData />
+          <div className="text-center py-4 text-gray-400">
+            No records found for the selected filters
+          </div>
         )}
       </div>
 
