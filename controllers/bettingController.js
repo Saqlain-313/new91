@@ -1,174 +1,144 @@
-import request from "request";
-import crypto from "crypto";
+import request from 'request';
+import crypto from 'crypto';
 import connection from "../config/connectDB";
 
-// ==================== CONFIG ====================
-const pid = process.env.TOPBET_PID || "TBTEST";
-const appKey = process.env.TOPBET_APP_KEY || "87F5E9F3BA234A9EA58444DF1D67299B";
-const API_URL = "https://tsdc.topbetgame.com/api/ChessGame";
+const pid = 'TBTEST';
+const appKey = '87F5E9F3BA234A9EA58444DF1D67299B';
 
-// ==================== HELPERS ====================
 function curlApiInfo(url, postData) {
-  const options = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Length": Buffer.byteLength(postData),
-    },
-    body: postData,
-  };
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': postData.length
+        },
+        body: postData
+    };
 
-  return new Promise((resolve, reject) => {
-    request(url, options, (error, response, body) => {
-      if (error) {
-        reject({ status: 0, data: "CURL Error String: " + error.message });
-      } else {
-        resolve({ status: 1, data: body, header: response.statusCode });
-      }
+    return new Promise((resolve, reject) => {
+        request(url, options, (error, response, body) => {
+            if (error) {
+                reject({ status: 0, data: "CURL Error String: " + error.message });
+            } else {
+                resolve({ status: 1, data: body, header: response.statusCode });
+            }
+        });
     });
-  });
 }
 
-// Encrypt with AES-128-CBC (key = IV = first 16 chars of appKey)
-function encryptData(obj) {
-  const cipher = crypto.createCipheriv(
-    "aes-128-cbc",
-    appKey.substring(0, 16),
-    appKey.substring(0, 16)
-  );
-  let encrypted = cipher.update(JSON.stringify(obj), "utf8", "base64");
-  encrypted += cipher.final("base64");
-  return encrypted;
-}
-
-function decryptData(encoded) {
-  const decoded = decodeURIComponent(encoded);
-  const decipher = crypto.createDecipheriv(
-    "aes-128-cbc",
-    appKey.substring(0, 16),
-    appKey.substring(0, 16)
-  );
-  let decrypted = decipher.update(decoded, "base64", "utf8");
-  decrypted += decipher.final("utf8");
-  return JSON.parse(decrypted);
-}
-
-// Call TopBetGame API and return parsed response, or null on failure
 const topbetgame = async (params, method) => {
-  try {
-    // Sort keys alphabetically (required by signature spec)
-    const sortedParams = Object.keys(params)
-      .sort()
-      .reduce((acc, key) => {
-        acc[key] = params[key];
-        return acc;
-      }, {});
+    try {
 
-    const encrypted = encryptData(sortedParams);
+        const sortedParams = Object.keys(params).sort().reduce((acc, key) => {
+            acc[key] = params[key];
+            return acc;
+        }, {});
 
-    const postData = JSON.stringify({
-      pid,
-      method,
-      ver: "1.0.0",
-      data: encodeURIComponent(encrypted),
-    });
+        const paramsString = JSON.stringify(sortedParams);
+        const cipher = crypto.createCipheriv('aes-128-cbc', appKey.substring(0, 16), appKey.substring(0, 16));
+        let encryptedParams = cipher.update(paramsString, 'utf8', 'base64');
+        encryptedParams += cipher.final('base64');
 
-    const result = await curlApiInfo(API_URL, postData);
+        const postData = JSON.stringify({
+            pid: pid,
+            method,
+            ver: '1.0.0',
+            data: encodeURIComponent(encryptedParams)
+        });
+        const result = await curlApiInfo("https://tsdc.topbetgame.com/api/ChessGame", postData);
+        if (result.status === 0) {
+            console.log('CURL was not executed successfully: ' + result.data);
+            return;
+        }
 
-    if (result.status === 0) {
-      console.log("CURL was not executed successfully:", result.data);
-      return null;
+        if (result.header !== 200) {
+            console.log('The server did not execute successfully: ' + result.data);
+            return;
+        }
+
+        let parsedData = JSON.parse(result.data);
+        return parsedData
+    } catch (error) {
+        console.error(error);
     }
-    if (result.header !== 200) {
-      console.log("Server did not execute successfully:", result.data);
-      return null;
-    }
-
-    return JSON.parse(result.data);
-  } catch (error) {
-    console.error("topbetgame error:", error);
-    return null;
-  }
 };
 
-// ==================== CONTROLLER ====================
 const boardGame = async (req, res) => {
-  try {
-    const auth = req.cookies.auth;
+    let auth = req.cookies.auth;
     let app_id = req.params.app_id;
 
-    if (!auth || !app_id) {
-      return res.status(200).json({ message: "Failed", status: false });
+    if (!auth) {
+        return res.status(200).json({
+            message: 'Failed',
+            status: false,
+            timeStamp: timeNow,
+        });
+    }
+    if (!app_id) {
+        return res.status(200).json({
+            message: 'Failed',
+            status: false,
+            timeStamp: timeNow,
+        });
+    }
+    app_id = parseInt(app_id)
+    const [rows] = await connection.query('SELECT * FROM users WHERE `token` = ? ', [auth]);
+
+    if (!rows) {
+        return res.status(200).json({
+            message: 'Failed',
+            status: false,
+            timeStamp: timeNow,
+        });
+    }
+    const { id, password, ip, veri, ip_address, status, time, token, ...others } = rows[0];
+    let username = others.id_user
+    let login = {
+        username,
+        app_id: app_id,
+        ip: ip_address || '192.168.1.123',
+        lang: 'en'
     }
 
-    app_id = parseInt(app_id);
-    if (!Number.isFinite(app_id)) {
-      return res.status(200).json({ message: "Invalid app_id", status: false });
-    }
+    let response = await topbetgame(login, 'login')
 
-    const [rows] = await connection.query("SELECT * FROM users WHERE `token` = ?", [auth]);
-    if (!rows.length) {
-      return res.status(200).json({ message: "Failed", status: false });
-    }
+    if (response.message == 'User is not created') {
+        let register = {
+            username,
+            currency: 'CNY',
+            org: 1,
+            ip: ip_address || '192.168.1.123',
+        };
+        let registerResponse = await topbetgame(register, 'register')
+        if (registerResponse.message == 'User is not created') {
+        } else {
 
-    // Extract only fields we need; never leak password/token
-    const { password, token, ...safeUser } = rows[0];
-    const username = safeUser.id_user;
+            if (registerResponse.data) {
+                const decryptedData = decodeURIComponent(registerResponse.data)
+                const decipher = crypto.createDecipheriv('aes-128-cbc', appKey.substring(0, 16), appKey.substring(0, 16));
+                let decrypted = decipher.update(decryptedData, 'base64', 'utf8');
+                decrypted += decipher.final('utf8');
+                const responseData = JSON.parse(decrypted);
 
-    const ip = safeUser.ip_address || "192.168.1.123";
-    const loginParams = { username, app_id, ip, lang: "en" };
+                response = await topbetgame(login, 'login')
+            }
 
-    let response = await topbetgame(loginParams, "login");
-
-    if (!response) {
-      return res.status(200).json({ message: "Game service unavailable", status: false });
-    }
-
-    // If user not registered on the game side, create them and retry login
-    if (response.message === "User is not created") {
-      const registerParams = { username, currency: "CNY", org: 1, ip };
-      const registerResponse = await topbetgame(registerParams, "register");
-
-      if (!registerResponse) {
-        return res.status(200).json({ message: "Registration failed", status: false });
-      }
-
-      if (registerResponse.message !== "User is not created") {
-        // Registration succeeded — retry login
-        response = await topbetgame(loginParams, "login");
-        if (!response) {
-          return res.status(200).json({ message: "Login after register failed", status: false });
         }
-      }
-    }
 
-    // Ensure response has payload before decrypting
-    if (!response.data) {
-      return res.status(200).json({
-        message: response.message || "Failed",
-        status: false,
-      });
     }
+    const decryptedData = decodeURIComponent(response.data)
+    const decipher = crypto.createDecipheriv('aes-128-cbc', appKey.substring(0, 16), appKey.substring(0, 16));
+    let decrypted = decipher.update(decryptedData, 'base64', 'utf8');
+    decrypted += decipher.final('utf8');
 
-    let responseData;
-    try {
-      responseData = decryptData(response.data);
-    } catch (decryptError) {
-      console.error("Decrypt error:", decryptError);
-      return res.status(200).json({ message: "Invalid response from game provider", status: false });
-    }
-
+    const responseData = JSON.parse(decrypted);
     return res.status(200).json({
-      message: "Success",
-      status: true,
-      data: responseData,
+        message: 'Send SMS regularly.',
+        status: true,
+        data: responseData,
     });
-  } catch (error) {
-    console.error("boardGame error:", error);
-    return res.status(500).json({ message: "Internal server error", status: false });
-  }
-};
+}
 
 module.exports = {
-  boardGame,
-};
+    boardGame
+}
