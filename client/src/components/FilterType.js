@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -19,26 +19,27 @@ const Picker = styled.div`
 
 const Item = styled.div`
   height: 55.67px;
-  width: 105px;
+  width: 120px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  color: ${(props) => (props.active ? "#fff" : "#80849C")};
+  color: ${(props) => (props.active ? "#15131E" : "#606877")};
   font-weight: 700;
   cursor: pointer;
   margin: 10px 5px;
   background: ${(props) =>
-    props.active ? "linear-gradient(90deg, #F95B5B 0%, #FFB7AF 100%)" : "#fff"};
+    props.active
+      ? "var(--Gradient-1, linear-gradient(93deg, var(--mediam-blue) 7.38%, var(--bgblue) 94.48%))"
+      : "#201D2B"};
   padding: 10px 30px;
   border-radius: 8px;
   flex-shrink: 0;
-  font-size: 12.8px;
 `;
 
 const Span = styled.span`
   font-size: 24px;
-  color: ${(props) => (props.active ? "#fff" : "#80849C")};
+  color: ${(props) => (props.active ? "#15131E" : "#606877")};
 `;
 
 const FilterType = ({ items, activeIndex, onActiveChange }) => {

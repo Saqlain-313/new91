@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { IoIosArrowBack } from "react-icons/io";
-import { Link } from "react-router-dom";
-import { wingoHistory } from "../../store/reducer/gameReducer";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import { AiOutlineSmallDash } from "react-icons/ai";
 import { FaRegDotCircle } from "react-icons/fa";
 import { MdSportsSoccer } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
 import CustomeNavbar from "../../components/CustomeNavbar";
+import { wingoHistory } from "../../store/reducer/gameReducer";
 
 const GameStatistics = () => {
   const [activeTabs, setActiveTabs] = useState("today");
@@ -62,7 +60,7 @@ const GameStatistics = () => {
           acc.amountSum += parseFloat(game.money);
           return acc;
         },
-        { idCount: 0, getSum: 0, amountSum: 0 }
+        { idCount: 0, getSum: 0, amountSum: 0 },
       );
   };
 
@@ -81,7 +79,7 @@ const GameStatistics = () => {
     monthData = filterData(wingoHistoryData?.gameslist, monthStart);
   }
 
-  //console.log("yesterdayData", yesterdayData);
+  console.log("yesterdayData", yesterdayData);
 
   useEffect(() => {
     let typeid1 = 15;
@@ -100,9 +98,9 @@ const GameStatistics = () => {
           <button
             className={`${
               activeTabs == "today"
-                ? "blue-linear font-bold text-white"
-                : " gray-50 bg-body"
-            }  rounded-full p w-[24%] heading-h4  p-1 flex items-center justify-center `}
+                ? "blue-linear font-bold  color-orange"
+                : " gray-50 nav-bg"
+            }  rounded-full p w-[24%] text-sm  p-1 py-2 flex items-center justify-center `}
             onClick={() => setActiveTabs("today")}
           >
             Today
@@ -110,9 +108,9 @@ const GameStatistics = () => {
           <button
             className={`${
               activeTabs == "yesterday"
-                ? "blue-linear font-bold text-white"
-                : "bg-body gray-50"
-            }  rounded-full p w-[24%] heading-h4  p-1  flex items-center justify-center`}
+                ? "blue-linear font-bold  color-orange"
+                : "nav-bg gray-50"
+            }  rounded-full p w-[24%] text-sm  p-1 py-2 flex items-center justify-center`}
             onClick={() => setActiveTabs("yesterday")}
           >
             Yesterday
@@ -120,9 +118,9 @@ const GameStatistics = () => {
           <button
             className={`${
               activeTabs == "this-week"
-                ? "blue-linear font-bold text-white"
-                : "bg-body gray-50"
-            }  rounded-full p w-[24%] heading-h4  p-1  flex items-center justify-center`}
+                ? "blue-linear font-bold  color-orange"
+                : "nav-bg gray-50"
+            }  rounded-full p w-[24%] text-sm  p-1 py-2  flex items-center justify-center`}
             onClick={() => setActiveTabs("this-week")}
           >
             This week
@@ -130,9 +128,9 @@ const GameStatistics = () => {
           <button
             className={`${
               activeTabs == "this-month"
-                ? "blue-linear font-bold text-white"
-                : "bg-body gray-50"
-            }  rounded-full p w-[24%] heading-h4  p-1  flex items-center justify-center`}
+                ? "blue-linear font-bold  color-orange"
+                : "nav-bg gray-50"
+            }  rounded-full p w-[24%] text-sm  p-1 py-2  flex items-center justify-center`}
             onClick={() => setActiveTabs("this-month")}
           >
             This month
@@ -141,15 +139,15 @@ const GameStatistics = () => {
 
         {activeTabs == "today" && (
           <div>
-            <div className="bg-body rounded-md mt-3 flex justify-center items-center flex-col h-32">
-              <h3 className="text-[22.4px] font-bold color-yellow-200">
+            <div className="nav-bg rounded-md mt-3 flex justify-center items-center flex-col h-40">
+              <h3 className="heading-h3 text-lg font-bold color-yellow-200">
                 ₹{todayData?.amountSum?.toFixed(2)}
               </h3>
-              <p className="text-base gray-100">Total bet</p>
+              <p className="text-base text-white">Total bet</p>
             </div>
             {todayData?.idCount > 0 && (
-              <div className="bg-body rounded-md p-4 mt-3">
-                <h2 className="flex items-center text-base font-bold text-whites">
+              <div className="nav-bg rounded-md p-4 mt-3">
+                <h2 className="flex items-center text-lg font-medium text-white">
                   <MdSportsSoccer className="text-blue text-2xl mr-1 mb-1" />
                   lottery
                 </h2>
@@ -161,9 +159,9 @@ const GameStatistics = () => {
                         <FaRegDotCircle className="text-blue  rounded-full fs-sm mr-1 border-b" />
                         <AiOutlineSmallDash className="rotate-90 mt-[2px] mr-1 text-blue fs-sm" />
                       </div>
-                      <p className="gray-100 heading-h4 ">Total bet </p>
+                      <p className="text-whites text-sm ">Total bet </p>
                     </div>
-                    <span className=" heading-h4 text-whites">
+                    <span className=" text-sm text-whites">
                       ₹{Number(todayData?.amountSum)?.toFixed(2)}
                     </span>
                   </li>
@@ -173,9 +171,9 @@ const GameStatistics = () => {
                         <FaRegDotCircle className="text-blue  rounded-full fs-sm mr-1 border-b" />
                         <AiOutlineSmallDash className="rotate-90 mt-[2px] mr-1 text-blue fs-sm" />
                       </div>
-                      <p className="gray-100 heading-h4 ">Number of bets</p>
+                      <p className="text-whites text-sm ">Number of bets</p>
                     </div>
-                    <span className=" heading-h4  text-whites">
+                    <span className=" text-sm  text-whites">
                       {todayData?.idCount}
                     </span>
                   </li>
@@ -184,9 +182,9 @@ const GameStatistics = () => {
                       <div className="flex  flex-col items-center mt-[3px] mr-1">
                         <FaRegDotCircle className="text-blue  rounded-full fs-sm mr-1 border-b" />
                       </div>
-                      <p className="gray-100 heading-h4 ">Winning amount</p>
+                      <p className="text-whites text-sm ">Winning amount</p>
                     </div>
-                    <span className=" heading-h4  color-l">
+                    <span className=" text-sm  color-l">
                       ₹{Number(todayData?.getSum)?.toFixed(2)}
                     </span>
                   </li>
@@ -197,15 +195,15 @@ const GameStatistics = () => {
         )}
         {activeTabs == "yesterday" && (
           <div>
-            <div className="bg-body rounded-md mt-3 flex justify-center items-center flex-col h-32">
-              <h3 className="text-[22.4px] font-bold color-yellow-200">
+            <div className="nav-bg rounded-md mt-3 flex justify-center items-center flex-col h-40">
+              <h3 className="heading-h3 text-lg font-bold color-yellow-200">
                 ₹{yesterdayData?.amountSum?.toFixed(2)}
               </h3>
-              <p className="text-base gray-100">Total bet</p>
+              <p className="text-base text-whites">Total bet</p>
             </div>
             {yesterdayData?.idCount > 0 && (
-              <div className="bg-body rounded-md p-4 mt-3">
-                <h2 className="flex items-center text-base font-bold text-whites">
+              <div className="nav-bg rounded-md p-4 mt-3">
+                <h2 className="flex items-center text-lg font-medium text-white">
                   <MdSportsSoccer className="text-blue text-2xl mr-1 mb-1" />
                   lottery
                 </h2>
@@ -217,9 +215,9 @@ const GameStatistics = () => {
                         <FaRegDotCircle className="text-blue  rounded-full fs-sm mr-1 border-b" />
                         <AiOutlineSmallDash className="rotate-90 mt-[2px] mr-1 text-blue fs-sm" />
                       </div>
-                      <p className="gray-100 heading-h4 ">Total bet </p>
+                      <p className="text-whites text-sm ">Total bet </p>
                     </div>
-                    <span className=" heading-h4 text-whites">
+                    <span className=" text-sm text-whites">
                       ₹{Number(yesterdayData?.amountSum)?.toFixed(2)}
                     </span>
                   </li>
@@ -229,9 +227,9 @@ const GameStatistics = () => {
                         <FaRegDotCircle className="text-blue  rounded-full fs-sm mr-1 border-b" />
                         <AiOutlineSmallDash className="rotate-90 mt-[2px] mr-1 text-blue fs-sm" />
                       </div>
-                      <p className="gray-100 heading-h4 ">Number of bets</p>
+                      <p className="text-whites text-sm ">Number of bets</p>
                     </div>
-                    <span className=" heading-h4  text-whites">
+                    <span className=" text-sm  text-whites">
                       {yesterdayData?.idCount}
                     </span>
                   </li>
@@ -240,9 +238,9 @@ const GameStatistics = () => {
                       <div className="flex  flex-col items-center mt-[3px] mr-1">
                         <FaRegDotCircle className="text-blue  rounded-full fs-sm mr-1 border-b" />
                       </div>
-                      <p className="gray-100 heading-h4 ">Winning amount</p>
+                      <p className="text-whites text-sm ">Winning amount</p>
                     </div>
-                    <span className=" heading-h4  color-l">
+                    <span className=" text-sm  color-l">
                       ₹{Number(yesterdayData?.getSum)?.toFixed(2)}
                     </span>
                   </li>
@@ -253,15 +251,15 @@ const GameStatistics = () => {
         )}
         {activeTabs == "this-week" && (
           <div>
-            <div className="bg-body rounded-md mt-3 flex justify-center items-center flex-col h-32">
-              <h3 className="text-[22.4px] font-bold color-yellow-200">
+            <div className="nav-bg rounded-md mt-3 flex justify-center items-center flex-col h-40">
+              <h3 className="heading-h3 text-lg font-bold color-yellow-200">
                 ₹{weekData?.amountSum?.toFixed(2)}
               </h3>
-              <p className="text-base gray-100">Total bet</p>
+              <p className="text-base text-whites">Total bet</p>
             </div>
             {weekData?.idCount > 0 && (
-              <div className="bg-body rounded-md p-4 mt-3">
-                <h2 className="flex items-center text-base font-bold text-whites">
+              <div className="nav-bg rounded-md p-4 mt-3">
+                <h2 className="flex items-center text-lg font-medium text-white">
                   <MdSportsSoccer className="text-blue text-2xl mr-1 mb-1" />
                   lottery
                 </h2>
@@ -273,9 +271,9 @@ const GameStatistics = () => {
                         <FaRegDotCircle className="text-blue  rounded-full fs-sm mr-1 border-b" />
                         <AiOutlineSmallDash className="rotate-90 mt-[2px] mr-1 text-blue fs-sm" />
                       </div>
-                      <p className="gray-100 heading-h4 ">Total bet </p>
+                      <p className="text-whites text-sm ">Total bet </p>
                     </div>
-                    <span className=" heading-h4 text-whites">
+                    <span className=" text-sm text-whites">
                       ₹{Number(weekData?.amountSum)?.toFixed(2)}
                     </span>
                   </li>
@@ -285,9 +283,9 @@ const GameStatistics = () => {
                         <FaRegDotCircle className="text-blue  rounded-full fs-sm mr-1 border-b" />
                         <AiOutlineSmallDash className="rotate-90 mt-[2px] mr-1 text-blue fs-sm" />
                       </div>
-                      <p className="gray-100 heading-h4 ">Number of bets</p>
+                      <p className="text-whites text-sm ">Number of bets</p>
                     </div>
-                    <span className=" heading-h4  text-whites">
+                    <span className=" text-sm  text-whites">
                       {weekData?.idCount}
                     </span>
                   </li>
@@ -296,9 +294,9 @@ const GameStatistics = () => {
                       <div className="flex  flex-col items-center mt-[3px] mr-1">
                         <FaRegDotCircle className="text-blue  rounded-full fs-sm mr-1 border-b" />
                       </div>
-                      <p className="gray-100 heading-h4 ">Winning amount</p>
+                      <p className="text-whites text-sm ">Winning amount</p>
                     </div>
-                    <span className=" heading-h4  color-l">
+                    <span className=" text-sm  color-l">
                       ₹{Number(weekData?.getSum)?.toFixed(2)}
                     </span>
                   </li>
@@ -309,15 +307,15 @@ const GameStatistics = () => {
         )}
         {activeTabs == "this-month" && (
           <div>
-            <div className="bg-body rounded-md mt-3 flex justify-center items-center flex-col h-32">
-              <h3 className="text-[22.4px] font-bold color-yellow-200">
+            <div className="nav-bg rounded-md mt-3 flex justify-center items-center flex-col h-40">
+              <h3 className="heading-h3 text-lg font-bold color-yellow-200">
                 ₹{monthData?.amountSum?.toFixed(2)}
               </h3>
-              <p className="text-base gray-100">Total bet</p>
+              <p className="text-base text-whites">Total bet</p>
             </div>
             {monthData?.idCount > 0 && (
-              <div className="bg-body rounded-md p-4 mt-3">
-                <h2 className="flex items-center text-base font-bold text-whites">
+              <div className="nav-bg rounded-md p-4 mt-3">
+                <h2 className="flex items-center text-lg font-medium text-white">
                   <MdSportsSoccer className="text-blue text-2xl mr-1 mb-1" />
                   lottery
                 </h2>
@@ -329,9 +327,9 @@ const GameStatistics = () => {
                         <FaRegDotCircle className="text-blue rounded-full fs-sm mr-1 border-b" />
                         <AiOutlineSmallDash className="rotate-90 mt-[2px] mr-1 text-blue fs-sm" />
                       </div>
-                      <p className="gray-100 heading-h4 ">Total bet </p>
+                      <p className="text-whites text-sm ">Total bet </p>
                     </div>
-                    <span className=" heading-h4 text-whites">
+                    <span className=" text-sm text-whites">
                       ₹{Number(monthData?.amountSum)?.toFixed(2)}
                     </span>
                   </li>
@@ -341,9 +339,9 @@ const GameStatistics = () => {
                         <FaRegDotCircle className="text-blue  rounded-full fs-sm mr-1 border-b" />
                         <AiOutlineSmallDash className="rotate-90 mt-[2px] mr-1 text-blue fs-sm" />
                       </div>
-                      <p className="gray-100 heading-h4 ">Number of bets</p>
+                      <p className="text-whites text-sm ">Number of bets</p>
                     </div>
-                    <span className=" heading-h4  text-whites">
+                    <span className=" text-sm  text-whites">
                       {monthData?.idCount}
                     </span>
                   </li>
@@ -352,9 +350,9 @@ const GameStatistics = () => {
                       <div className="flex  flex-col items-center mt-[3px] mr-1">
                         <FaRegDotCircle className="text-blue  rounded-full fs-sm mr-1 border-b" />
                       </div>
-                      <p className="gray-100 heading-h4 ">Winning amount</p>
+                      <p className="text-whites text-sm ">Winning amount</p>
                     </div>
-                    <span className=" heading-h4  color-l">
+                    <span className=" text-sm  color-l">
                       ₹{Number(monthData?.getSum)?.toFixed(2)}
                     </span>
                   </li>

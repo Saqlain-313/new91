@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   IoIosArrowBack,
   IoIosArrowDropright,
@@ -6,52 +6,51 @@ import {
 } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 
-import "./wingo.css";
+import { FaMinus, FaPlus } from "react-icons/fa";
 import {
   MdKeyboardDoubleArrowLeft,
   MdKeyboardDoubleArrowRight,
-  MdSupportAgent,
 } from "react-icons/md";
-import { FaMinus, FaPlus } from "react-icons/fa";
+import "./wingo.css";
 
-import TimeImg from "../../assets/time.png";
-import TimeActiveImg from "../../assets/time_aactive.png";
-import ZeroImg from "../../assets/zero.png";
-import OneImg from "../../assets/one.png";
-import TwoImg from "../../assets/two.png";
-import ThreeImg from "../../assets/three.png";
-import FourImg from "../../assets/four.png";
-import FiveImg from "../../assets/five.png";
-import SixImg from "../../assets/six.png";
-import SevenImg from "../../assets/seven.png";
-import EightImg from "../../assets/eight.png";
-import NineImg from "../../assets/nine.png";
 import AImg from "../../assets/a-num.png";
 import BImg from "../../assets/b-num.png";
 import CImg from "../../assets/c-num.png";
 import DImg from "../../assets/d-num.png";
 import EImg from "../../assets/e-num.png";
+import EightImg from "../../assets/eight.png";
 import FImg from "../../assets/f-num.png";
+import FiveImg from "../../assets/five.png";
+import FourImg from "../../assets/four.png";
+import NineImg from "../../assets/nine.png";
+import OneImg from "../../assets/one.png";
+import SevenImg from "../../assets/seven.png";
+import SixImg from "../../assets/six.png";
+import ThreeImg from "../../assets/three.png";
+import TimeImg from "../../assets/time.png";
+import TimeActiveImg from "../../assets/time_aactive.png";
+import TwoImg from "../../assets/two.png";
+import ZeroImg from "../../assets/zero.png";
 
 import { PiCopySimpleBold } from "react-icons/pi";
 
-import HeaderInfo from "./HeaderInfo";
-import { useDispatch, useSelector } from "react-redux";
-import { userDetail } from "../../store/reducer/authReducer";
-import { wingoHistory, wingoPeriodList } from "../../store/reducer/gameReducer";
-import { wingoBet } from "../../store/reducer/betReducer";
 import debounce from "lodash/debounce";
-import { io } from "socket.io-client";
 import { IoCloseCircleOutline } from "react-icons/io5";
-import CopyCopmponent from "../../components/CopyCopmponent";
+import { useDispatch, useSelector } from "react-redux";
+import { io } from "socket.io-client";
 import Audio1 from "../../assets/audio/di1.mp3";
 import Audio2 from "../../assets/audio/di2.mp3";
+import CopyCopmponent from "../../components/CopyCopmponent";
+import { userDetail } from "../../store/reducer/authReducer";
+import { wingoBet } from "../../store/reducer/betReducer";
+import { wingoHistory, wingoPeriodList } from "../../store/reducer/gameReducer";
+import HeaderInfo from "./HeaderInfo";
 
+import Loader from "../../components/Loader";
 import { host } from "../../store/reducer/api";
 import EmptyData from "../activity/EmptyData";
-import Loader from "../../components/Loader";
 
-const WinImg = "https://i.ibb.co/TMnbvp0N/win-popup.png";
+const WinImg = "https://i.ibb.co/ssJ2HLw/win-popup.png";
 const LoseImg = "https://i.ibb.co/8zTQQmx/loss-popup.png";
 
 const ImgData = [
@@ -94,7 +93,7 @@ const socket = io(host);
 const Trx = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const { wingoPeriodListData, wingoHistoryData } = useSelector(
-    (state) => state.game
+    (state) => state.game,
   );
   const { loader } = useSelector((state) => state.bet);
   const [activeTime, setActiveTime] = useState(11);
@@ -258,7 +257,7 @@ const Trx = () => {
           setBetAlert(false);
         }, 2000);
         dispatch(wingoHistory({ typeid1, pageno, pageto }));
-      }
+      },
     );
   };
 
@@ -332,19 +331,19 @@ const Trx = () => {
       const line = document.createElementNS(svgns, "line");
       line.setAttribute(
         "x1",
-        `${firstActive.offsetLeft + firstActive.offsetWidth / 2}px`
+        `${firstActive.offsetLeft + firstActive.offsetWidth / 2}px`,
       );
       line.setAttribute(
         "y1",
-        `${firstActive.offsetTop + firstActive.offsetHeight / 2}px`
+        `${firstActive.offsetTop + firstActive.offsetHeight / 2}px`,
       );
       line.setAttribute(
         "x2",
-        `${secondActive.offsetLeft + secondActive.offsetWidth / 2}px`
+        `${secondActive.offsetLeft + secondActive.offsetWidth / 2}px`,
       );
       line.setAttribute(
         "y2",
-        `${secondActive.offsetTop + secondActive.offsetHeight / 2}px`
+        `${secondActive.offsetTop + secondActive.offsetHeight / 2}px`,
       );
       line.setAttribute("stroke", "red");
       line.setAttribute("stroke-width", "2");
@@ -370,7 +369,7 @@ const Trx = () => {
       });
       updateNumbers();
     }, 500),
-    [dispatch, typeid1]
+    [dispatch, typeid1],
   );
 
   const debouncedDispatchResult = useCallback(
@@ -384,7 +383,7 @@ const Trx = () => {
         }
       });
     }, 500),
-    [dispatch, typeid1]
+    [dispatch, typeid1],
   );
 
   useEffect(() => {
@@ -500,7 +499,7 @@ const Trx = () => {
       .writeText(String(number))
       .then(() => {
         setCopyPopup(true);
-        //console.log("Copied to clipboard");
+        console.log("Copied to clipboard");
         setTimeout(() => {
           setCopyPopup(false);
         }, 1500);
@@ -537,17 +536,6 @@ const Trx = () => {
     setWinResult(null);
     setResultPopup(false);
   };
-  useEffect(() => {
-    if (resultPopup && (winResult === true || winResult === false)) {
-      const timer = setTimeout(() => {
-        handleClose(); // 5 sec ke baad popup close
-      }, 5000);
-
-      // Cleanup: agar popup close ho jaye ya component unmount ho to timer clear ho
-      return () => clearTimeout(timer);
-    }
-  }, [resultPopup, winResult]);
-
   function getRelevantDigits(activeTime) {
     let str = String(activeTime);
     if (str.length === 3) {
@@ -569,7 +557,7 @@ const Trx = () => {
         activeVoice={activeVoice}
       />
       <div
-        className="container-section relative mt-[-75px] mb-[-85px]"
+        className="container-section relative mt-[-75px]"
         onClick={openAudio}
       >
         {/* time tabs */}
@@ -646,7 +634,7 @@ const Trx = () => {
               >
                 <svg
                   data-v-3e4c6499=""
-                  className="text-white"
+                  className="text-whites"
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
                   height="20"
@@ -707,7 +695,7 @@ const Trx = () => {
         {/* bet period section */}
 
         <div className="relative">
-          <div className="bg-light mt-5 p-2">
+          <div className="nav-bg mt-5 p-2">
             <div className="flex justify-between items-center">
               <button
                 className="bgs-green text-sm font-medium w-full  py-2 rounded-tr-lg rounded-bl-lg"
@@ -804,7 +792,7 @@ const Trx = () => {
               className={` flex justify-center items-center h-full w-full py-2 border-none rounded-lg ${
                 gameHistory == "ghistory"
                   ? " text-base blue-linear text-white font-medium "
-                  : "bg-light text-sm gray-50"
+                  : "nav-bg text-sm gray-50"
               }`}
               onClick={() => setGameHistory("ghistory")}
             >
@@ -816,7 +804,7 @@ const Trx = () => {
               className={` flex justify-center items-center h-full w-full py-2 border-none rounded-lg ${
                 gameHistory == "chart"
                   ? "text-base blue-linear text-white font-medium "
-                  : "bg-light text-sm gray-50"
+                  : "nav-bg text-sm gray-50"
               }`}
               onClick={() => {
                 setGameHistory("chart");
@@ -832,7 +820,7 @@ const Trx = () => {
               className={` flex justify-center items-center h-full w-full py-2 border-none rounded-lg ${
                 gameHistory == "mhistory"
                   ? " text-base blue-linear text-white font-medium "
-                  : "bg-light text-sm gray-50"
+                  : "nav-bg text-sm gray-50"
               }`}
               onClick={() => setGameHistory("mhistory")}
             >
@@ -844,7 +832,7 @@ const Trx = () => {
 
         {gameHistory == "ghistory" && (
           <div>
-            <div className="grid grid-cols-10 nav-bg text-white rounded-t-md p-2 mt-5">
+            <div className="grid grid-cols-10 bg-darks rounded-t-md p-2 mt-5">
               <div className="col-span-2 flex text-center justify-center">
                 <h5 className="fs-sm font-bold">Period</h5>
               </div>
@@ -864,7 +852,7 @@ const Trx = () => {
 
             {Array.isArray(wingoPeriodListData?.data?.gameslist) &&
               wingoPeriodListData.data.gameslist.map((item, i) => (
-                <div className="grid grid-cols-10 bg-light p-2 py-3" key={i}>
+                <div className="grid grid-cols-10 nav-bg p-2 py-3" key={i}>
                   <div className="col-span-2 flex text-center justify-center items-center">
                     <span className="text-sm gray-50  relative flex">
                       {obscureMiddleDigits(item.period)}
@@ -890,13 +878,13 @@ const Trx = () => {
                       item.amount == 0
                         ? "bg-red-voilet"
                         : item.amount == 5
-                        ? "bg-green-voilet"
-                        : item.amount == 1 ||
-                          item.amount == 3 ||
-                          item.amount == 7 ||
-                          item.amount == 9
-                        ? "bgs-green"
-                        : "bgs-red-200"
+                          ? "bg-green-voilet"
+                          : item.amount == 1 ||
+                              item.amount == 3 ||
+                              item.amount == 7 ||
+                              item.amount == 9
+                            ? "bgs-green"
+                            : "bgs-red-200"
                     }
                     `}
                     >
@@ -912,12 +900,10 @@ const Trx = () => {
                   </div>
                 </div>
               ))}
-            <div className="bg-light p-6 flex items-center justify-center mt-5">
+            <div className="nav-bg p-6 flex items-center justify-center mt-5">
               <button
                 className={`rounded-md p-2 mr-4 ${
-                  pageto / 10 >= 2
-                    ? "bg-color-l2 text-white"
-                    : "bg-blues text-whites"
+                  pageto / 10 >= 2 ? "bg-color-l2 text-black" : "bg-popup-nav"
                 } `}
                 disabled={pageto / 10 > 1 ? false : true}
                 onClick={handleDecrease}
@@ -933,8 +919,8 @@ const Trx = () => {
               <button
                 className={`rounded-md p-2 ms-4 ${
                   wingoPeriodListData?.page
-                    ? "bg-color-l2 text-white"
-                    : "bg-[#E6EBF0] text-whites"
+                    ? "bg-color-l2 text-black"
+                    : "bg-popup-nav text-whites"
                 } `}
                 disabled={
                   wingoPeriodListData?.page > pageto / 10 ? false : true
@@ -952,8 +938,8 @@ const Trx = () => {
 
         {gameHistory == "chart" && (
           <div>
-            <div className="chart-section mt-5 bg-light rounded-t-md">
-              <div className="flex items-center nav-bg text-white justify-evenly rounded-t-md py-2">
+            <div className="chart-section mt-5 nav-bg rounded-t-md">
+              <div className="flex items-center bg-darks justify-evenly rounded-t-md py-2">
                 <h5 className="heading-h5 text-base font-semibold ">Period</h5>
                 <h5 className="heading-h5 text-base font-semibold ">Number</h5>
               </div>
@@ -1127,12 +1113,10 @@ const Trx = () => {
               </div>
             </div>
 
-            <div className="bg-light p-6 flex items-center justify-center mt-5">
+            <div className="nav-bg p-6 flex items-center justify-center mt-5">
               <button
                 className={`rounded-md p-2 mr-4 ${
-                  pageto / 10 >= 2
-                    ? "bg-color-l2 text-white"
-                    : "bg-blues text-whites"
+                  pageto / 10 >= 2 ? "bg-color-l2 text-black" : "bg-popup-nav"
                 } `}
                 disabled={pageto / 10 > 1 ? false : true}
                 onClick={handleDecrease}
@@ -1148,8 +1132,8 @@ const Trx = () => {
               <button
                 className={`rounded-md p-2 ms-4 ${
                   wingoPeriodListData?.page
-                    ? "bg-color-l2 text-white"
-                    : "bg-[#E6EBF0]"
+                    ? "bg-color-l2 text-black"
+                    : "bg-popup-nav"
                 } `}
                 disabled={
                   wingoPeriodListData?.page > pageto / 10 ? false : true
@@ -1166,20 +1150,19 @@ const Trx = () => {
         )}
 
         {gameHistory == "mhistory" && (
-          <div className="bg-light p-2 py-3 mt-5">
+          <div className="nav-bg p-2 py-3 mt-5">
             <div className="flex items-end justify-end mb-3">
-              <Link className="text-[#F5CC2C] fs-sm border rounded-lg border-[#F5CC2C] px-3 py-1 flex item-center items-end ">
+              <Link className="text-[#21D9CC] fs-sm border rounded-lg border-[#21D9CC] px-3 py-1 flex item-center items-end ">
                 Details <IoIosArrowDropright className="mb-[2px]" />
               </Link>
             </div>
 
-            {/* {wingoHistoryData?.gameslist == "" && (
+            {wingoHistoryData?.gameslist == "" && (
               <div className="mt-5">
                 <EmptyData />
               </div>
-            )} */}
-            {wingoHistoryData?.gameslist?.length > 0 ? (
-              Array.isArray(wingoHistoryData?.gameslist) &&
+            )}
+            {Array.isArray(wingoHistoryData?.gameslist) &&
               wingoHistoryData?.gameslist?.map((item, i) => (
                 <div key={i}>
                   <div
@@ -1188,44 +1171,43 @@ const Trx = () => {
                   >
                     <div className="flex items-center">
                       <div
-                        className={`flex justify-center items-center h-10 w-10 rounded-lg mr-2
-    ${
-      item.bet === "x"
-        ? "bgs-green" // Green
-        : item.bet === "d"
-        ? "bgs-red-200" // Red
-        : item.bet === "t"
-        ? "bgs-violet" // Violet
-        : item.bet === "l"
-        ? "color-yellow-bg-200" // Big
-        : item.bet === "n"
-        ? "bgs-blue-500" // Small
-        : item.bet === "0"
-        ? "bg-red-voilet"
-        : item.bet === "5"
-        ? "bg-green-voilet"
-        : [1, 3, 7, 9].includes(item.bet)
-        ? "bgs-green"
-        : "bgs-red-200"
-    }
-    ${
-      ["l", "n", "x", "d", "t"].includes(item.bet) ? "text-[14px]" : "text-base"
-    }
-  `}
+                        className={`flex justify-center items-center h-9 w-9 text-sm rounded-md mr-2 
+                     ${
+                       item.bet == "x"
+                         ? "bgs-green"
+                         : item.bet == "d"
+                           ? "bgs-red-200"
+                           : item.bet == "t"
+                             ? "bgs-violet"
+                             : item.bet == "l"
+                               ? "color-yellow-bg-200"
+                               : item.bet == "n"
+                                 ? "bgs-blue-500"
+                                 : item.bet == "0"
+                                   ? "bg-red-voilet"
+                                   : item.bet == "5"
+                                     ? "bg-green-voilet"
+                                     : item.bet == 1 ||
+                                         item.bet == 3 ||
+                                         item.bet == 7 ||
+                                         item.bet == 9
+                                       ? "bgs-green"
+                                       : "bgs-red-200"
+                     }
+                      `}
                       >
-                        {item.bet === "x"
-                          ? "" // Green square
-                          : item.bet === "t"
-                          ? "Voilet"
-                          : item.bet === "l"
-                          ? "Big"
-                          : item.bet === "n"
-                          ? "Small"
-                          : item.bet === "d"
-                          ? "" // Red square
-                          : item.bet}
+                        {item.bet == "x"
+                          ? "Green"
+                          : item.bet == "t"
+                            ? "Voilet"
+                            : item.bet == "l"
+                              ? "Big"
+                              : item.bet == "n"
+                                ? "Small"
+                                : item.bet == "d"
+                                  ? "Red"
+                                  : item.bet}
                       </div>
-
                       <div>
                         <h3 className="heading-h3  text-whites text-md">
                           {item?.stage}
@@ -1236,9 +1218,9 @@ const Trx = () => {
                     {item.status !== 0 && (
                       <div className="flex flex-col items-end">
                         <div
-                          className={`min-w-[80px] text-center border px-3 py-[2px] rounded-md text-sm ${
+                          className={`border  px-5 py-[2px] rounded-md text-sm  ${
                             item.status === 1
-                              ? "color-green border-green-500"
+                              ? "color-green border-color-green"
                               : "color-red-200 border-color-red"
                           }`}
                         >
@@ -1262,7 +1244,7 @@ const Trx = () => {
                     }`}
                   >
                     <h2 className="heading-h2 gray-50 text-lg">Details</h2>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2 rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2 rounded-md">
                       <span className=" text-whites ">Order number</span>
                       <span className=" text-whites flex item-center">
                         {item.id_product}
@@ -1272,29 +1254,29 @@ const Trx = () => {
                         />
                       </span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2 rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2 rounded-md">
                       <span className=" text-whites ">Period</span>
                       <span className=" text-whites ">{item.stage}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Purchase amount</span>
                       <span className=" text-whites ">
                         ₹{parseFloat(item.money) + parseFloat(item.fee)}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Quantiy</span>
                       <span className=" text-whites ">{item.amount}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
                       <span className="text-whites ">Amount after tax</span>
                       <span className="color-red-200 ">₹{item.money}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
                       <span className="text-whites ">Tax</span>
                       <span className="text-whites ">₹{item.fee}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
                       <span className="text-whites ">Result</span>
                       {item.status !== 0 && (
                         <div className=" flex text-center justify-center  items-center">
@@ -1303,16 +1285,16 @@ const Trx = () => {
                               item.result === 0
                                 ? "color-red-voilet"
                                 : item.result === 5
-                                ? "color-green-voilet"
-                                : item.result === 1 ||
-                                  item.result === 3 ||
-                                  item.result === 7 ||
-                                  item.result === 9 ||
-                                  item.result == "x"
-                                ? "color-green"
-                                : item.result == "t"
-                                ? "color-voilet"
-                                : "color-red-200"
+                                  ? "color-green-voilet"
+                                  : item.result === 1 ||
+                                      item.result === 3 ||
+                                      item.result === 7 ||
+                                      item.result === 9 ||
+                                      item.result == "x"
+                                    ? "color-green"
+                                    : item.result == "t"
+                                      ? "color-voilet"
+                                      : "color-red-200"
                             }`}
                           >
                             {item.result}
@@ -1320,24 +1302,24 @@ const Trx = () => {
                         </div>
                       )}
                     </div>
-                    <div className=" flex items-center justify-between  bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className=" flex items-center justify-between  bg-popup-nav p-1 mb-2  rounded-md">
                       <span className="text-whites ">Select</span>
                       <span className=" text-whites ms-2">
                         {" "}
                         {item.bet == "x"
                           ? "Green"
                           : item.bet == "t"
-                          ? "Voilet"
-                          : item.bet == "l"
-                          ? "Big"
-                          : item.bet == "n"
-                          ? "Small"
-                          : item.bet == "d"
-                          ? "Red"
-                          : item.bet}
+                            ? "Voilet"
+                            : item.bet == "l"
+                              ? "Big"
+                              : item.bet == "n"
+                                ? "Small"
+                                : item.bet == "d"
+                                  ? "Red"
+                                  : item.bet}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Status</span>
                       {item.status !== 0 && (
                         <span
@@ -1350,7 +1332,7 @@ const Trx = () => {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Win/loss</span>
                       {item.status !== 0 && (
                         <span
@@ -1364,23 +1346,17 @@ const Trx = () => {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Order time</span>
                       <span className=" text-whites ">{item.today}</span>
                     </div>
                   </div>
                 </div>
-              ))
-            ) : (
-              <EmptyData />
-            )}
-
-            <div className="bg-light p-6 flex items-center justify-center mt-5">
+              ))}
+            <div className="nav-bg p-6 flex items-center justify-center mt-5">
               <button
                 className={`rounded-md p-2 mr-4 ${
-                  pageto / 10 >= 2
-                    ? "bg-color-l2 text-white"
-                    : "bg-blues text-whites"
+                  pageto / 10 >= 2 ? "bg-color-l2 text-black" : "bg-popup-nav"
                 } `}
                 disabled={pageto / 10 > 1 ? false : true}
                 onClick={handleDecrease}
@@ -1395,7 +1371,7 @@ const Trx = () => {
               </span>
               <button
                 className={`rounded-md p-2 ms-4 ${
-                  historyPage ? "bg-color-l2 text-white" : "bg-[#E6EBF0]"
+                  historyPage ? "bg-color-l2 text-black" : "bg-popup-nav"
                 } `}
                 disabled={historyPage > pageto / 10 ? false : true}
                 onClick={handleIncrease}
@@ -1414,7 +1390,7 @@ const Trx = () => {
 
       {/* popups */}
       <div
-        className={`bg-light z-[12]  items-center transition ease-in-out delay-150 justify-center fixed bottom-0 rounded-t-2xl filter-section w-[24.7rem] ${
+        className={`nav-bg z-[12]  items-center transition ease-in-out delay-150 justify-center fixed bottom-0 rounded-t-2xl filter-section w-[24.7rem] ${
           openPopup ? "flex" : "hidden"
         }`}
       >
@@ -1424,23 +1400,23 @@ const Trx = () => {
               selectBet == "x"
                 ? "bgs-green"
                 : selectBet == "d"
-                ? "bgs-red-200"
-                : selectBet == "t"
-                ? "bgs-violet"
-                : selectBet == "l"
-                ? "color-yellow-bg-200"
-                : selectBet == "n"
-                ? "bgs-blue-500"
-                : selectBet == "0"
-                ? "bg-red-voilet"
-                : selectBet == "5"
-                ? "bg-green-voilet"
-                : selectBet == 1 ||
-                  selectBet == 3 ||
-                  selectBet == 7 ||
-                  selectBet == 9
-                ? "bgs-green"
-                : "bgs-red-200"
+                  ? "bgs-red-200"
+                  : selectBet == "t"
+                    ? "bgs-violet"
+                    : selectBet == "l"
+                      ? "color-yellow-bg-200"
+                      : selectBet == "n"
+                        ? "bgs-blue-500"
+                        : selectBet == "0"
+                          ? "bg-red-voilet"
+                          : selectBet == "5"
+                            ? "bg-green-voilet"
+                            : selectBet == 1 ||
+                                selectBet == 3 ||
+                                selectBet == 7 ||
+                                selectBet == 9
+                              ? "bgs-green"
+                              : "bgs-red-200"
             }`}
           >
             <h2 className="text-md font-semibold">
@@ -1453,14 +1429,14 @@ const Trx = () => {
                 {selectBet == "x"
                   ? "Green"
                   : selectBet == "t"
-                  ? "Voilet"
-                  : selectBet == "l"
-                  ? "Big"
-                  : selectBet == "n"
-                  ? "Small"
-                  : selectBet == "d"
-                  ? "Red"
-                  : selectBet}
+                    ? "Voilet"
+                    : selectBet == "l"
+                      ? "Big"
+                      : selectBet == "n"
+                        ? "Small"
+                        : selectBet == "d"
+                          ? "Red"
+                          : selectBet}
               </span>
             </button>
           </div>
@@ -1477,21 +1453,21 @@ const Trx = () => {
                         ? selectBet == "x"
                           ? "bgs-green text-white"
                           : selectBet == "d"
-                          ? "bgs-red-200 text-white"
-                          : selectBet == "t"
-                          ? "bgs-violet text-white"
-                          : selectBet == "l"
-                          ? "color-yellow-bg-200 text-white"
-                          : selectBet == "n"
-                          ? "bgs-blue-500 text-white"
-                          : selectBet == 1 ||
-                            selectBet == 3 ||
-                            selectBet == 5 ||
-                            selectBet == 7 ||
-                            selectBet == 9
-                          ? "bgs-green text-white"
-                          : "bgs-red-200 text-white"
-                        : "bg-[#E6EBF0] text-whites "
+                            ? "bgs-red-200 text-white"
+                            : selectBet == "t"
+                              ? "bgs-violet text-white"
+                              : selectBet == "l"
+                                ? "color-yellow-bg-200 text-white"
+                                : selectBet == "n"
+                                  ? "bgs-blue-500 text-white"
+                                  : selectBet == 1 ||
+                                      selectBet == 3 ||
+                                      selectBet == 5 ||
+                                      selectBet == 7 ||
+                                      selectBet == 9
+                                    ? "bgs-green text-white"
+                                    : "bgs-red-200 text-white"
+                        : "bg-popup-nav text-whites "
                     }`}
                   >
                     {value}
@@ -1511,20 +1487,20 @@ const Trx = () => {
                       selectBet == "x"
                         ? "bgs-green"
                         : selectBet == "d"
-                        ? "bgs-red-200"
-                        : selectBet == "t"
-                        ? "bgs-violet"
-                        : selectBet == "l"
-                        ? "color-yellow-bg-200"
-                        : selectBet == "n"
-                        ? "bgs-blue-500"
-                        : selectBet == 1 ||
-                          selectBet == 3 ||
-                          selectBet == 5 ||
-                          selectBet == 7 ||
-                          selectBet == 9
-                        ? "bgs-green"
-                        : "bgs-red-200"
+                          ? "bgs-red-200"
+                          : selectBet == "t"
+                            ? "bgs-violet"
+                            : selectBet == "l"
+                              ? "color-yellow-bg-200"
+                              : selectBet == "n"
+                                ? "bgs-blue-500"
+                                : selectBet == 1 ||
+                                    selectBet == 3 ||
+                                    selectBet == 5 ||
+                                    selectBet == 7 ||
+                                    selectBet == 9
+                                  ? "bgs-green"
+                                  : "bgs-red-200"
                     }
                     `}
                 >
@@ -1545,20 +1521,20 @@ const Trx = () => {
                       selectBet == "x"
                         ? "bgs-green"
                         : selectBet == "d"
-                        ? "bgs-red-200"
-                        : selectBet == "t"
-                        ? "bgs-violet"
-                        : selectBet == "l"
-                        ? "color-yellow-bg-200"
-                        : selectBet == "n"
-                        ? "bgs-blue-500"
-                        : selectBet == 1 ||
-                          selectBet == 3 ||
-                          selectBet == 5 ||
-                          selectBet == 7 ||
-                          selectBet == 9
-                        ? "bgs-green"
-                        : "bgs-red-200"
+                          ? "bgs-red-200"
+                          : selectBet == "t"
+                            ? "bgs-violet"
+                            : selectBet == "l"
+                              ? "color-yellow-bg-200"
+                              : selectBet == "n"
+                                ? "bgs-blue-500"
+                                : selectBet == 1 ||
+                                    selectBet == 3 ||
+                                    selectBet == 5 ||
+                                    selectBet == 7 ||
+                                    selectBet == 9
+                                  ? "bgs-green"
+                                  : "bgs-red-200"
                     }
                     `}
                 >
@@ -1575,21 +1551,21 @@ const Trx = () => {
                       ? selectBet == "x"
                         ? "bgs-green text-white"
                         : selectBet == "d"
-                        ? "bgs-red-200 text-white"
-                        : selectBet == "t"
-                        ? "bgs-violet text-white"
-                        : selectBet == "l"
-                        ? "color-yellow-bg-200 text-white"
-                        : selectBet == "n"
-                        ? "bgs-blue-500 text-white"
-                        : selectBet == 1 ||
-                          selectBet == 3 ||
-                          selectBet == 7 ||
-                          selectBet == 5 ||
-                          selectBet == 9
-                        ? "bgs-green text-white"
-                        : "bgs-red-200 text-white"
-                      : "bg-[#E6EBF0] text-whites "
+                          ? "bgs-red-200 text-white"
+                          : selectBet == "t"
+                            ? "bgs-violet text-white"
+                            : selectBet == "l"
+                              ? "color-yellow-bg-200 text-white"
+                              : selectBet == "n"
+                                ? "bgs-blue-500 text-white"
+                                : selectBet == 1 ||
+                                    selectBet == 3 ||
+                                    selectBet == 7 ||
+                                    selectBet == 5 ||
+                                    selectBet == 9
+                                  ? "bgs-green text-white"
+                                  : "bgs-red-200 text-white"
+                      : "bg-popup-nav text-whites "
                   }`}
                   key={i}
                   onClick={() => {
@@ -1610,7 +1586,7 @@ const Trx = () => {
                   checked={isChecked}
                   onChange={handleCheckboxChange}
                 />
-                <div className="w-6 h-6 rounded-full border-2 border-[#dd9138] flex items-center justify-center peer-checked:bg-[#dd9138]">
+                <div className="w-6 h-6 rounded-full border-2 border-black flex items-center justify-center peer-checked:bg-cyan-400">
                   <svg
                     className={`w-4 h-4 text-whites ${
                       isChecked ? "block" : "hidden"
@@ -1625,7 +1601,7 @@ const Trx = () => {
                     />
                   </svg>
                 </div>
-                <span className="text-white ms-2 mr-2 text-sm cursor-pointer">
+                <span className="text-whites ms-2 mr-2 text-sm cursor-pointer">
                   I agree
                 </span>{" "}
                 <Link className="color-red-200 fs-sm flex items-center">
@@ -1637,7 +1613,7 @@ const Trx = () => {
           </div>
           <div className="flex justify-between items-center">
             <button
-              className="bg-[#E6EBF0] text-whites w-[40%] p-2 text-sm font-medium"
+              className="bg-popup-nav text-whites w-[40%] p-2 text-sm font-medium"
               onClick={() => setOpenPopup(false)}
             >
               Cancel
@@ -1648,20 +1624,20 @@ const Trx = () => {
                 selectBet == "x"
                   ? "bgs-green"
                   : selectBet == "d"
-                  ? "bgs-red-200"
-                  : selectBet == "t"
-                  ? "bgs-violet"
-                  : selectBet == "l"
-                  ? "color-yellow-bg-200"
-                  : selectBet == "n"
-                  ? "bgs-blue-500"
-                  : selectBet == 1 ||
-                    selectBet == 3 ||
-                    selectBet == 5 ||
-                    selectBet == 7 ||
-                    selectBet == 9
-                  ? "bgs-green"
-                  : "bgs-red-200"
+                    ? "bgs-red-200"
+                    : selectBet == "t"
+                      ? "bgs-violet"
+                      : selectBet == "l"
+                        ? "color-yellow-bg-200"
+                        : selectBet == "n"
+                          ? "bgs-blue-500"
+                          : selectBet == 1 ||
+                              selectBet == 3 ||
+                              selectBet == 5 ||
+                              selectBet == 7 ||
+                              selectBet == 9
+                            ? "bgs-green"
+                            : "bgs-red-200"
               }
               `}
               disabled={loader ? true : false}
@@ -1716,16 +1692,16 @@ const Trx = () => {
                 {wingoHistoryData?.gameslist[0]?.result == "x"
                   ? "Green"
                   : wingoHistoryData?.gameslist[0]?.result == "t"
-                  ? "Voilet"
-                  : wingoHistoryData?.gameslist[0]?.result == "l"
-                  ? "Big"
-                  : wingoHistoryData?.gameslist[0]?.result == "n"
-                  ? "Small"
-                  : wingoHistoryData?.gameslist[0]?.result == "d"
-                  ? "Red"
-                  : wingoHistoryData?.gameslist[0]?.result % 2 == 0
-                  ? "Red"
-                  : "Green"}
+                    ? "Voilet"
+                    : wingoHistoryData?.gameslist[0]?.result == "l"
+                      ? "Big"
+                      : wingoHistoryData?.gameslist[0]?.result == "n"
+                        ? "Small"
+                        : wingoHistoryData?.gameslist[0]?.result == "d"
+                          ? "Red"
+                          : wingoHistoryData?.gameslist[0]?.result % 2 == 0
+                            ? "Red"
+                            : "Green"}
               </span>
 
               <span
@@ -1802,10 +1778,10 @@ const Trx = () => {
 
       {openHowtoPlay ? (
         <div className="fixed top-32 bg-popup w-[270px] flex flex-col justify-center items-center m-auto left-0 right-0 rounded-t-2xl rounded-b-2xl z-30">
-          <div className=" nav-bg w-full text-center text-white text-xl py-2  rounded-t-2xl">
+          <div className=" bg-blues w-full text-center text-white text-xl py-2  rounded-t-2xl">
             How to play
           </div>
-          <div className="h-[300px] overflow-auto p-2 fs-sm leading-6 text-whites">
+          <div className="h-[300px] overflow-auto p-2 fs-sm leading-6 text-gray-200">
             <p className="font-bold">
               3 minutes 1 issue, 2minutes 55 seconds to order, 5 seconds waiting
               for the draw. It opens all day. The total number of trade is 480
@@ -1858,9 +1834,9 @@ const Trx = () => {
               <span>(98*2)=196</span>
             </p>
           </div>
-          <div className="flex justify-center items-center bg-light w-full py-3 rounded-b-2xl">
+          <div className="flex justify-center items-center nav-bg w-full py-3 rounded-b-2xl">
             <button
-              className="blue-linear rounded-full w-40 py-2 text-white"
+              className="blue-linear rounded-full w-40 py-2"
               onClick={() => setHowtoPlay(false)}
             >
               Close

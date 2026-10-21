@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { commissiondatas } from "../../store/reducer/promotionReducer";
 
-import CopyCopmponent from "../../components/CopyCopmponent";
 import Calendar from "../../Calender";
+import CopyCopmponent from "../../components/CopyCopmponent";
 import CustomeNavbar from "../../components/CustomeNavbar";
 const CommissionDetails = () => {
   const { commissiondatasData } = useSelector((state) => state.promotion);
@@ -23,7 +23,7 @@ const CommissionDetails = () => {
         totals.totalCommsionsAmount += parseFloat(item.commission) || 0;
         return totals;
       },
-      { userLevel: 0, totalBetAmount: 0, totalCommsionsAmount: 0 }
+      { userLevel: 0, totalBetAmount: 0, totalCommsionsAmount: 0 },
     );
   };
 
@@ -45,7 +45,7 @@ const CommissionDetails = () => {
     totalBetAmount: 0,
     totalCommsionsAmount: 0,
   });
-  // //console.log("dfff",totals)
+  // console.log("dfff",totals)
   useEffect(() => {
     const fetchTotals = async () => {
       if (commissiondatasData && commissiondatasData.length > 0) {
@@ -93,34 +93,34 @@ const CommissionDetails = () => {
       </div>
 
       <div className="container-section mt-5">
-        <div className="bg-light rounded-md mt-3 pb-7 px-3 pt-1">
-          <p className="fs-sm text-whites py-1"> Settlement successful</p>
-          <p className="fs-sm text-whites py-1"> date</p>
-          <p className="fs-sm text-whites py-1">
+        <div className="nav-bg rounded-md mt-3 pb-7 px-3 pt-1">
+          <p className="text-sm text-whites"> Settlement successful</p>
+          <p className="text-sm text-whites"> date</p>
+          <p className="text-sm text-whites">
             {" "}
             The commission has been automatically credited your balance
           </p>
           <hr className="border-color-slat mt-1" />
-          <div className="mt-3 flex justify-between items-center gray-linear text-black fs-sm p-2">
-            <span className="fs-sm">Number of bettors</span>
-            <span className="fs-sm  text-black">{totals.userLevel}</span>
+          <div className="mt-3 p-2 flex justify-between items-center bg-popup-nav gray-text text-sm">
+            <span className="text-sm">Number of bettors</span>
+            <span className="text-sm  gray-text">{totals.userLevel}</span>
           </div>
 
-          <div className=" flex justify-between gray-linear items-center mt-3 text-black fs-sm p-2">
-            <span className="fs-sm">Bet Amount</span>
-            <span className="fs-sm text-black">
+          <div className=" flex justify-between bg-popup-nav items-center mt-3 p-2 gray-text text-sm">
+            <span className="text-sm font-medium">Bet Amount</span>
+            <span className="text-sm font-medium gray-text">
               {totals.totalBetAmount.toFixed(2)}
             </span>
           </div>
-          <div className=" flex justify-between gray-linear items-center mt-3 text-black fs-sm p-2">
-            <span className="fs-sm">Commission payout</span>
-            <span className="fs-sm color-yellow-200">
+          <div className=" flex justify-between bg-popup-nav items-center mt-3 p-2 gray-text text-sm">
+            <span className="text-sm font-medium">Commission payout</span>
+            <span className="text-sm font-medium color-yellow-200">
               {totals.totalCommsionsAmount.toFixed(2)}
             </span>
           </div>
-          <div className=" flex justify-between gray-linear items-center mt-3 text-black fs-sm p-2">
-            <span className="fs-sm">Time</span>
-            <span className="fs-sm  text-black">
+          <div className=" flex justify-between bg-popup-nav items-center mt-3 p-2 gray-text text-sm">
+            <span className="text-sm font-medium">Time</span>
+            <span className="text-sm font-medium  gray-text">
               {selectedDate ? selectedDate : currentDate}
             </span>
           </div>

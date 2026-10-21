@@ -1,128 +1,115 @@
-.promotion-banner{
- background: url("../../assets/promotionbg.png"),linear-gradient(90deg, #F95B5B 0%, #FFB7AF 100%);   
- /* background-color: (90deg, #374992 0%, #4675D2 100%); */
- background-position: center;
- background-size: cover;
- object-fit: cover;
- padding: 10px;
- position: relative;
+.promotion-banner {
+  background:
+    url("../../assets/promotionbg.png"),
+    linear-gradient(90deg, #21d9cc 0%, #bed921 100%);
+  /* background-color: (90deg, #374992 0%, #4675D2 100%); */
+  background-position: center;
+  background-size: cover;
+  object-fit: cover;
+  padding: 10px;
+  position: relative;
 }
 .css-1q2h7u5 {
   color: white !important;
 }
-.promotion-banner::after{
-    content: "";
-    position: absolute;
-    width: 100%;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 4rem;
-    z-index: 1;
-    background-color: var(--bgbody);
+.promotion-banner::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4rem;
+  z-index: 1;
+  background-color: var(--bgbody);
 }
-.picker-botom-hilight{
-    position: absolute;
-    top: 45%;
-    height: 3rem;
-    /* background-color: #333332; */
-    width: 100%;
+.picker-botom-hilight {
+  position: absolute;
+  top: 45%;
+  height: 3rem;
+  /* background-color: #dddddd; */
+  width: 100%;
 }
-.filter-imgs{
-   width: 240px;
-  height: auto;
-  /* convert color and boost saturation + contrast - tweak values to taste */
-  filter:
-    saturate(150%)
-    brightness(95%)
-    contrast(105%)
-    hue-rotate(-200deg)
-    sepia(20%);
-  /* smooth edges */
-  image-rendering: auto;
-}
-
 
 .App {
-    font-family: sans-serif;
-    text-align: center;
-    margin: 20px;
-    color: white;
-    background-color: #282c34;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  h1 {
-    margin-bottom: 20px;
-  }
-  
-  .WheelPicker {
-    background-color: rgba(0, 0, 0, 0.75);
-    color: white;
-  }
-  
+  font-family: sans-serif;
+  text-align: center;
+  margin: 20px;
+  color: white;
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
+h1 {
+  margin-bottom: 20px;
+}
 
+.WheelPicker {
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+}
 
-  .text-lv{
-  
-    background: linear-gradient(180deg, var(--yellow-1) 0%, var(--yellow-2) 56.13%, var(--yellow-3) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-fill-color: transparent;
-  }
+.text-lv {
+  background: linear-gradient(
+    180deg,
+    var(--yellow-1) 0%,
+    var(--yellow-2) 56.13%,
+    var(--yellow-3) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
 
+.subordinate-record .css-1h9z7r5-MuiButtonBase-root-MuiTab-root {
+  border-radius: 10px;
+  width: 33%;
+  background: var(--bg-nav);
+  color: var(--grey-100);
+  font-weight: 500;
+  text-transform: capitalize;
+  font-size: 14px;
+}
 
-  
-
-  .subordinate-record  .css-1h9z7r5-MuiButtonBase-root-MuiTab-root{
-      border-radius: 10px;
-      width: 33%;
-      background: var( --bg-nav);
-      color: var(--grey-100);
-      font-weight: 500;
-      text-transform: capitalize;
-      font-size: 14px;
-  }
-  
-  .subordinate-record  .css-1h9z7r5-MuiButtonBase-root-MuiTab-root.Mui-selected {
-     background:var(--Gradient-1, linear-gradient(93deg, var(--mediam-blue) 7.38%, var(--bgblue) 94.48%));;
-     color:white;
-     border: none;
-  }
-  .subordinate-record  .css-1aquho2-MuiTabs-indicator{
-      display: none;
-  }
-  .partner-code::before {
+.subordinate-record .css-1h9z7r5-MuiButtonBase-root-MuiTab-root.Mui-selected {
+  background: var(
+    --Gradient-1,
+    linear-gradient(93deg, var(--mediam-blue) 7.38%, var(--bgblue) 94.48%)
+  );
+  color: white;
+  border: none;
+}
+.subordinate-record .css-1aquho2-MuiTabs-indicator {
+  display: none;
+}
+.partner-code::before {
   content: "";
-    position: absolute;
-    width: 3.73333rem;
-    height: 2rem;
-    right: 0px;
-    background: var(--main-color);
-    border-radius: 0px 0.66667rem 0.66667rem 0px;
-    z-index: -1;
-    top: 50%;
+  position: absolute;
+  width: 3.73333rem;
+  height: 2rem;
+  right: 0px;
+  background: var(--main-color);
+  border-radius: 0px 0.66667rem 0.66667rem 0px;
+  z-index: -1;
+  top: 50%;
   transform: translateY(-50%);
 }
 
 .partner-code::after {
   display: block;
-    content: "";
-    width: 0px;
-    height: 0px;
-    border-left: .58667rem solid var(--bg-light);
-    border-bottom: 1.17333rem solid transparent;
-    border-top: 0px solid transparent;
-    position: absolute;
-    right: 3.18667rem;
-    top: 9%;
+  content: "";
+  width: 0px;
+  height: 0px;
+  border-left: 0.58667rem solid var(--white);
+  border-bottom: 1.17333rem solid transparent;
+  border-top: 0px solid transparent;
+  position: absolute;
+  right: 3.18667rem;
+  top: 9%;
   transform: translateY(-50%);
 }
-
- 

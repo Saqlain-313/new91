@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { RiFileCopyLine } from "react-icons/ri";
-import CopyCopmponent from "../../components/CopyCopmponent";
 import { useSelector } from "react-redux";
+import CopyCopmponent from "../../components/CopyCopmponent";
 import CustomeNavbar from "../../components/CustomeNavbar";
 
 const PartnerRewards = () => {
@@ -12,7 +12,7 @@ const PartnerRewards = () => {
   const [copyPopup, setCopyPopup] = useState(false);
   const currentUrl = window.location.origin;
   const invitationLink = `${currentUrl}/#/register?invitationCode=${userInfo?.code}`;
-  // //console.log("object", promotionsData)
+  // console.log("object", promotionsData)
   const copyToClipboard = () => {
     navigator.clipboard
       .writeText(invitationLink)
@@ -26,8 +26,12 @@ const PartnerRewards = () => {
         console.error("Failed to copy the text: ", err);
       });
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
-    <div className="bgs-body text-black max-w-md mx-auto rounded-xl shadow-lg ">
+    <div className="bg-[#0f0f1c] text-white max-w-md mx-auto rounded-xl shadow-lg ">
       <CopyCopmponent
         copyPopup={copyPopup}
         message="Copy successful"
@@ -52,7 +56,7 @@ const PartnerRewards = () => {
             {" "}
             max rewards
           </p>
-          <p className="bg-gradient-to-r from-orange-300 to-orange-400 px-4 py-1 rounded-full mt-2 text-whites font-bold text-sm shadow-md">
+          <p className="bg-gradient-to-r from-orange-300 to-orange-400 px-4 py-1 rounded-full mt-2 text-white font-bold text-sm shadow-md">
             ₹10,000.00
           </p>
         </div>
@@ -60,15 +64,15 @@ const PartnerRewards = () => {
 
       {/* Counte₹ */}
       <div className="space-y-2 p-2">
-        <div className="bg-light p-3 rounded flex justify-between">
+        <div className="bg-[#1a1a2e] p-3 rounded flex justify-between">
           <span className="gray-text">Invitation count</span>
           <span>{promotionsData?.invite?.f1}</span>
         </div>
-        <div className="bg-light p-3 rounded flex justify-between">
+        <div className="bg-[#1a1a2e] p-3 rounded flex justify-between">
           <span className="gray-text">Effective Invitation count</span>
           <span className="text-green-500">0</span>
         </div>
-        <div className="bg-light p-3 rounded flex justify-between">
+        <div className="bg-[#1a1a2e] p-3 rounded flex justify-between">
           <span className="gray-text">Invitation total bonus</span>
           <span className="text-red-500">₹0.00</span>
         </div>
@@ -77,34 +81,34 @@ const PartnerRewards = () => {
       {/* Invitation Link */}
       <div className="mt-4 px-4">
         {/* Invitation Record */}
-        <p className="text-sm text-center text-whites mb-2">
+        <p className="text-sm text-center text-white mb-2">
           Invitation record <span className="ml-1">{`>`}</span>
         </p>
 
         {/* Invitation Link */}
         <div>
           <p className="font-semibold mb-1 flex items-center">
-            <span className="w-1 h-4 bg-yellow-400 mr-2 inline-block rounded-sm" />
+            <span className="w-1 h-4 bg-cyan-400 mr-2 inline-block rounded-sm" />
             Invitation link
           </p>
 
-          <div className="relative bg-light flex items-center rounded-full overflow-hidden text-sm w-full max-w-md partner-code">
-            <span className="truncate px-4 py-2 text-whites">
+          <div className="relative bg-[#141421] flex items-center rounded-full overflow-hidden text-sm w-full max-w-md partner-code">
+            <span className="truncate px-4 py-2 text-white">
               {invitationLink}
             </span>
             <span
               onClick={copyToClipboard}
               className="relative partner-code flex items-center justify-center w-[80px] h-full z-10"
             >
-              <RiFileCopyLine className="text-white text-2xl z-20 ml-5 py-1" />
+              <RiFileCopyLine className="text-black text-2xl z-20 ml-5 py-1" />
             </span>
           </div>
         </div>
       </div>
 
       {/* Invitation Rules */}
-      <div className="mt-6 p-2 bg-light">
-        <div className="text-yellow-400 text-lg font-semibold mb-2 flex">
+      <div className="mt-6 p-2 nav-bg">
+        <div className="text-cyan-400 text-lg font-semibold mb-2 flex">
           <svg data-v-28c19aaa="" class="svg-icon icon-shuoming img img">
             <use href="#icon-shuoming"></use>
           </svg>
@@ -116,8 +120,8 @@ const PartnerRewards = () => {
         </p>
 
         {/* Bonus Table */}
-        <div className="bg-light gray-text w-full overflow-x-auto">
-          <div className="grid grid-cols-3 bg-[--main-color] border rounded-t-lg text-center font-semibold py-2 border-b border-[#E1E1E1] text-sm text-white">
+        <div className="bg-[#141421] gray-text w-full overflow-x-auto">
+          <div className="grid grid-cols-3 bg-[#3A3947] border rounded-t-lg text-center font-semibold py-2 border-b border-gray-700 text-sm">
             <div>Deposit</div>
             <div>When Player A</div>
             <div>You get bonus</div>
@@ -150,7 +154,7 @@ const PartnerRewards = () => {
               bonus: "₹4,000",
             },
           ].map((item, i) => (
-            <div className="grid grid-cols-[1fr_3fr_1fr] text-center py-2 border-b border-[#E1E1E1] text-xs">
+            <div className="grid grid-cols-[1fr_3fr_1fr] text-center py-2 border-b border-[#1e1e2d] text-xs">
               <div className="text-purple-400">
                 {i === 0 ? "1st deposit" : ""}
               </div>
@@ -186,9 +190,9 @@ const PartnerRewards = () => {
               bonus: "₹6,000",
             },
           ].map((item, i) => (
-            <div className="grid grid-cols-[1fr_3fr_1fr] text-center py-2 border-b border-[#E1E1E1] text-xs">
+            <div className="grid grid-cols-[1fr_3fr_1fr] text-center py-2 border-b border-[#1e1e2d] text-xs">
               <div className="text-purple-400">
-                {i === 0 ? "1st deposit" : ""}
+                {i === 0 ? "2nd deposit" : ""}
               </div>
               <div>{item.amount}</div>
               <div className="text-red-500 font-medium">{item.bonus}</div>
@@ -222,9 +226,9 @@ const PartnerRewards = () => {
               bonus: "₹10,000",
             },
           ].map((item, i) => (
-            <div className="grid grid-cols-[1fr_3fr_1fr] text-center py-2 text-xs border-b border-[#E1E1E1]">
+            <div className="grid grid-cols-[1fr_3fr_1fr] text-center py-2 text-xs border-b border-[#3A3947]">
               <div className="text-purple-400">
-                {i === 0 ? "1st deposit" : ""}
+                {i === 0 ? "3rd deposit" : ""}
               </div>
               <div>{item.amount}</div>
               <div className="text-red-500 font-medium">{item.bonus}</div>
@@ -233,7 +237,7 @@ const PartnerRewards = () => {
         </div>
 
         {/* Notes */}
-        <div className="mt-4 text-sm space-y-2 gray-text p-2">
+        <div className="mt-4 text-sm space-y-2 text-gray-300 p-2">
           <p className="text-red-400">*Each deposit can only get one bonus.</p>
           <ul className="space-y-1">
             <li className="flex flex-col text-sm">
@@ -251,7 +255,7 @@ const PartnerRewards = () => {
                     height="8"
                     rx="1"
                     transform="rotate(45 5.65625 0)"
-                    fill="#F5CC2C"
+                    fill="#21D9CC"
                   />
                 </svg>
                 <span>eg:</span>
@@ -281,7 +285,7 @@ const PartnerRewards = () => {
                   height="10"
                   rx="1"
                   transform="rotate(45 5.65625 0)"
-                  fill="#F5CC2C"
+                  fill="#21D9CC"
                 ></rect>
               </svg>
               <span className="ml-2">
@@ -305,7 +309,7 @@ const PartnerRewards = () => {
                   height="10"
                   rx="1"
                   transform="rotate(45 5.65625 0)"
-                  fill="#F5CC2C"
+                  fill="#21D9CC"
                 ></rect>
               </svg>
               <span className="ml-2">

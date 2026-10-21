@@ -38,11 +38,10 @@ import "./wingo.css";
 import debounce from "lodash/debounce";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import Loader from "../../components/Loader";
-import ServiceRotate from "../../components/ServiceRotate";
 import { host } from "../../store/reducer/api";
 import EmptyData from "../activity/EmptyData";
 
-const WinImg = "https://i.ibb.co/TMnbvp0N/win-popup.png";
+const WinImg = "https://i.ibb.co/ssJ2HLw/win-popup.png";
 const LoseImg = "https://i.ibb.co/8zTQQmx/loss-popup.png";
 const ImgData = [
   ZeroImg,
@@ -73,6 +72,7 @@ const Wingo = () => {
   const [gameHistory, setGameHistory] = useState("ghistory");
   const [openPopup, setOpenPopup] = useState(false);
   const [openTime, setOpenTime] = useState(false);
+
   const [openHowtoPlay, setHowtoPlay] = useState(false);
   const [details, setDetails] = useState(null);
   const [refershPopup, setRefeshPopup] = useState(false);
@@ -146,13 +146,10 @@ const Wingo = () => {
 
   useEffect(() => {
     // const wingominutes = localStorage?.getItem('wingominute');
-    if (Game) {
-      setActiveTime(Number(Game));
-      setTypeid1(Number(Game));
-    } else {
-      setActiveTime(1);
-      setTypeid1(1);
-    }
+    // if (wingominutes !== null) {
+    setActiveTime(Number(Game));
+    setTypeid1(Number(Game));
+    // }
 
     if (typeid1 !== null) {
       updateNumbers();
@@ -256,11 +253,12 @@ const Wingo = () => {
   };
 
   const handleBet = async () => {
+    setOpenPopup(false);
     dispatch(wingoBet({ typeid1, selectBet, balance, multiplier })).then(
       (res) => {
         setBetAlert(true);
         dispatch(userDetail());
-        setOpenPopup(false);
+        // setOpenPopup(false)
         setMessage(res.payload.message);
         setBalance(1);
         setMultiplier(1);
@@ -279,7 +277,7 @@ const Wingo = () => {
   };
 
   useEffect(() => {
-    debouncedDispatch(dispatch, Number(Game) || 1, pageno, pageto);
+    debouncedDispatch(dispatch, Number(Game), pageno, pageto);
   }, [dispatch]);
 
   const debouncedDispatch = useCallback(
@@ -300,6 +298,7 @@ const Wingo = () => {
   const debouncedDispatchResult = useCallback(
     debounce((dispatch, typeid1, pageno, pageto) => {
       dispatch(wingoHistory({ typeid1, pageno, pageto })).then((res) => {
+        console.log(res?.payload.data?.gameslist[0]?.status);
         if (res?.payload.data?.gameslist[0]?.status == 1) {
           dispatch(userDetail());
           setWinResult(true);
@@ -328,7 +327,7 @@ const Wingo = () => {
       setPage(1);
       setPageto(10);
       // Realtime data
-      // //console.log("msg?.data",msg?.data,"wingoHistoryData?.",wingoHistoryData?.gameslist[0]?.stage)
+      // console.log("msg?.data",msg?.data,"wingoHistoryData?.",wingoHistoryData?.gameslist[0]?.stage)
 
       if (
         msg?.data[1]?.period == wingoHistoryData?.gameslist[0]?.stage &&
@@ -345,7 +344,7 @@ const Wingo = () => {
       // if (msg?.data[1]?.period === wingoHistoryData?.gameslist[0]?.stage) {
       //   debouncedDispatchResult(dispatch, typeid1, pageno, pageto)
       //   setResultPopup(true)
-      //   //console.log("fff",resultPopup)
+      //   console.log("fff",resultPopup)
       // }
 
       if (
@@ -523,7 +522,7 @@ const Wingo = () => {
     if (!isConnectedRef.current) {
       socket.current = io.connect(host);
       isConnectedRef.current = true;
-      //console.log("Socket connected");
+      console.log("Socket connected");
     }
 
     // Set listeners only, do not reconnect the socket
@@ -543,7 +542,7 @@ const Wingo = () => {
         socket.current.disconnect();
         socket.current = null;
         isConnectedRef.current = false;
-        //console.log("Socket disconnected");
+        console.log("Socket disconnected");
       }
     };
   }, []);
@@ -555,7 +554,7 @@ const Wingo = () => {
       .writeText(String(number))
       .then(() => {
         setCopyPopup(true);
-        //console.log("Copied to clipboard");
+        console.log("Copied to clipboard");
         setTimeout(() => {
           setCopyPopup(false);
         }, 1500);
@@ -588,27 +587,174 @@ const Wingo = () => {
     const newNumbers4 = getRandomNumbers(number4.length, 29); // Generate random numbers up to 30
     setNumber4(newNumbers4);
   };
-
   const handleClose = () => {
     setWinResult(null);
     setResultPopup(false);
   };
 
-  // Auto close popup after 5 seconds
-  useEffect(() => {
-    if (resultPopup && (winResult === true || winResult === false)) {
-      const timer = setTimeout(() => {
-        handleClose(); // 5 sec ke baad popup close
-      }, 3000);
-
-      // Cleanup: agar popup close ho jaye ya component unmount ho to timer clear ho
-      return () => clearTimeout(timer);
+  // Add a function to get the appropriate content based on activeTime
+  const getHowToPlayContent = () => {
+    switch (activeTime) {
+      case 10: // 30s
+        return (
+          <>
+            <p className="font-bold">
+              30 seconds 1 issue, 25 seconds to order, 5 seconds waiting for the
+              draw. It opens all day. The total number of trade is 2880 issues.
+            </p>
+            <p className="font-bold">
+              If you spend 100 to trade, after deducting 2 service fee, your
+              contract amount is 98:
+            </p>
+            <p>
+              1. Select green: if the result shows 1,3,7,9 you will get
+              (98*2)=196; If the result shows 5, you will get (98*1.5) 147
+            </p>
+            <p>
+              2. Select red: if the result shows 2,4,6,8 you will get
+              (98*2)=196; If the result shows 0, you will get (98*1.5) 147
+            </p>
+            <p>
+              3. Select violet: if the result shows 0 or 5, you will get
+              (98*4.5) 441
+            </p>
+            <p>
+              4. Select number: if the result is the same as the number you
+              selected, you will get (98*9)=882
+            </p>
+            <p>
+              5. Select big: if the result shows 5,6,7,8,9 you will get
+              (98*2)=196
+            </p>
+            <p>
+              6. Select small: if the result shows 0,1,2,3,4 you will get
+              (98*2)=196
+            </p>
+          </>
+        );
+      case 1: // 1min
+        return (
+          <>
+            <p className="font-bold">
+              1 minute 1 issue, 45 seconds to order, 15 seconds waiting for the
+              draw. It opens all day. The total number of trades is 1440 issues.
+            </p>
+            <p className="font-bold">
+              If you spend 100 to trade, after deducting a 2 service fee, your
+              contract amount is 98:
+            </p>
+            <p>
+              1. Select green: If the result shows 1, 3, 7, 9, you will get (98
+              * 2) 196; If the result shows 5, you will get (98 * 1.5) 147.
+            </p>
+            <p>
+              2. Select red: If the result shows 2, 4, 6, 8, you will get (98 *
+              2) 196; If the result shows 0, you will get (98 * 1.5) 147.
+            </p>
+            <p>
+              3. Select violet: If the result shows 0 or 5, you will get (98 *
+              4.5) 441.
+            </p>
+            <p>
+              4. Select number: If the result is the same as the number you
+              selected, you will get (98 * 9) 882.
+            </p>
+            <p>
+              5. Select big: If the result shows 5, 6, 7, 8, 9, you will get (98
+              * 2) 196.
+            </p>
+            <p>
+              6. Select small: If the result shows 0, 1, 2, 3, 4, you will get
+              (98 * 2) 196.
+            </p>
+          </>
+        );
+      case 3: // 3min
+        return (
+          <>
+            <p className="font-bold">
+              3 minutes 1 issue, 2 minutes and 45 seconds to order, 15 seconds
+              waiting for the draw. It opens all day. The total number of trade
+              is 480 issues.
+            </p>
+            <p className="font-bold">
+              If you spend 100 to trade, after deducting 2 service fee, your
+              contract amount is 98:
+            </p>
+            <p>
+              1. Select green: if the result shows 1, 3, 7, 9 you will get (98 *
+              2) 196; If the result shows 5, you will get (98 * 1.5) 147
+            </p>
+            <p>
+              2. Select red: if the result shows 2, 4, 6, 8 you will get (98 *
+              2) 196; If the result shows 0, you will get (98 * 1.5) 147
+            </p>
+            <p>
+              3. Select violet: if the result shows 0 or 5, you will get (98 *
+              4.5) 441
+            </p>
+            <p>
+              4. Select number: if the result is the same as the number you
+              selected, you will get (98 * 9) 882
+            </p>
+            <p>
+              5. Select big: if the result shows 5, 6, 7, 8, 9 you will get (98
+              * 2) 196
+            </p>
+            <p>
+              6. Select small: if the result shows 0, 1, 2, 3, 4 you will get
+              (98 * 2) 196
+            </p>
+          </>
+        );
+      case 5: // 5min
+        return (
+          <>
+            <p className="font-bold">
+              5 minutes 1 issue, 4 minutes and 45 seconds to order, 15 seconds
+              waiting for the draw. It opens all day. The total number of trade
+              is 288 issues.
+            </p>
+            <p className="font-bold">
+              If you spend 100 to trade, after deducting 2 service fee, your
+              contract amount is 98:
+            </p>
+            <p>
+              1. Select green: if the result shows 1, 3, 7, 9 you will get (98 *
+              2) 196; If the result shows 5, you will get (98 * 1.5) 147
+            </p>
+            <p>
+              2. Select red: if the result shows 2, 4, 6, 8 you will get (98 *
+              2) 196; If the result shows 0, you will get (98 * 1.5) 147
+            </p>
+            <p>
+              3. Select violet: if the result shows 0 or 5, you will get (98 *
+              4.5) 441
+            </p>
+            <p>
+              4. Select number: if the result is the same as the number you
+              selected, you will get (98 * 9) 882
+            </p>
+            <p>
+              5. Select big: if the result shows 5, 6, 7, 8, 9 you will get (98
+              * 2) 196
+            </p>
+            <p>
+              6. Select small: if the result shows 0, 1, 2, 3, 4 you will get
+              (98 * 2) 196
+            </p>
+          </>
+        );
+      default:
+        return null;
     }
-  }, [resultPopup, winResult]);
+  };
 
   return (
     <>
-      <ServiceRotate />
+      {/* <div>
+        <ServiceRotate />
+      </div> */}
       {!userInfo && <Loader />}
       <HeaderInfo
         handleRefersh={handleRefersh}
@@ -617,23 +763,24 @@ const Wingo = () => {
         activeVoice={activeVoice}
       />
 
-      <div className="container-section relative mt-[-79px] mb-[-85px]">
+      <div className="container-section relative mt-[-79px]">
         {/* time tabs */}
+        {/* Time tabs */}
         <div className="grid grid-cols-12 bg-popup-nav rounded-xl">
           <div
-            className={`col-span-3  cursor-pointer flex items-center flex-col justify-center py-2  rounded-xl  ${
+            className={`col-span-3 cursor-pointer flex items-center flex-col justify-center py-2 rounded-xl ${
               activeTime == "10" ? "blue-linear2" : ""
             }`}
             onClick={() => handleWingoMinut(10)}
           >
             <img
               src={activeTime == "10" ? TimeActiveImg : TimeImg}
-              alt=""
-              className="w-10"
+              alt="30 seconds"
+              className={`w-10 ${activeTime == "10" ? "hue-rotate-45" : ""}`}
             />
             <p
-              className={`text-center  fs-sm font-sans leading-4 ${
-                activeTime == "10" ? "text-white" : "gray-text"
+              className={`text-center fs-sm font-sans leading-4 ${
+                activeTime == "10" ? "text-black" : "gray-text"
               }`}
             >
               Win Go <br /> 30s
@@ -641,57 +788,59 @@ const Wingo = () => {
           </div>
 
           <div
-            className={`col-span-3 cursor-pointer  flex items-center flex-col justify-center py-2 ${
+            className={`col-span-3 cursor-pointer flex items-center flex-col justify-center py-2 ${
               activeTime == "1" ? "blue-linear2" : ""
             } rounded-xl`}
             onClick={() => handleWingoMinut(1)}
           >
             <img
               src={activeTime == "1" ? TimeActiveImg : TimeImg}
-              alt=""
-              className="w-10"
+              alt="1 minute"
+              className={`w-10 ${activeTime == "1" ? "hue-rotate-45" : ""}`}
             />
             <p
-              className={`text-center  fs-sm font-sans leading-4 ${
-                activeTime == "1" ? "text-white" : "gray-text"
+              className={`text-center fs-sm font-sans leading-4 ${
+                activeTime == "1" ? "text-black" : "gray-text"
               }`}
             >
               Win Go <br /> 1Min
             </p>
           </div>
+
           <div
-            className={`col-span-3  cursor-pointer flex items-center flex-col justify-center py-2  rounded-xl  ${
+            className={`col-span-3 cursor-pointer flex items-center flex-col justify-center py-2 rounded-xl ${
               activeTime == "3" ? "blue-linear2" : ""
             }`}
             onClick={() => handleWingoMinut(3)}
           >
             <img
               src={activeTime == "3" ? TimeActiveImg : TimeImg}
-              alt=""
-              className="w-10"
+              alt="3 minutes"
+              className={`w-10 ${activeTime == "3" ? "hue-rotate-45" : ""}`}
             />
             <p
-              className={`text-center  fs-sm font-sans leading-4 ${
-                activeTime == "3" ? "text-white" : "gray-text"
+              className={`text-center fs-sm font-sans leading-4 ${
+                activeTime == "3" ? "text-black" : "gray-text"
               }`}
             >
               Win Go <br /> 3Min
             </p>
           </div>
+
           <div
-            className={`col-span-3  cursor-pointer flex items-center flex-col justify-center py-2  rounded-xl  ${
+            className={`col-span-3 cursor-pointer flex items-center flex-col justify-center py-2 rounded-xl ${
               activeTime == "5" ? "blue-linear2" : ""
             }`}
             onClick={() => handleWingoMinut(5)}
           >
             <img
               src={activeTime == "5" ? TimeActiveImg : TimeImg}
-              alt=""
-              className="w-10"
+              alt="5 minutes"
+              className={`w-10 ${activeTime == "5" ? "hue-rotate-45" : ""}`}
             />
             <p
-              className={`text-center  fs-sm font-sans leading-4 ${
-                activeTime == "5" ? "text-white" : "gray-text"
+              className={`text-center fs-sm font-sans leading-4 ${
+                activeTime == "5" ? "text-black" : "gray-text"
               }`}
             >
               Win Go <br /> 5Min
@@ -700,15 +849,15 @@ const Wingo = () => {
         </div>
 
         {/* wingo time period */}
+        {/* Wingo time period */}
         <div className="wingo-period-bg flex justify-between mt-4 rounded-lg p-2">
           <div>
             <button
-              className="border border-white flex items-center justify-center text-white  rounded-full px-4 py-[1px]"
+              className="border border-black flex items-center justify-center text-black rounded-full px-4 py-[1px]"
               onClick={() => setHowtoPlay(true)}
             >
               <svg
-                data-v-3e4c6499=""
-                xmlns=""
+                xmlns="http://www.w3.org/2000/svg"
                 className="svg-white"
                 width="20"
                 height="20"
@@ -716,15 +865,13 @@ const Wingo = () => {
                 fill="#fff"
               >
                 <path
-                  data-v-3e4c6499=""
                   d="M23.67 3H12.33C6.66 3 5.25 4.515 5.25 10.56V27.45C5.25 31.44 7.44 32.385 10.095 29.535L10.11 29.52C11.34 28.215 13.215 28.32 14.28 29.745L15.795 31.77C17.01 33.375 18.975 33.375 20.19 31.77L21.705 29.745C22.785 28.305 24.66 28.2 25.89 29.52C28.56 32.37 30.735 31.425 30.735 27.435V10.56C30.75 4.515 29.34 3 23.67 3ZM11.67 18C10.845 18 10.17 17.325 10.17 16.5C10.17 15.675 10.845 15 11.67 15C12.495 15 13.17 15.675 13.17 16.5C13.17 17.325 12.495 18 11.67 18ZM11.67 12C10.845 12 10.17 11.325 10.17 10.5C10.17 9.675 10.845 9 11.67 9C12.495 9 13.17 9.675 13.17 10.5C13.17 11.325 12.495 12 11.67 12ZM24.345 17.625H16.095C15.48 17.625 14.97 17.115 14.97 16.5C14.97 15.885 15.48 15.375 16.095 15.375H24.345C24.96 15.375 25.47 15.885 25.47 16.5C25.47 17.115 24.96 17.625 24.345 17.625ZM24.345 11.625H16.095C15.48 11.625 14.97 11.115 14.97 10.5C14.97 9.885 15.48 9.375 16.095 9.375H24.345C24.96 9.375 25.47 9.885 25.47 10.5C25.47 11.115 24.96 11.625 24.345 11.625Z"
                   fill="currentColor"
                 ></path>
               </svg>
               <span className="fs-sm">How to play</span>
             </button>
-            <p className="fs-sm ms-1 mb-3 mt-1 text-white">
-              {" "}
+            <p className="fs-sm ms-1 mb-3 mt-1 text-black">
               Win Go {activeTime == "10" ? "30s" : activeTime + "Min"}
             </p>
             <div className="flex items-center">
@@ -742,35 +889,37 @@ const Wingo = () => {
                   ))}
             </div>
           </div>
-          {/* period */}
+
+          {/* Period */}
           <div className="flex flex-col items-end">
-            <p className="text-sm font-bold text-white">Time remaining</p>
+            <p className="text-sm font-bold text-black">Time remaining</p>
             <div className="flex items-center mt-1">
-              <span className="bg-body  text-lg mx-[1px] font-semibold w-5 text-center text-whites">
+              <span className="nav-bg text-lg mx-[1px] font-semibold w-5 text-center text-whites">
                 {minutetime1}
               </span>
-              <span className="bg-body  text-lg mx-[1px] font-semibold w-5 text-center text-whites">
+              <span className="nav-bg text-lg mx-[1px] font-semibold w-5 text-center text-whites">
                 {minutetime2}
               </span>
-              <span className="bg-body px-1 text-lg mx-[1px] font-semibold text-whites">
+              <span className="nav-bg px-1 text-lg mx-[1px] font-semibold text-whites">
                 :
               </span>
-              <span className="bg-body  text-lg mx-[1px] font-semibold w-5 text-center text-whites">
+              <span className="nav-bg text-lg mx-[1px] font-semibold w-5 text-center text-whites">
                 {secondtime1}
               </span>
-              <span className="bg-body  text-lg mx-[1px] font-semibold w-5 text-center text-whites">
+              <span className="nav-bg text-lg mx-[1px] font-semibold w-5 text-center text-whites">
                 {secondtime2}
               </span>
             </div>
-            <h5 className="heading-h5 text-base font-bold mt-2 text-white">
+            <h5 className="heading-h5 text-base font-bold mt-2 text-black">
               {wingoPeriodListData?.period}
             </h5>
           </div>
         </div>
+
         {/* bet period section */}
 
         <div className="relative">
-          <div className="bg-body mt-3 p-2">
+          <div className="nav-bg mt-3 p-2">
             <div className="flex justify-between items-center">
               <button
                 className="bgs-green text-sm font-medium w-full  py-2 rounded-tr-lg rounded-bl-lg"
@@ -793,21 +942,21 @@ const Wingo = () => {
             </div>
 
             <div className="bgs-body mt-2 p-2 rounded-lg">
-              <div className="grid grid-cols-10 gap-2">
+              <div className="grid grid-cols-10 gap-3 p-1">
                 {ImgData.map((item, i) => (
                   <div
                     key={i}
-                    className={`col-span-2 ${animate ? "animate-up-down" : ""}`}
+                    className={`col-span-2 flex justify-center items-center  rounded ${animate ? "animate-up-down" : ""}`}
                     onClick={() => selectBetHandle(i)}
                     style={{ animationDelay: `${i * 0.3}s` }}
                   >
-                    <img src={item} alt={`Image ${i}`} className="w-14 mx-1" />
+                    <img src={item} alt={`Image ${i}`} className="w-14" />
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center  justify-between mt-2">
               <button
                 className="rounded-md border color-red-200 px-2 text-base border-[--red-color-200] mr-2 py-1"
                 onClick={generateRandomNumber}
@@ -817,7 +966,7 @@ const Wingo = () => {
               <div className="flex items-center ">
                 {xData.map((item, i) => (
                   <button
-                    className={`bgs-body text-whites text-sm mr-1 px-[7px] py-[5px] rounded-md ${
+                    className={`bgs-body text-whites text-sm mr-1 px-[6px] py-[5px] rounded-md ${
                       activeX === i ? "bgs-green text-white" : ""
                     }`}
                     key={i}
@@ -834,13 +983,13 @@ const Wingo = () => {
 
             <div className="flex items-center mt-3 rounded-full">
               <button
-                className="bg-yellow text-sm font-medium w-full  py-3 rounded-s-full  "
+                className="bg-yellow text-sm font-medium w-full  py-[10px] rounded-s-full  "
                 onClick={() => selectBetHandle("l")}
               >
                 Big
               </button>
               <button
-                className="bgs-blue-500 text-sm font-sans font-medium w-full  py-3 rounded-e-full"
+                className="bgs-blue-500 text-sm font-sans font-medium w-full  py-[10px] rounded-e-full"
                 onClick={() => selectBetHandle("n")}
               >
                 Small
@@ -867,8 +1016,8 @@ const Wingo = () => {
             <button
               className={` flex justify-center items-center h-full w-full py-2 border-none rounded-lg ${
                 gameHistory == "ghistory"
-                  ? " text-base blue-linear text-white font-medium "
-                  : "bg-body text-sm text-whites"
+                  ? " text-base blue-linear text-black font-medium "
+                  : "nav-bg text-sm text-whites"
               }`}
               onClick={() => setGameHistory("ghistory")}
             >
@@ -879,8 +1028,8 @@ const Wingo = () => {
             <button
               className={` flex justify-center items-center h-full w-full py-2 border-none rounded-lg ${
                 gameHistory == "chart"
-                  ? "text-base blue-linear text-white font-medium "
-                  : "bg-body text-sm text-whites"
+                  ? "text-base blue-linear text-black font-medium "
+                  : "nav-bg text-sm whites"
               }`}
               onClick={() => {
                 setGameHistory("chart");
@@ -894,8 +1043,8 @@ const Wingo = () => {
             <button
               className={` flex justify-center items-center h-full w-full py-2 border-none rounded-lg ${
                 gameHistory == "mhistory"
-                  ? " text-base blue-linear text-white font-medium "
-                  : "bg-body text-sm text-whites"
+                  ? " text-base blue-linear text-black font-medium "
+                  : "nav-bg text-sm text-whites"
               }`}
               onClick={() => setGameHistory("mhistory")}
             >
@@ -907,30 +1056,30 @@ const Wingo = () => {
 
         {gameHistory == "ghistory" && (
           <div>
-            <div className="grid grid-cols-12 nav-bg rounded-t-md p-2 mt-5">
+            <div className="grid grid-cols-12 bg-popup-nav rounded-t-md p-2 mt-5 ">
               <div className="col-span-4 flex text-center justify-center">
-                <h5 className="heading-h5 text-sm text-white">Period</h5>
+                <h5 className="heading-h5 text-sm">Period</h5>
               </div>
               <div className="col-span-2  text-center justify-center">
-                <h5 className="heading-h5 text-sm text-white">Number</h5>
+                <h5 className="heading-h5 pl-3 text-sm">Number</h5>
               </div>
               <div className="col-span-3  text-center justify-center">
-                <h5 className="heading-h5 text-sm text-white">Big Small</h5>
+                <h5 className="heading-h5 pl-4 text-sm">Big Small</h5>
               </div>
               <div className="col-span-3  text-center justify-center">
-                <h5 className="heading-h5 text-sm text-white">Color</h5>
+                <h5 className="heading-h5 pl-3 text-sm">Color</h5>
               </div>
             </div>
 
             {Array.isArray(wingoPeriodListData?.data?.gameslist) &&
               wingoPeriodListData.data.gameslist.map((item, i) => (
-                <div className="grid grid-cols-12 bg-body p-1 py-[5px]" key={i}>
-                  <div className="col-span-4 flex text-center justify-center items-center">
+                <div className="grid grid-cols-12 nav-bg p-1  py-[5px]" key={i}>
+                  <div className="col-span-4 flex text-center pl-1 justify-center items-center">
                     <span className="fs-sm  gray-50  relative flex">
                       {item.period}
                     </span>
                   </div>
-                  <div className="col-span-2  text-center justify-center  items-center">
+                  <div className="col-span-2 pl-4 text-center justify-center  items-center">
                     <span
                       className={`text-2xl gray-50 font-bold color-red-200 ${
                         item.amount === 0
@@ -948,7 +1097,7 @@ const Wingo = () => {
                       {item.amount}
                     </span>
                   </div>
-                  <div className="col-span-3  text-center justify-center  items-center">
+                  <div className="col-span-3 pl-2 text-center justify-center  items-center">
                     <span className="text-sm gray-50">
                       {item.amount > 4 ? "Big" : "Small"}
                     </span>
@@ -982,12 +1131,10 @@ const Wingo = () => {
                   </div>
                 </div>
               ))}
-            <div className="bg-body p-6 flex items-center justify-center mt-5">
+            <div className="nav-bg p-6 flex items-center justify-center mt-5">
               <button
                 className={`rounded-md p-2 mr-4 ${
-                  pageto / 10 >= 2
-                    ? "bg-color-l2 text-white"
-                    : "bg-blues text-whites"
+                  pageto / 10 >= 2 ? "bg-color-l2 text-black" : "bg-popup-nav"
                 } `}
                 disabled={pageto / 10 > 1 ? false : true}
                 onClick={handleDecrease}
@@ -1003,8 +1150,8 @@ const Wingo = () => {
               <button
                 className={`rounded-md p-2 ms-4 ${
                   wingoPeriodListData?.page
-                    ? "bg-color-l2 text-white"
-                    : "bg-[#E6EBF0] text-whites"
+                    ? "bg-color-l2 text-black"
+                    : "bg-popup-nav text-whites"
                 } `}
                 disabled={
                   wingoPeriodListData?.page > pageto / 10 ? false : true
@@ -1022,14 +1169,10 @@ const Wingo = () => {
 
         {gameHistory == "chart" && (
           <div>
-            <div className="chart-section mt-5 bg-body rounded-t-md">
-              <div className="flex items-center nav-bg justify-evenly rounded-t-md py-2">
-                <h5 className="heading-h5 text-base font-semibold text-white">
-                  Period
-                </h5>
-                <h5 className="heading-h5 text-base font-semibold text-white">
-                  Number
-                </h5>
+            <div className="chart-section mt-5 nav-bg rounded-t-md">
+              <div className="flex items-center  bg-darks justify-evenly rounded-t-md py-2">
+                <h5 className="heading-h5 text-base font-semibold ">Period</h5>
+                <h5 className="heading-h5 text-base font-semibold ">Number</h5>
               </div>
 
               <div className="mx-2 mt-2">
@@ -1103,7 +1246,7 @@ const Wingo = () => {
                 </div>
               </div>
 
-              <div className="container2 mx-2">
+              <div className="container2 mx-2 overflow-x-auto">
                 <div className="trend-record w-full">
                   <ul id="trendList" className="w-full mt-5">
                     {Array.isArray(wingoPeriodListData?.data?.gameslist) &&
@@ -1112,10 +1255,10 @@ const Wingo = () => {
                           className="flex justify-between items-center"
                           key={i}
                         >
-                          <div className="first  fs-sm gray-50">
+                          <div className="first mr-1 fs-sm gray-50">
                             {item.period}
                           </div>
-                          <div className="sec">
+                          <div className="sec ">
                             <span
                               className={`${
                                 item.amount === 0 ? "active bg-red-voilet" : ""
@@ -1201,12 +1344,10 @@ const Wingo = () => {
               </div>
             </div>
 
-            <div className="bg-body p-6 flex items-center justify-center mt-5">
+            <div className="nav-bg p-6 flex items-center justify-center mt-5">
               <button
                 className={`rounded-md p-2 mr-4 ${
-                  pageto / 10 >= 2
-                    ? "bg-color-l2 text-white"
-                    : "bg-blues text-whites"
+                  pageto / 10 >= 2 ? "bg-color-l2 text-black" : "bg-text-whites"
                 } `}
                 disabled={pageto / 10 > 1 ? false : true}
                 onClick={handleDecrease}
@@ -1222,7 +1363,7 @@ const Wingo = () => {
               <button
                 className={`rounded-md p-2 ms-4 ${
                   wingoPeriodListData?.page
-                    ? "bg-color-l2 text-white"
+                    ? "bg-color-l2 text-black"
                     : "bg-text-whites"
                 } `}
                 disabled={
@@ -1239,10 +1380,11 @@ const Wingo = () => {
           </div>
         )}
         {gameHistory == "mhistory" && (
-          <div className="bg-body p-2 py-3 mt-5">
+          <div className="nav-bg p-2 py-3 mt-5">
             <div className="flex items-end justify-end mb-3">
-              <Link className="fs-sm text-[#F5CC2C] border rounded-lg border-[#F5CC2C] px-3 py-1 flex item-center items-end ">
-                Details <IoIosArrowDropright className="mb-[2px] " />
+              <Link className="fs-sm text-[#21D9CC] border rounded-lg border-[#21D9CC] px-3 py-1 flex item-center items-end ">
+                Details
+                <IoIosArrowDropright className="mb-[2px] " />
               </Link>
             </div>
 
@@ -1254,14 +1396,14 @@ const Wingo = () => {
 
             {Array.isArray(wingoHistoryData?.gameslist) &&
               wingoHistoryData?.gameslist?.map((item, i) => (
-                <div key={i} className="mb-2 border-b">
+                <div key={i} className="mb-2">
                   <div
-                    className="  flex items-center justify-between pt-1"
+                    className="  flex items-center justify-between"
                     onClick={() => handleDetail(i)}
                   >
                     <div className="flex items-center">
                       <div
-                        className={`flex justify-center h-10 w-10 items-center rounded-lg mr-2
+                        className={`flex justify-center h-9 w-9 items-center fs-sm rounded-lg mr-2 
                      ${
                        item.bet == "x"
                          ? "bgs-green"
@@ -1284,11 +1426,6 @@ const Wingo = () => {
                                        ? "bgs-green"
                                        : "bgs-red-200"
                      }
-                      ${
-                        ["l", "n", "x", "d", "t"].includes(item.bet)
-                          ? "text-[12px]"
-                          : "text-xl"
-                      }
                       `}
                       >
                         {item.bet == "x"
@@ -1304,7 +1441,7 @@ const Wingo = () => {
                                   : item.bet}
                       </div>
                       <div>
-                        <h3 className="heading-h4 text-whites">
+                        <h3 className="heading-h3  text-whites text-base">
                           {item?.stage}
                         </h3>
                         <p className="fs-sm gray-50">{item.today}</p>
@@ -1314,18 +1451,18 @@ const Wingo = () => {
                     {item.status !== 0 && (
                       <div className="flex flex-col items-end">
                         <div
-                          className={`min-w-[75px] text-center border px-4 py-1 rounded-md text-xs ${
+                          className={`border  px-5 py-[2px] rounded-md fs-sm  ${
                             item.status === 1
-                              ? "color-green border-green-500"
+                              ? "color-green border-color-green"
                               : "color-red-200 border-color-red"
                           }`}
                         >
-                          {item.status === 1 ? "Succeed" : "Failed"}
+                          {item.status === 1 ? "Succeed" : " Failed"}
                         </div>
 
                         <p
-                          className={`text-[12.8px] mt-1 ${
-                            item.status === 1 ? "color-green" : "color-red-200"
+                          className={`color-red-200 fs-sm mt-2 ${
+                            item.status === 1 ? "color-green " : "color-red-200"
                           }`}
                         >
                           {item.status === 1
@@ -1349,7 +1486,7 @@ const Wingo = () => {
                     }`}
                   >
                     <h2 className="heading-h2 gray-50 text-lg">Details</h2>
-                    <div className="flex bg-[#E6EBF0] items-center justify-between text-sm p-1 mb-2 rounded-md">
+                    <div className="flex bg-popup-nav items-center justify-between text-sm p-1 mb-2 rounded-md">
                       <span className=" text-whites ">Order number</span>
                       <span className=" text-whites flex item-center">
                         {item.id_product}
@@ -1359,21 +1496,21 @@ const Wingo = () => {
                         />
                       </span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] text-sm p-1 mb-2 rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav text-sm p-1 mb-2 rounded-md">
                       <span className=" text-whites ">Period</span>
                       <span className=" text-whites ">{item.stage}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] text-sm p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav text-sm p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Purchase amount</span>
                       <span className=" text-whites ">
                         ₹{parseFloat(item.money) + parseFloat(item.fee)}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] text-sm p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav text-sm p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Quantiy</span>
                       <span className=" text-whites ">{item.amount}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] text-sm p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav text-sm p-1 mb-2  rounded-md">
                       <span className="text-whites ">Amount after tax</span>
                       <span className="color-red-200 ">
                         ₹
@@ -1383,11 +1520,11 @@ const Wingo = () => {
                         })}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] text-sm p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav text-sm p-1 mb-2  rounded-md">
                       <span className="text-whites ">Tax</span>
                       <span className="text-whites ">₹{item.fee}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] text-sm p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav text-sm p-1 mb-2  rounded-md">
                       <span className="text-whites ">Result</span>
                       {item.status !== 0 && (
                         <div className=" flex text-center justify-center  items-center">
@@ -1413,7 +1550,7 @@ const Wingo = () => {
                         </div>
                       )}
                     </div>
-                    <div className=" flex items-center justify-between bg-[#E6EBF0] text-sm p-1 mb-2  rounded-md">
+                    <div className=" flex items-center justify-between bg-popup-nav text-sm p-1 mb-2  rounded-md">
                       <span className="text-whites ">Select</span>
                       <span className=" text-whites ms-2">
                         {" "}
@@ -1430,7 +1567,7 @@ const Wingo = () => {
                                   : item.bet}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] text-sm p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav text-sm p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Status</span>
                       {item.status !== 0 && (
                         <span
@@ -1443,7 +1580,7 @@ const Wingo = () => {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] text-sm p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav text-sm p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Win/loss</span>
                       {item.status !== 0 && (
                         <span
@@ -1465,19 +1602,17 @@ const Wingo = () => {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between bg-[#E6EBF0] text-sm p-1 mb-2  rounded-md">
+                    <div className="flex items-center justify-between bg-popup-nav text-sm p-1 mb-2  rounded-md">
                       <span className=" text-whites ">Order time</span>
                       <span className=" text-whites ">{item.today}</span>
                     </div>
                   </div>
                 </div>
               ))}
-            <div className="bg-body p-6 flex items-center justify-center mt-5">
+            <div className="nav-bg p-6 flex items-center justify-center mt-5">
               <button
                 className={`rounded-md p-2 mr-4 ${
-                  pageto / 10 >= 2
-                    ? "bg-[#E6EBF0] text-white"
-                    : "bg-blues text-whites"
+                  pageto / 10 >= 2 ? "bg-popup-nav text-black" : "bg-popup-nav"
                 } `}
                 disabled={pageto / 10 > 1 ? false : true}
                 onClick={handleDecrease}
@@ -1492,7 +1627,7 @@ const Wingo = () => {
               </span>
               <button
                 className={`rounded-md p-2 ms-4 ${
-                  historyPage ? "bg-[#E6EBF0] text-white" : "bg-[#E6EBF0]"
+                  historyPage ? "bg-popup-nav text-black" : "bg-popup-nav"
                 } `}
                 disabled={historyPage > pageto / 10 ? false : true}
                 onClick={handleIncrease}
@@ -1507,9 +1642,11 @@ const Wingo = () => {
         )}
       </div>
 
+      <div className={openPopup ? "overlay-section block" : "hidden"}></div>
+
       {/* popups */}
       <div
-        className={`bg-body z-[12] items-center transition ease-in-out delay-150 justify-center fixed bottom-0 rounded-t-2xl filter-section w-[24.7rem] ${
+        className={`nav-bg z-[12] items-center transition ease-in-out delay-150 justify-center fixed bottom-0 rounded-t-2xl filter-section w-[24.7rem] ${
           openPopup ? "flex" : "hidden"
         }`}
       >
@@ -1541,9 +1678,9 @@ const Wingo = () => {
             <h2 className="text-md font-semibold">
               Win Go {activeTime == "10" ? "30s" : activeTime + "Min"}
             </h2>
-            <button className=" color-yellow-200 rounded-md w-[80%] px-4 py-1 mt-2 bg-white text-sm text-white">
+            <button className=" color-yellow-200 rounded-md w-[80%] px-4 py-1 mt-2 bg-white text-sm text-black">
               Select{" "}
-              <span className="text-black">
+              <span>
                 {selectBet == "x"
                   ? "Green"
                   : selectBet == "t"
@@ -1559,8 +1696,8 @@ const Wingo = () => {
             </button>
           </div>
           <div className="px-4 py-3 ">
-            <div className="flex justify-between items-center mb-4 ">
-              <span className="text-black">Balance</span>
+            <div className="flex justify-between items-center mb-4 text-white">
+              <span>Balance</span>
               <div className="flex space-x-2">
                 {balanceOptions.map((value) => (
                   <button
@@ -1569,23 +1706,23 @@ const Wingo = () => {
                     className={`text-whites text-base mx-1 px-2 py-[3px]  rounded-md ${
                       balance === value
                         ? selectBet == "x"
-                          ? "bgs-green text-white"
+                          ? "bgs-green text-black"
                           : selectBet == "d"
-                            ? "bgs-red-200 text-white"
+                            ? "bgs-red-200 text-black"
                             : selectBet == "t"
-                              ? "bgs-violet text-white"
+                              ? "bgs-violet text-black"
                               : selectBet == "l"
-                                ? "color-yellow-bg-200 text-white"
+                                ? "color-yellow-bg-200 text-black"
                                 : selectBet == "n"
-                                  ? "bgs-blue-500 text-white"
+                                  ? "bgs-blue-500 text-black"
                                   : selectBet == 1 ||
                                       selectBet == 3 ||
                                       selectBet == 5 ||
                                       selectBet == 7 ||
                                       selectBet == 9
-                                    ? "bgs-green text-white"
-                                    : "bgs-red-200 text-white"
-                        : "bg-[#E6EBF0] "
+                                    ? "bgs-green text-black"
+                                    : "bgs-red-200 text-black"
+                        : "bg-popup-nav "
                     }`}
                   >
                     {value}
@@ -1600,7 +1737,7 @@ const Wingo = () => {
                   onClick={() =>
                     setMultiplier(multiplier > 1 ? multiplier - 1 : 1)
                   }
-                  className={` text-lg p-[3px] font-bold mx-1 text-white flex items-center justify-center rounded-md 
+                  className={` text-lg p-[3px] font-bold mx-1 text-black flex items-center justify-center rounded-md 
                     ${
                       selectBet == "x"
                         ? "bgs-green"
@@ -1634,7 +1771,7 @@ const Wingo = () => {
                 />
                 <button
                   onClick={() => setMultiplier(multiplier + 1)}
-                  className={` text-lg  p-[3px] font-bold mx-1 text-white flex items-center justify-center rounded-md  
+                  className={` text-lg  p-[3px] font-bold mx-1 text-black flex items-center justify-center rounded-md  
                     ${
                       selectBet == "x"
                         ? "bgs-green"
@@ -1667,23 +1804,23 @@ const Wingo = () => {
                   className={`text-base mx-1 px-2 py-[3px]  rounded-md ${
                     activeX === i
                       ? selectBet == "x"
-                        ? "bgs-green text-white"
+                        ? "bgs-green text-black"
                         : selectBet == "d"
-                          ? "bgs-red-200 text-white"
+                          ? "bgs-red-200 text-black"
                           : selectBet == "t"
-                            ? "bgs-violet text-white"
+                            ? "bgs-violet text-black"
                             : selectBet == "l"
-                              ? "color-yellow-bg-200 text-white"
+                              ? "color-yellow-bg-200 text-black"
                               : selectBet == "n"
-                                ? "bgs-blue-500 text-white"
+                                ? "bgs-blue-500 text-black"
                                 : selectBet == 1 ||
                                     selectBet == 3 ||
                                     selectBet == 7 ||
                                     selectBet == 5 ||
                                     selectBet == 9
-                                  ? "bgs-green text-white"
-                                  : "bgs-red-200 text-white"
-                      : "bg-[#E6EBF0] text-whites"
+                                  ? "bgs-green text-black"
+                                  : "bgs-red-200 text-black"
+                      : "bg-popup-nav text-whites"
                   }`}
                   key={i}
                   onClick={() => {
@@ -1704,9 +1841,9 @@ const Wingo = () => {
                   checked={isChecked}
                   onChange={handleCheckboxChange}
                 />
-                <div className="w-6 h-6 rounded-full border-2 border-[#dd9138] flex items-center justify-center peer-checked:bg-[#dd9138]">
+                <div className="w-6 h-6 rounded-full border-2 border-black flex items-center justify-center peer-checked:bg-cyan-400">
                   <svg
-                    className={`w-4 h-4 text-white ${
+                    className={`w-4 h-4 text-black ${
                       isChecked ? "block" : "hidden"
                     }`}
                     viewBox="0 0 20 20"
@@ -1719,7 +1856,7 @@ const Wingo = () => {
                     />
                   </svg>
                 </div>
-                <span className="text-black ms-2 mr-2 text-sm cursor-pointer">
+                <span className="text-whites ms-2 mr-2 text-sm cursor-pointer">
                   I agree
                 </span>{" "}
                 <Link className="color-red-200 fs-sm flex items-center">
@@ -1731,7 +1868,7 @@ const Wingo = () => {
           </div>
           <div className="flex justify-between items-center">
             <button
-              className="bg-[#E6EBF0] text-whites w-[40%] p-2 text-sm font-medium"
+              className="bg-popup-nav text-whites w-[40%] p-2 text-sm font-medium"
               onClick={() => setOpenPopup(false)}
             >
               Cancel
@@ -1777,18 +1914,11 @@ const Wingo = () => {
       {/* result popup */}
       {resultPopup && (winResult === true || winResult === false) && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-[9999]">
-          <div className="relative">
-            <img
-              src={winResult ? WinImg : LoseImg}
-              alt=""
-              className="w-[20rem] h-[27rem] relative"
-            />
-            <img
-              src="https://i.ibb.co/DykZrTr/popper.gif"
-              alt=""
-              className="absolute top-0 md:top-0 sm:top-0"
-            />
-          </div>
+          <img
+            src={winResult ? WinImg : LoseImg}
+            alt=""
+            className="w-[20rem] h-[27rem]"
+          />
           <div
             className='"top-[50%] left-[50%]"'
             style={{ position: "absolute", top: "38%" }}
@@ -1867,7 +1997,7 @@ const Wingo = () => {
               )}
             </div>
             <p
-              className={`text-[10px] text-white text-center font-semibold ${
+              className={`text-[10px] text-black text-center font-semibold ${
                 winResult ? "mt-1" : "mt-3"
               }`}
             >
@@ -1898,75 +2028,27 @@ const Wingo = () => {
         </div>
       )}
 
-      {openHowtoPlay ? (
-        <div className="fixed top-32 bg-body w-[270px] flex flex-col justify-center items-center m-auto left-0 right-0 rounded-t-2xl rounded-b-2xl z-30">
-          <div className=" blue-linear w-full text-center text-white text-xl py-2  rounded-t-2xl">
-            How to play
+      {openHowtoPlay && (
+        <>
+          <div className="fixed top-32 nav-bg w-[270px] flex flex-col justify-center items-center m-auto left-0 right-0 rounded-t-2xl rounded-b-2xl z-30">
+            <div className="blue-linear w-full text-center text-black text-xl py-2 rounded-t-2xl">
+              How to play Win Go{" "}
+              {activeTime === "10" ? "30s" : activeTime + "Min"}
+            </div>
+            <div className="h-[300px] overflow-auto p-2 fs-sm leading-6 text-white">
+              {getHowToPlayContent()}
+            </div>
+            <div className="flex justify-center items-center nav-bg w-full py-3 rounded-b-2xl">
+              <button
+                className="blue-linear rounded-full w-40 py-2"
+                onClick={() => setHowtoPlay(false)}
+              >
+                Close
+              </button>
+            </div>
           </div>
-          <div className="h-[300px] overflow-auto p-2 fs-sm leading-6 text-whites">
-            <p className="font-bold">
-              3 minutes 1 issue, 2minutes 55 seconds to order, 5 seconds waiting
-              for the draw. It opens all day. The total number of trade is 480
-              issues.
-            </p>
-
-            <p className="font-bold">
-              <font>
-                if you spend 100 to trade, after deducting service fee 2%,
-                contract amount : 98
-              </font>
-            </p>
-            <p>
-              <span>
-                1. Select green: if the result shows 1,3,7,9 you will get
-                (98*2)=196;If the result shows 5, you will get (98*1.5) 147
-              </span>
-            </p>
-            <p>
-              <span>
-                2. Select red: if the result shows 2,4,6,8 you will get
-              </span>
-              <span>(98*2)=196</span>
-              <span>;If the result shows 0, you will get</span>
-              <span>(98*1.5) 147</span>
-            </p>
-            <p>
-              <span>
-                3. Select violet: if the result shows 0 or 5, you will get
-              </span>
-              <span>(98*2)=196</span>
-            </p>
-            <p>
-              <span>
-                4. Select number: if the result is the same as the number you
-                selected, you will get
-              </span>
-              <span>(98*9)=882</span>
-            </p>
-            <p>
-              <span>
-                5. Select big: if the result shows 5,6,7,8,9 you will get
-              </span>
-              <span>(98*2)=196</span>
-            </p>
-            <p>
-              <span>
-                6. Select small: if the result shows 0,1,2,3,4 you will get
-              </span>
-              <span>(98*2)=196</span>
-            </p>
-          </div>
-          <div className="flex justify-center items-center bg-body w-full py-3 rounded-b-2xl">
-            <button
-              className="blue-linear rounded-full w-40 py-2 text-white"
-              onClick={() => setHowtoPlay(false)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      ) : (
-        ""
+          <div className="overlay-section block"></div>
+        </>
       )}
 
       <div className={`place-bet-popup ${betAlert ? "active" : ""}`}>

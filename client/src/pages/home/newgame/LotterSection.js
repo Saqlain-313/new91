@@ -1,124 +1,149 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { rechargeList2 } from "../../../store/reducer/userReducer";
-import RechargePopup from "../../../components/RechargePopup";
-
-import Slider from "react-slick";
-
-const img11 = "https://i.ibb.co/7xzW3FWt/wingo.png";
-const img12 = "https://i.ibb.co/RksPMscQ/k3.png";
-const img13 = "https://i.ibb.co/bj9PQtCK/5d.png";
-const img14 = "https://i.ibb.co/Df41Vh4p/4.png";
-const cargame = "https://i.ibb.co/5xSm1xPD/car.png";
+import JilliPopup from "../../../components/JilliPopup";
 
 const LotterSection = () => {
   const navigate = useNavigate();
+
   const [soon, setSoon] = useState(false);
-  const [repopup, setRepopup] = useState(false);
-  const dispatch = useDispatch();
+  const [gameId, setGameId] = useState("");
+
+  // Direct navigation without login or recharge checks.
   const handleCheck = (path) => {
-    // //console.log("path",
-    dispatch(rechargeList2()).then((res) => {
-      if (res.payload.data2?.length == 0) {
-        setRepopup(true);
-      } else if (res.payload.message === "Please login") {
-        navigate("/login");
-      } else {
-        navigate(path);
-      }
-    });
+    if (path === "motobike") {
+      setSoon(true);
+      return;
+    }
+
+    navigate(path);
   };
 
-  const handlecloseSoon = () => {
+  const handleCloseSoon = () => {
     setSoon(false);
   };
 
-  const settings = {
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
+  const handleJilliOpen = (apiKey) => {
+    setGameId(apiKey);
   };
+
   return (
     <>
-      {soon == true && (
-        <div className="fixed top-0 z-[20] bottom-0 bg-[#ffffffdc] h-40 border border-[#1ab266] backdrop-blur-xl m-auto flex flex-col justify-center gap-2 items-center left-0 right-0 w-[20rem] rounded-lg">
-          <h3 className="heading-h3 gray-50 mt-5">Alert</h3>
-          <p className="text-sm gray-100 mt-2">Game will be available soon</p>
-          <button
-            className="bg-[#1ab266] px-4 py-1 rounded-full"
-            onClick={handlecloseSoon}
-          >
-            Close
-          </button>
+      {gameId && <JilliPopup gameId={gameId} />}
+
+      {/* Coming Soon Popup - Motobike only */}
+      {soon && (
+        <div className="fixed inset-0 z-[30] flex items-center justify-center px-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black bg-opacity-70"
+            onClick={handleCloseSoon}
+          />
+
+          {/* Popup Box */}
+          <div className="z-10 bg-[#000251] text-center p-5 rounded-xl shadow-lg w-full max-w-[340px]">
+            <h3 className="text-lg font-semibold text-white">Alert</h3>
+
+            <p className="text-sm text-white mt-1.5">
+              Game will be available soon
+            </p>
+
+            <button
+              type="button"
+              className="bg-[#23C1DB] text-white px-5 py-1.5 mt-4 rounded-full text-sm hover:bg-[#1ab3c7] transition"
+              onClick={handleCloseSoon}
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
 
-      <div className={soon ? "overlay-section block" : "hidden"}></div>
-
-      <RechargePopup repopup={repopup} setRepopup={setRepopup} />
-
-      <div className="flex flex-col justify-between">
-        <div className="flex items-center gap-2">
-          <h2 className="border-after font-[500] text-black text-base ">
-            Lottery
-          </h2>
-          <button className="text-blue text-xs  bg-[#201D2B] rounded items-center overflow-auto p-1   ">
-            More 3
-          </button>
-        </div>
-
-        <p className="text-whites text-xs ">
-          Fair and diverse lottery gameplay
+      {/* Lottery Game Section */}
+      <div>
+        <p className="mt-2 flex items-center gap-2 text-base text-gray-200 font-semibold">
+          <span>
+            <img
+              src="https://i.ibb.co/mCS1hw9t/L-d9b599f044f44fc10475.png"
+              className="size-8"
+              alt="Lottery icon"
+            />
+          </span>
+          Lottery
         </p>
-      </div>
-      <div className="slider-container mt-1">
-        <Slider {...settings}>
-          <div>
-            <div className="grid grid-cols-12 gap-2">
-              <div
-                className="col-span-4"
-                onClick={() => handleCheck("/wingo?Game=10")}
-              >
-                <img
-                  src={img11}
-                  alt=""
-                  loading="lazy"
-                  className="w-full  h-[160px] object-cover"
-                />
-              </div>
-              <div className="col-span-4" onClick={() => handleCheck("/k3")}>
-                <img
-                  src={img12}
-                  alt=""
-                  loading="lazy"
-                  className="w-full h-[160px] object-cover"
-                />
-              </div>
-              <div className="col-span-4" onClick={() => handleCheck("/5d")}>
-                <img
-                  src={img13}
-                  alt=""
-                  loading="lazy"
-                  className="w-full h-[160px] object-cover"
-                />
-              </div>
-            </div>
+
+        <div className="grid grid-cols-12 gap-2 mt-2">
+          {/* WinGo */}
+          <div
+            className="col-span-6 cursor-pointer"
+            onClick={() => handleCheck("wingo?Game=10")}
+          >
+            <img
+              src="https://i.ibb.co/PvF6n675/wingo-1.png"
+              alt="WinGo"
+              className="w-full h-28 rounded-lg object-cover"
+            />
           </div>
-          <div>
-            <div className="grid grid-cols-12 gap-2">
-              <div className="col-span-4" onClick={() => handleCheck("/trx")}>
-                <img
-                  src={img14}
-                  alt=""
-                  loading="lazy"
-                  className="w-full h-[160px] object-cover"
-                />
-              </div>
-            </div>
+
+          {/* K3 */}
+          <div
+            className="col-span-6 cursor-pointer"
+            onClick={() => handleCheck("k3")}
+          >
+            <img
+              src="https://i.ibb.co/YB46Rgh8/k3-1.png"
+              alt="K3"
+              className="w-full h-28 rounded-lg object-cover"
+            />
           </div>
-        </Slider>
+
+          {/* 5D */}
+          <div
+            className="col-span-6 cursor-pointer"
+            onClick={() => handleCheck("5d")}
+          >
+            <img
+              src="https://i.ibb.co/B5GRf7y0/5d-1.png"
+              alt="5D"
+              className="w-full h-28 rounded-lg object-cover"
+            />
+          </div>
+
+          {/* Motobike - Coming Soon */}
+          <div
+            className="col-span-6 cursor-pointer"
+            onClick={() => handleCheck("motobike")}
+          >
+            <img
+              src="https://i.ibb.co/SXx5s8kt/moto-racing.png"
+              alt="Motobike"
+              className="w-full h-28 rounded-lg object-cover"
+            />
+          </div>
+
+          {/* TRX */}
+          <div
+            className="col-span-6 cursor-pointer"
+            onClick={() => handleCheck("trx")}
+          >
+            <img
+              src="https://i.ibb.co/fzwhzMcp/trxcard.png"
+              alt="TRX"
+              className="w-full h-28 rounded-lg object-cover"
+            />
+          </div>
+
+          {/* Aviator */}
+          <div
+            className="col-span-6 cursor-pointer"
+            onClick={() => handleCheck("a04d1f3eb8ccec8a4823bdf18e3f0e84")}
+          >
+            <img
+              src="https://i.ibb.co/XfwVQ9SS/Blueaviatorcard-min.png"
+              alt="Aviator"
+              className="w-full h-28 rounded-lg object-cover"
+            />
+          </div>
+        </div>
       </div>
     </>
   );

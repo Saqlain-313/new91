@@ -16,21 +16,24 @@ const ActivityDetail = () => {
   return (
     <>
       <CustomeNavbar name="Activity details" />
-      <div className="bg-light">
+      <div className="nav-bg">
         {id == 2 && (
           <div>
             <img
-              src={bannergetData?.activity?.ban1}
+              src={bannergetData?.activity?.ban2}
               alt=""
               className="w-full"
             />
             <h3 className="heading-h3 text-center mt-3 mb-1 text-whites font-medium">
               {" "}
-              Mega Spin Event
+              VIP bonus
             </h3>
-            <h3 className="text-[#920be7] text-center">
-              <a href="#">Click here to join</a>
-            </h3>
+            <h4
+              onClick={() => navigate("/vip")}
+              className="text-green-500 text-xs text-center underline mb-2 font-bold"
+            >
+              Click here for claim
+            </h4>
             <div className="container-section">
               <img src={bannergetData?.activity?.ban22} alt="" />
             </div>
@@ -44,7 +47,7 @@ const ActivityDetail = () => {
               className="w-full"
             />
             <h3 className="heading-h3 text-center mt-3 mb-1 text-whites font-medium">
-              Benefits of Using ARWALLET
+              💰 Member Activities Winning Streak 💰
             </h3>
             <div className="container-section">
               <img src={bannergetData?.activity?.ban33} alt="" />
@@ -59,7 +62,7 @@ const ActivityDetail = () => {
               className="w-full"
             />
             <h3 className="heading-h3 text-center mt-3 mb-1 text-whites font-medium">
-              Chennai91 Super Jackpot
+              RECHARGE BONUS
             </h3>
             <div className="container-section">
               <img src={bannergetData?.activity?.ban44} alt="" />
@@ -74,10 +77,13 @@ const ActivityDetail = () => {
               className="w-full"
             />
             <h3 className="heading-h3 text-center mt-3 mb-1 text-whites font-medium">
-              Chennai91 Real-Time Rebate
+              Aviator Additional Bonus
             </h3>
             <div className="container-section">
-              <img src={bannergetData?.activity?.ban55} alt="" />
+              <img
+                src="https://i.ibb.co/hJ1cBKDJ/AVIATOR-ADDITIONALBONUS.jpg"
+                alt=""
+              />
             </div>
           </div>
         )}
@@ -89,7 +95,7 @@ const ActivityDetail = () => {
               className="w-full"
             />
             <h3 className="heading-h3 text-center mt-3 mb-1 text-whites font-medium">
-              Chennai91 Youtube Creative Video Event
+              Lucky Spin
             </h3>
 
             <div className="container-section">
@@ -105,7 +111,7 @@ const ActivityDetail = () => {
               className="w-full"
             />
             <h3 className="heading-h3 text-center mt-3 mb-1 text-whites font-medium">
-              Chennai91 Winstreak Bonus
+              BENEFITS OF USING AR WALLET
             </h3>
             <div className="container-section">
               <img src={bannergetData?.activity?.ban77} alt="" />
@@ -120,7 +126,7 @@ const ActivityDetail = () => {
               className="w-full"
             />
             <h3 className="heading-h3 text-center mt-3 mb-1 text-whites font-medium">
-              Partner Rewards
+              VIDEO CONTENT BONUS
             </h3>
 
             <div className="container-section">
@@ -136,7 +142,7 @@ const ActivityDetail = () => {
               className="w-full"
             />
             <h3 className="heading-h3 text-center mt-3 mb-1 text-whites font-medium">
-              Special Attendance Bonus
+              WEEKLY DEPOSIT BONUS FOR AGENT
             </h3>
             {/* <h4 className="text-center text-[#00ff00] mb-2 text-xs font-bold">
               Click here to apply : Winning Streak Bonus
@@ -149,22 +155,15 @@ const ActivityDetail = () => {
         {id == 10 && (
           <div>
             <img
-              src={
-                "https://i.ibb.co/xKgW3thN/imgi-13-Banner-2025101920340218jl.png"
-              }
+              src={bannergetData?.activity?.ban9}
               alt=""
               className="w-full"
             />
             <h3 className="heading-h3 text-center mt-3 mb-1 text-whites font-medium">
-              Weekly Betting Rewards
+              ⁉️ WEEKLY DEPOSIT BONUS FOR AGENT ⁉️
             </h3>
             <div className="container-section">
-              <img
-                src={
-                  "https://i.ibb.co/BVgQTKG8/imgi-2-editor-20251019203357xs95.png"
-                }
-                alt=""
-              />
+              <img src={bannergetData?.activity?.ban99} alt="" />
             </div>
           </div>
         )}
@@ -191,7 +190,7 @@ const ActivityDetail = () => {
               className="w-full"
             />
             <h3 className="heading-h3 text-center mt-3 mb-1 text-whites font-medium">
-              PARTNER REWARDS BONUS
+              BENEFITS OF USING AR WALLET
             </h3>
             <div className="container-section">
               <img src={bannergetData?.activity?.ban1012} alt="" />

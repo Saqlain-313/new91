@@ -1,14 +1,14 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 import FeedbackImg from "../../assets/feedbackImg.png";
 import CustomeNavbar from "../../components/CustomeNavbar";
 const Feedback = () => {
-  useEffect(()=>{
-    window.scrollTo(0,0)
-  },[])
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
-      <CustomeNavbar name="Feedback"/>
+      <CustomeNavbar name="Feedback" />
 
       <div className="container-section mt-3">
         <div className="bg-body rounded-xl">
@@ -20,9 +20,7 @@ const Feedback = () => {
           ></textarea>
         </div>
         <div className="mt-9 flex flex-col justify-center items-center">
-          <p className="heading-h4 text-whites mb-1">
-            Send helpful feedback
-          </p>
+          <p className="heading-h4 text-whites mb-1">Send helpful feedback</p>
           <p className="heading-h4 text-whites mb-2">
             Chance to win Mystery Rewards
           </p>
