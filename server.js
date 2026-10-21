@@ -29,7 +29,8 @@ const corsdata = [
   "http://localhost:3000",
   "http://localhost:5173",
   "http://localhost:7805",
-  "https://chennai91.co",
+  "https://max-win.site/",
+  "http://max-win.site/",
 ];
 
 // Socket IO setup with CORS
@@ -84,7 +85,7 @@ app.options(
     origin: corsdata,
     methods: ["GET", "POST", "OPTIONS"],
     credentials: true,
-  })
+  }),
 );
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
