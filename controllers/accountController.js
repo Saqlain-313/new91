@@ -470,23 +470,22 @@ const register = async (req, res) => {
 };
 
 const loginAdmin = async (req, res) => {
-  let { username, pwd } = req.body;
+  const { username, pwd } = req.body;
 
   if (!username || !pwd) {
     return res.status(200).json({
-      message: "Please enter all field",
+      message: "Please enter all fields",
       status: false,
     });
   }
 
-
   try {
-    const [rows] = await connection.query(
-      "SELECT * FROM users WHERE phone = ? AND password = ? AND level = 1",
+    const [rows] = await connection.execute(
+      `SELECT * FROM users
+       WHERE phone = ? AND password = ? AND level = 1
+       LIMIT 1`,
       [username, md5(pwd)],
     );
-
-    console.log("Admin login attempt:", { username, pwd, rows });
 
     if (rows.length !== 1) {
       return res.status(200).json({
@@ -497,50 +496,80 @@ const loginAdmin = async (req, res) => {
 
     const admin = rows[0];
 
-    if (admin.status != 1) {
+    if (Number(admin.status) !== 1) {
       return res.status(200).json({
         message: "Account has been locked",
         status: false,
       });
     }
 
-    // ✅ Generate OTP
-    const otp = randomNumber(100000, 999999);
-    const timeEnd = Date.now() + 1000 * 60 * 5; // 5 min validity
-
-    // ✅ Save OTP to DB (admin_otp table or users table)
-    await connection.execute(
-      "UPDATE users SET otp = ?, time_otp = ? WHERE phone = ?",
-      [otp, timeEnd, username],
+    // Generate a six-digit OTP
+    const otp = String(
+      Math.floor(100000 + Math.random() * 900000),
     );
 
-    // ✅ Send OTP via Email (nodemailer) — admin email DB se lo
+    // OTP expires after five minutes
+    const timeEnd = Date.now() + 5 * 60 * 1000;
+
+    // Save OTP and expiry in MySQL
+    await connection.execute(
+      `UPDATE users
+       SET otp = ?, time_otp = ?
+       WHERE phone = ? AND level = 1`,
+      [otp, String(timeEnd), username],
+    );
+
+    const recipient = admin.email || process.env.ADMIN_EMAIL;
+
+    if (!recipient) {
+      // Clear OTP if no recipient is configured
+      await connection.execute(
+        `UPDATE users SET otp = '', time_otp = ''
+         WHERE phone = ? AND level = 1`,
+        [username],
+      );
+
+      return res.status(500).json({
+        message: "Admin email is not configured",
+        status: false,
+      });
+    }
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: admin.email || process.env.ADMIN_EMAIL,
+      to: recipient,
       subject: "Admin Login OTP",
-      text: `Your admin login OTP is ${otp}. Valid for 5 minutes. Do not share.`,
+      text: `Your admin login OTP is ${otp}. It is valid for 5 minutes. Do not share it.`,
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending OTP:", error);
-        return res.status(500).json({
-          message: "OTP send failed",
-          status: false,
-        });
-      }
+    try {
+      await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+      console.error("Error sending admin OTP:", emailError.message);
 
-      return res.status(200).json({
-        message: "OTP sent to registered email",
-        status: true,
-        otpRequired: true,
-        phone: username,
-        timeEnd,
+      // Clear OTP when email delivery fails
+      await connection.execute(
+        `UPDATE users SET otp = '', time_otp = ''
+         WHERE phone = ? AND level = 1`,
+        [username],
+      );
+
+      return res.status(500).json({
+        message: "OTP send failed",
+        status: false,
       });
+    }
+
+    return res.status(200).json({
+      message: "OTP sent to registered email",
+      status: true,
+      otpRequired: true,
+      phone: username,
+      timeEnd,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Admin login error:", error.message);
+
     return res.status(500).json({
       message: "Internal Server Error",
       status: false,
@@ -548,23 +577,43 @@ const loginAdmin = async (req, res) => {
   }
 };
 
+
 const verifyAdminOTP = async (req, res) => {
   const { username, otp } = req.body;
 
-  if (!username || !otp) {
+  if (!username || otp === undefined || otp === null || otp === "") {
     return res.status(200).json({
       message: "Phone and OTP required",
       status: false,
     });
   }
 
+  // Accept only six-digit OTPs
+  if (!/^\d{6}$/.test(String(otp))) {
+    return res.status(200).json({
+      message: "Invalid OTP",
+      status: false,
+    });
+  }
+
+  let dbConnection;
+
   try {
-    const [rows] = await connection.query(
-      "SELECT * FROM users WHERE phone = ? AND level = 1",
+    // Use a transaction to prevent simultaneous OTP verification
+    dbConnection = await connection.getConnection();
+    await dbConnection.beginTransaction();
+
+    const [rows] = await dbConnection.execute(
+      `SELECT * FROM users
+       WHERE phone = ? AND level = 1
+       LIMIT 1
+       FOR UPDATE`,
       [username],
     );
 
     if (rows.length !== 1) {
+      await dbConnection.rollback();
+
       return res.status(200).json({
         message: "Admin not found",
         status: false,
@@ -573,23 +622,40 @@ const verifyAdminOTP = async (req, res) => {
 
     const admin = rows[0];
 
-    // ✅ Check OTP expiry
-    if (!admin.time_otp || Number(admin.time_otp) < Date.now()) {
+    if (Number(admin.status) !== 1) {
+      await dbConnection.rollback();
+
+      return res.status(200).json({
+        message: "Account has been locked",
+        status: false,
+      });
+    }
+
+    // Check OTP exists and has not expired
+    if (
+      !admin.otp ||
+      !admin.time_otp ||
+      !Number.isFinite(Number(admin.time_otp)) ||
+      Number(admin.time_otp) < Date.now()
+    ) {
+      await dbConnection.rollback();
+
       return res.status(200).json({
         message: "OTP expired. Please login again.",
         status: false,
       });
     }
 
-    // ✅ Check OTP match
+    // Check OTP match
     if (String(admin.otp) !== String(otp)) {
+      await dbConnection.rollback();
+
       return res.status(200).json({
         message: "Invalid OTP",
         status: false,
       });
     }
 
-    // ✅ OTP correct — generate JWT
     const {
       password,
       money,
@@ -599,47 +665,87 @@ const verifyAdminOTP = async (req, res) => {
       status,
       time,
       otp: _otp,
-      time_otp,
+      time_otp: _timeOtp,
       ...others
     } = admin;
 
+    if (!process.env.JWT_ACCESS_TOKEN) {
+      throw new Error("JWT_ACCESS_TOKEN is not configured");
+    }
+
     const accessToken = jwt.sign(
-      { user: { ...others }, timeNow: Date.now() },
+      {
+        user: others,
+        timeNow: Date.now(),
+      },
       process.env.JWT_ACCESS_TOKEN,
       { expiresIn: "1d" },
     );
 
-    // ✅ Clear OTP + update token
-    await connection.execute(
-      "UPDATE users SET token = ?, otp = NULL, time_otp = NULL, login_at = CURRENT_TIMESTAMP WHERE phone = ?",
-      [md5(accessToken), username],
+    const hashedToken = md5(accessToken);
+
+    // Clear OTP using empty strings because columns are NOT NULL
+    const [updateResult] = await dbConnection.execute(
+      `UPDATE users
+       SET token = ?,
+           otp = '',
+           time_otp = '',
+           login_at = CURRENT_TIMESTAMP
+       WHERE phone = ? AND level = 1`,
+      [hashedToken, username],
     );
 
-    req.session.token = md5(accessToken);
+    if (updateResult.affectedRows !== 1) {
+      throw new Error("Admin token update failed");
+    }
 
-    // ✅ Log admin login
-    await logUserAction({
-      user_phone: username,
-      action_type: "admin_login",
-      money: 0,
-      status: "success",
-      ip_address: ipAddress(req),
-      user_agent: req.headers["user-agent"] || "",
-      info: JSON.stringify({ message: "Admin login via OTP" }),
-    });
+    await dbConnection.commit();
+
+    // Set session after successful database commit
+    req.session.token = hashedToken;
+
+    try {
+      await logUserAction({
+        user_phone: username,
+        action_type: "admin_login",
+        money: 0,
+        status: "success",
+        ip_address: ipAddress(req),
+        user_agent: req.headers["user-agent"] || "",
+        info: JSON.stringify({
+          message: "Admin login via OTP",
+        }),
+      });
+    } catch (logError) {
+      // Do not expose sensitive authentication information
+      console.error("Admin login audit log failed:", logError.message);
+    }
 
     return res.status(200).json({
       message: "Login Successful",
       status: true,
       token: accessToken,
-      value: md5(accessToken),
+      value: hashedToken,
     });
   } catch (error) {
-    console.error(error);
+    if (dbConnection) {
+      try {
+        await dbConnection.rollback();
+      } catch (rollbackError) {
+        console.error("OTP transaction rollback failed");
+      }
+    }
+
+    console.error("Admin OTP verification error:", error.message);
+
     return res.status(500).json({
       message: "Internal Server Error",
       status: false,
     });
+  } finally {
+    if (dbConnection) {
+      dbConnection.release();
+    }
   }
 };
 
