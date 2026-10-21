@@ -1,136 +1,87 @@
-const socket = io();
+// Connect to the backend Socket.IO server. Change 7805 if your backend uses another port.
+const socket = io(`${window.location.protocol}//${window.location.hostname}:7805`, {
+    withCredentials: true,
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000,
+    transports: ["websocket", "polling"],
+});
+
+socket.on("connect", () => {
+    console.log("K3 Socket connected:", socket.id);
+});
+
+socket.on("connect_error", (error) => {
+    console.error("K3 Socket connection error:", error.message);
+});
+
+socket.on("disconnect", (reason) => {
+    console.warn("K3 Socket disconnected:", reason);
+});
 
 $(window).on('load', function () {
-    setTimeout(() => {
-        $('#preloader').fadeOut(0);
-    }, 100);
-})
-$(document).ready(function () {
-    $(`a[href="${window.location.pathname}"]`).addClass('active');
-    $(`a[href="${window.location.pathname}"]`).css('pointerEvents', 'none');
+    setTimeout(() => $('#preloader').fadeOut(0), 100);
 });
- 
+
+$(document).ready(function () {
+    $(`a[href="${window.location.pathname}"]`).addClass('active').css('pointerEvents', 'none');
+});
+
 $('.back-to-tops').click(function() {
-    $('html, body').animate({
-      scrollTop: 0
-    }, 800);
+    $('html, body').animate({ scrollTop: 0 }, 800);
     return false;
 });
 
-const isNumber = (params) => {
-    let pattern = /^[0-9]*\d$/;
-    return pattern.test(params);
-}
+const isNumber = (params) => /^[0-9]*\d$/.test(params);
 
 function formatMoney(amount, separator = ',') {
-    if (typeof amount !== 'number') {
-        amount = Number(amount);
-    }
-
-    if (isNaN(amount)) {
-        return '';
-    }
-
-    // Convert the number to a string and add commas as thousands separators
+    amount = typeof amount === 'number' ? amount : Number(amount);
+    if (isNaN(amount)) return '';
     return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 }
 
+// Subscribe to the event for the currently selected K3 game without opening
+// a new socket connection every second. Backend maps game 1 to timeUpdate_11
+// and game 10 to timeUpdate_30.
+const socketEvents = {
+    5: 'timeUpdate_5',
+    3: 'timeUpdate_3',
+    1: 'timeUpdate_11',
+    10: 'timeUpdate_30',
+};
+let activeTimerEvent = null;
 
-// function cownDownTimer() {
-//     var countDownDate = new Date("2030-07-16T23:59:59.9999999+01:00").getTime();
-//     setInterval(function () {
-//         let checkID = $('html').attr('data-change');
-//         var now = new Date().getTime();
-//         var distance = countDownDate - now;
-//         var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-//         var minute = Math.ceil(minutes % Number(checkID));
-//         var seconds1 = Math.floor((distance % (1000 * 60)) / 10000);
-//         var seconds2 = Math.floor(((distance % (1000 * 60)) / 1000) % 10);
-//         //console.log("times",checkID,minute,seconds1,seconds2)
-       
-//             $(".time .time-sub:eq(1)").text(minute);
-        
-
-//         $(".time .time-sub:eq(2)").text(seconds1);
-//         $(".time .time-sub:eq(3)").text(seconds2);
-//     }, 1000);
-// }
-
-// cownDownTimer();
-
-
-
-let sockets = null;
-let intervalRef = null;
-
-function connectsockets(checkID, host) {
-console.log("ddd",checkID)
-  // Clear any existing interval
-  if (intervalRef) {
-    clearInterval(intervalRef);
-  }
-
-  if (sockets) {
-    sockets.disconnect(); // Ensure previous sockets is disconnected
-  }
-
-  const setupsockets = (eventName) => {
-    sockets = io.connect(host); // Connect to the server
-
-    sockets.on(eventName, (data) => {
-      if (!data) return;
-
-      const { minute, secondtime1, secondtime2 } = data;
-
- 
-         $(".time .time-sub:eq(1)").text(minute);
-      $(".time .time-sub:eq(2)").text(secondtime1); // Dividing seconds1 by 10 to simulate the original logic
-      $(".time .time-sub:eq(3)").text(secondtime2);
-      // Handle open time logic
-    });
-
-    // Clean up sockets listener on disconnection
-    return () => {
-      sockets.off(eventName);
-      sockets.disconnect();
-    };
-  };
-
-
-
-   
-
-
-  // Set up sockets connection based on typeid1
-  if (checkID == 5) {
-    setupsockets("timeUpdate_5");
-  }
-  if (checkID == 3) {
-    setupsockets("timeUpdate_3");
-  }
-  if (checkID == 1) {
-    setupsockets("timeUpdate_11");
-  }
-  if (checkID == 10) {
-    setupsockets("timeUpdate_10");
-  }
- }
-
-// Usage example
-const typeid1 = 5; // Change this based on your needs
-const host = window.location.hostname;
-const activeVoice = true; // or false, depending on your needs
-
-function cownDownTimer() {
-    setInterval(function () {
-     let checkID = $('html').attr('data-change');
-    
-// Call the function to establish the sockets connection
-connectsockets(checkID, host);
-    }, 1000);
+function updateTimer(data) {
+    if (!data) return;
+    const { minute, secondtime1, secondtime2 } = data;
+    $(".time .time-sub:eq(1)").text(minute);
+    $(".time .time-sub:eq(2)").text(secondtime1);
+    $(".time .time-sub:eq(3)").text(secondtime2);
 }
 
-cownDownTimer();
+function connectsockets(checkID) {
+    const eventName = socketEvents[Number(checkID)];
+    if (!eventName) {
+        console.warn('Unknown K3 game ID:', checkID);
+        return;
+    }
+    if (activeTimerEvent === eventName) return;
+    if (activeTimerEvent) socket.off(activeTimerEvent, updateTimer);
+    activeTimerEvent = eventName;
+    socket.on(activeTimerEvent, updateTimer);
+}
+
+function syncK3Socket() {
+    connectsockets($('html').attr('data-change'));
+}
+
+$(document).ready(function () {
+    syncK3Socket();
+    // The existing handler updates data-change synchronously before its AJAX call.
+    $('#manage .col-12').on('click.k3Socket', function () {
+        setTimeout(syncK3Socket, 0);
+    });
+});
 // -------------------------------------------------------------------------------------
 
 function showListOrder(datas) {

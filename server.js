@@ -42,6 +42,9 @@ const io = new Server(server, {
   },
 });
 
+app.set("io", io);
+
+
 // Log when a client connects or disconnects
 io.on("connection", (socket) => {
   //logToFile(`Socket connected - ID: ${socket.id}`);
