@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { launchGame } from '../store/reducer/spribeGameReducer';
-import { rechargeList2 } from '../store/reducer/userReducer'; // <- Import your rechargeList2 action here
-import { useSelector, useDispatch } from 'react-redux';
-import Loader from './Loader';
-import { useNavigate } from 'react-router-dom';
-import RechargePopup from './RechargePopup';
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { launchGame } from "../store/reducer/spribeGameReducer";
+import Loader from "./Loader";
+import RechargePopup from "./RechargePopup";
 
 const JilliPopup = ({ gameId }) => {
   const [betAlert, setBetAlert] = useState(false);
@@ -12,29 +11,38 @@ const JilliPopup = ({ gameId }) => {
   const [repopup, setRepopup] = useState(false); // <- You were using this but it wasn't defined
   const { userInfo } = useSelector((state) => state.auth);
   const { loader } = useSelector((state) => state.spribeGame);
-  
+  const { rechargeList2Data } = useSelector((state) => state.user);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // 👉 Trigger the API call when gameId changes
   useEffect(() => {
     if (gameId) {
-      dispatch(rechargeList2()).then((res) => {
-        if (res.payload.data2?.length === 0) {
-          setRepopup(true);
-        } else if (res.payload.message === 'Please login') {
-          navigate('/login');
-        } else {
-          setJilliPopup(true);
-        }
-      });
+      if (rechargeList2Data?.length === 0) {
+        setRepopup(true);
+      } else if (!userInfo) {
+        navigate("/login");
+      } else {
+        setJilliPopup(true);
+      }
+
+      // dispatch(rechargeList2()).then((res) => {
+      //   if (res.payload.data2?.length === 0) {
+      //     setRepopup(true);
+      //   } else if (res.payload.message === 'Please login') {
+      //     navigate('/login');
+      //   } else {
+      //     setJilliPopup(true);
+      //   }
+      // });
     }
-  }, [gameId, dispatch, navigate]);
+  }, [gameId, rechargeList2Data, dispatch, navigate]);
 
   // 👉 Handle Jilli Submit
   const handleJilliSubmit = () => {
     if (!userInfo) {
-      navigate('/login');
+      navigate("/login");
     } else if (userInfo?.isdemo === 0) {
       const playerid = userInfo?.phone_user;
       dispatch(launchGame({ playerid, gameId })).then((res) => {
@@ -51,29 +59,28 @@ const JilliPopup = ({ gameId }) => {
     }
   };
 
-    useEffect(() => {
-      if (jilliPopup || repopup) {
-        document.body.style.overflow = "hidden";
-      }
-  
-      return () => {
-        document.body.style.overflow = "auto"; // or 'visible' depending on your default
-      };
-    }, [jilliPopup,repopup]);
+  useEffect(() => {
+    if (jilliPopup || repopup) {
+      document.body.style.overflow = "hidden";
+    }
 
-  
+    return () => {
+      document.body.style.overflow = "auto"; // or 'visible' depending on your default
+    };
+  }, [jilliPopup, repopup]);
+
   return (
     <>
-        {/* 🔹 Render RechargePopup if repopup is true */}
+      {/* 🔹 Render RechargePopup if repopup is true */}
       <RechargePopup repopup={repopup} setRepopup={setRepopup} />
       {loader && <Loader />}
 
       {betAlert && (
-        <div className="fixed top-0 z-[20] bottom-0 bg-[#ffffffdc] h-40 border border-[#1ab266] backdrop-blur-xl m-auto flex flex-col justify-center gap-2 items-center left-0 right-0 w-[20rem] rounded-lg">
+        <div className="fixed top-0 z-[100] bottom-0 nav-bg h-40 border border-[#1ab266] backdrop-blur-xl m-auto flex flex-col justify-center gap-2 items-center left-0 right-0 w-[20rem] rounded-lg">
           <h3 className="heading-h3 gray-50 mt-5">Alert</h3>
-          <p className="text-sm gray-100 mt-2">This is a demo account</p>
+          <p className="text-sm text-white mt-2">This is a demo account</p>
           <button
-            className="bg-[#1ab266] px-4 py-1 rounded-full"
+            className="text-gray-400 px-4 py-1 rounded-full"
             onClick={() => setBetAlert(false)}
           >
             Close
@@ -82,13 +89,13 @@ const JilliPopup = ({ gameId }) => {
       )}
 
       {/* Overlay Section */}
-      <div className={betAlert ? 'overlay-section block' : 'hidden'}></div>
-      <div className={jilliPopup ? 'overlay-section block' : 'hidden'}></div>
-      
+      <div className={betAlert ? "overlay-section block" : "hidden"}></div>
+      <div className={jilliPopup ? "overlay-section block" : "hidden"}></div>
+
       {jilliPopup && (
-        <div className="fixed top-0 z-[20] bottom-0 h-32 m-auto flex flex-col justify-center items-center left-0 right-0 w-[20rem] bg-light rounded-lg pb-2">
+        <div className="fixed top-0 z-[20] bottom-0 h-32 m-auto flex flex-col justify-center items-center left-0 right-0 w-[20rem] nav-bg rounded-lg pb-2">
           <h3 className="heading-h3 gray-50 mt-5">Tips</h3>
-          <p className="text-sm text-whites mt-2">
+          <p className="text-sm text-white mt-2">
             Are you sure you want to join the game?
           </p>
 
@@ -100,7 +107,7 @@ const JilliPopup = ({ gameId }) => {
               Cancel
             </button>
             <button
-              className="p-2 text-blue rounded-br-lg w-[50%]"
+              className="p-2 text-blue-500 rounded-br-lg w-[50%]"
               onClick={handleJilliSubmit}
             >
               Confirm
