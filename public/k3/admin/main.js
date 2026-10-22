@@ -1,169 +1,91 @@
-// Connect to the backend Socket.IO server. Change 7805 if your backend uses another port.
-const socket = io(`${window.location.protocol}//${window.location.hostname}:7805`, {
-    withCredentials: true,
-    reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 1000,
-    transports: ["websocket", "polling"],
-});
-
-socket.on("connect", () => {
-    console.log("K3 Socket connected:", socket.id);
-});
-
-socket.on("connect_error", (error) => {
-    console.error("K3 Socket connection error:", error.message);
-});
-
-socket.on("disconnect", (reason) => {
-    console.warn("K3 Socket disconnected:", reason);
-});
+// ✅ SINGLE SHARED SOCKET — EJS timer bhi isi ko use karega
+window.appSocket = window.appSocket || io();
+const socket = window.appSocket;
 
 $(window).on('load', function () {
-    setTimeout(() => $('#preloader').fadeOut(0), 100);
+    setTimeout(() => {
+        $('#preloader').fadeOut(0);
+    }, 100);
 });
 
 $(document).ready(function () {
-    $(`a[href="${window.location.pathname}"]`).addClass('active').css('pointerEvents', 'none');
+    $(`a[href="${window.location.pathname}"]`).addClass('active');
+    $(`a[href="${window.location.pathname}"]`).css('pointerEvents', 'none');
 });
 
-$('.back-to-tops').click(function() {
+$('.back-to-tops').click(function () {
     $('html, body').animate({ scrollTop: 0 }, 800);
     return false;
 });
 
-const isNumber = (params) => /^[0-9]*\d$/.test(params);
+const isNumber = (params) => {
+    let pattern = /^[0-9]*\d$/;
+    return pattern.test(params);
+};
 
 function formatMoney(amount, separator = ',') {
-    amount = typeof amount === 'number' ? amount : Number(amount);
+    if (typeof amount !== 'number') amount = Number(amount);
     if (isNaN(amount)) return '';
     return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator);
 }
 
-// Subscribe to the event for the currently selected K3 game without opening
-// a new socket connection every second. Backend maps game 1 to timeUpdate_11
-// and game 10 to timeUpdate_30.
-const socketEvents = {
-    5: 'timeUpdate_5',
-    3: 'timeUpdate_3',
-    1: 'timeUpdate_11',
-    10: 'timeUpdate_30',
-};
-let activeTimerEvent = null;
-
-function updateTimer(data) {
-    if (!data) return;
-    const { minute, secondtime1, secondtime2 } = data;
-    $(".time .time-sub:eq(1)").text(minute);
-    $(".time .time-sub:eq(2)").text(secondtime1);
-    $(".time .time-sub:eq(3)").text(secondtime2);
-}
-
-function connectsockets(checkID) {
-    const eventName = socketEvents[Number(checkID)];
-    if (!eventName) {
-        console.warn('Unknown K3 game ID:', checkID);
-        return;
-    }
-    if (activeTimerEvent === eventName) return;
-    if (activeTimerEvent) socket.off(activeTimerEvent, updateTimer);
-    activeTimerEvent = eventName;
-    socket.on(activeTimerEvent, updateTimer);
-}
-
-function syncK3Socket() {
-    connectsockets($('html').attr('data-change'));
-}
-
-$(document).ready(function () {
-    syncK3Socket();
-    // The existing handler updates data-change synchronously before its AJAX call.
-    $('#manage .col-12').on('click.k3Socket', function () {
-        setTimeout(syncK3Socket, 0);
-    });
-});
-// -------------------------------------------------------------------------------------
-
+// ================= LIST ORDERS DISPLAY =================
 function showListOrder(datas) {
     let html = '';
-
-    datas.map((data) => {
+    (datas || []).map((data) => {
         let list_kq = '';
         let total = 0;
         String(data.result).split('').forEach((e) => {
             total += Number(e);
-            list_kq += `<span data-v-a9660e98="" class="red box-xs"> ${e} </span>`;
+            list_kq += `<span class="red box-xs"> ${e} </span>`;
         });
-        html += 
-        `
-        <div data-v-a9660e98="" class="c-tc item van-row">
-            <div data-v-a9660e98="" class="van-col van-col--8">
-                <div data-v-a9660e98="" class="c-tc goItem">${data.period}</div>
+        html += `
+        <div class="c-tc item van-row">
+            <div class="van-col van-col--8">
+                <div class="c-tc goItem">${data.period}</div>
             </div>
-            <div data-v-a9660e98="" class="van-col van-col--5">
-                <div data-v-a9660e98="" class="c-tc goItem" style="display: flex;justify-content: center;">
-                    <!---->
+            <div class="van-col van-col--5">
+                <div class="c-tc goItem" style="display:flex;justify-content:center;">
                     ${list_kq}
-                    <span data-v-a9660e98="" class="red box-xs"> = </span>
-                    <span data-v-a9660e98="" class="red box-xs" style="font-size: 14px"> ${total} </span>
+                    <span class="red box-xs"> = </span>
+                    <span class="red box-xs" style="font-size:14px"> ${total} </span>
                 </div>
             </div>
-            <div data-v-a9660e98="" class="van-col van-col--5">
-                <div data-v-a9660e98="" class="c-tc goItem">
-                    <span data-v-a9660e98=""> ${(total >= 3 && total <= 10) ? "Small" : "Big"} </span>
+            <div class="van-col van-col--5">
+                <div class="c-tc goItem">
+                    <span> ${(total >= 3 && total <= 10) ? "Small" : "Big"} </span>
                 </div>
             </div>
-            <div data-v-a9660e98="" class="van-col van-col--5">
-                <div data-v-a9660e98="" class="c-tc goItem">
-                    <span data-v-a9660e98=""> ${(total % 2 == 0) ? "Even" : "Odd"} </span>
+            <div class="van-col van-col--5">
+                <div class="c-tc goItem">
+                    <span> ${(total % 2 == 0) ? "Even" : "Odd"} </span>
                 </div>
             </div>
-        </div>
-        `;
+        </div>`;
     });
     $('#list-orders').html(html);
 }
 
+// ================= BET CHAT MESSAGES =================
+const BET_LABELS = {
+    'total': 'Join Total',
+    'three-same': 'Join 3 same numbers',
+    'two-same': 'Join 2 same numbers',
+    'unlike': 'Join another number'
+};
+
 function messNewJoin2(datas) {
     let result = '';
-    datas.map((data) => {
-        if (data.typeGame == 'total') {
-            result += `
-                <div class="direct-chat-infos clearfix mt-2">
-                    <span class="direct-chat-name float-left"></span>
-                </div>
-                <img class="direct-chat-img" src="/images/myimg.png" alt="message user image">
-                <div class="direct-chat-text" style="background-color: #1eb93d"> Join Total (${data.bet}) with the A mount of money ${data.money}</div>
-            `; 
-        }
-        if (data.typeGame == 'three-same') {
-            result += `
-                <div class="direct-chat-infos clearfix mt-2">
-                    <span class="direct-chat-name float-left"></span>
-                </div>
-                <img class="direct-chat-img" src="/images/myimg.png" alt="message user image">
-                <div class="direct-chat-text" style="background-color: #1eb93d"> Join 3 same numbers(${data.bet}) with the A mount of money ${data.money}</div>
-            `; 
-        }
-
-        if (data.typeGame == 'two-same') {
-            result += `
-                <div class="direct-chat-infos clearfix mt-2">
-                    <span class="direct-chat-name float-left"></span>
-                </div>
-                <img class="direct-chat-img" src="/images/myimg.png" alt="message user image">
-                <div class="direct-chat-text" style="background-color: #1eb93d"> Join 2 same numbers(${data.bet}) with the A mount of money ${data.money}</div>
-            `; 
-        }
-        if (data.typeGame == 'unlike') {
-            result += `
-                <div class="direct-chat-infos clearfix mt-2">
-                    <span class="direct-chat-name float-left"></span>
-                </div>
-                <img class="direct-chat-img" src="/images/myimg.png" alt="message user image">
-                <div class="direct-chat-text" style="background-color: #1eb93d"> Join another number(${data.bet}) with the A mount of money ${data.money}</div>
-            `; 
-        }
+    (datas || []).map((data) => {
+        const label = BET_LABELS[data.typeGame] || 'Join';
+        result += `
+            <div class="direct-chat-infos clearfix mt-2">
+                <span class="direct-chat-name float-left"></span>
+            </div>
+            <img class="direct-chat-img" src="/images/myimg.png" alt="user image">
+            <div class="direct-chat-text" style="background-color:#1eb93d">
+                ${label}(${data.bet}) with the A mount of money ${data.money}
+            </div>`;
     });
     $('.direct-chat-msg').html(result);
     $(".direct-chat-warning .direct-chat-messages").animate({
@@ -171,121 +93,147 @@ function messNewJoin2(datas) {
     }, 750);
 }
 
-function messNewJoin3(datas) {
-    let total = 0;
-    let twoSame = 0;
-    let threeSame = 0;
-    let unlike = 0;
+// ================= UPDATE JOIN CARDS (0-9, B, S) =================
+// 🔴 YEH FUNCTION MISSING THA JO CARDS KE ANDAR VALUE UPDATE KAREGA
+function updateJoinCards(datas) {
+    // Pehle sabhi cards ko 0 kar dein
+    $('.orderNumber').text('0');
+    let cardTotals = {};
 
-    datas.map((data) => {
-        let typeGame = data.typeGame;
-        let money = parseInt(data.money, 10); // Convert data.money to an integer
+    // Har ek bet ko check karein aur uske number/card me add karein
+    (datas || []).forEach((data) => {
+        let type = data.typeGame;
+        let betStr = data.bet || "";
+        let amount = Number(data.money) || 0;
+        let xvalue = Number(data.amount) || 1; // amount = xvalue
+        let totalBetAmount = amount * xvalue;
 
-        if (typeGame === "total") {
-            total += money;
-            $(`#total`).attr('totalMoney', total);
-            $(`#total`).text(total);
+        if (type === 'total') {
+            // Total game me '1,2,3,b,s,c,l' sab ho sakta hai
+            let bets = betStr.split(',');
+            bets.forEach(b => {
+                b = b.trim();
+                if (b !== "") {
+                    cardTotals[b] = (cardTotals[b] || 0) + totalBetAmount;
+                }
+            });
+        } 
+        else if (type === 'two-same' || type === 'three-same') {
+            // In games me '1,2,3' type numbers hote hain
+            let parts = betStr.split('@');
+            if (parts[0]) {
+                let nums = parts[0].split(',');
+                nums.forEach(n => {
+                    n = n.trim();
+                    if (n !== "") {
+                        cardTotals[n] = (cardTotals[n] || 0) + totalBetAmount;
+                    }
+                });
+            }
         }
-        if (typeGame === "two-same") {
-            twoSame += money;
-            $(`#2-so-trung`).attr('totalMoney', twoSame);
-            $(`#2-so-trung`).text(twoSame);
-        }
-        if (typeGame === "three-same") {
-            threeSame += money;
-            $(`#3-so-trung`).attr('totalMoney', threeSame);
-            $(`#3-so-trung`).text(threeSame);
-        }
-        if (typeGame === "unlike") {
-            unlike += money;
-            $(`#khac-so`).attr('totalMoney', unlike);
-            $(`#khac-so`).text(unlike);
+        // Note: 'unlike' game me 3 alag alag numbers hote hain, 
+        // unko 0-9 cards me count karna ya na karna aapki logic par depend karta hai.
+    });
+
+    // Ab DOM (Cards) me values update karein
+    $('.info-box').each(function () {
+        let label = $(this).find('.info-box-icon').text().trim(); // Card ka ID (0, 1, B, S)
+        let valToShow = cardTotals[label] || 0;
+        
+        // Agar value 0 se badi hai to comma format karke dikhayein
+        if (valToShow > 0) {
+            $(this).find('.orderNumber').text(formatMoney(valToShow));
         }
     });
 }
 
+// ================= BET STATS (TOTAL, 2SAME, 3SAME, UNLIKE) =================
+function messNewJoin3(datas) {
+    let total = 0, twoSame = 0, threeSame = 0, unlike = 0;
+    (datas || []).map((data) => {
+        const money = parseInt(data.money, 10) || 0;
+        if (data.typeGame === "total") {
+            total += money;
+            $('#total').attr('totalMoney', total).text(total);
+        }
+        if (data.typeGame === "two-same") {
+            twoSame += money;
+            $('#2-so-trung').attr('totalMoney', twoSame).text(twoSame);
+        }
+        if (data.typeGame === "three-same") {
+            threeSame += money;
+            $('#3-so-trung').attr('totalMoney', threeSame).text(threeSame);
+        }
+        if (data.typeGame === "unlike") {
+            unlike += money;
+            $('#khac-so').attr('totalMoney', unlike).text(unlike);
+        }
+    });
+}
+
+// ================= ORDER POLLING =================
 const intervalId = setInterval(callListOrder, 2000);
+
 function callListOrder() {
     let game = $('html').attr('data-change');
     $.ajax({
         type: "POST",
         url: "/api/webapi/admin/k3/listOrders",
-        data: {
-            gameJoin: game,
-        },
+        data: { gameJoin: game },
         dataType: "json",
         success: function (response) {
-            showListOrder(response.data.gameslist);
-            messNewJoin2(response.bet);
-            messNewJoin3(response.bet);
-            let settings = response.settings[0];
-            if(game == 1) $('#ketQua').text('next result: ' + `${(settings.k3d == '-1') ? 'Random' : settings.k3d}`);
-            if(game == 3) $('#ketQua').text('next result: ' + `${(settings.k3d3 == '-1') ? 'Random' : settings.k3d3}`);
-            if(game == 5) $('#ketQua').text('next result: ' + `${(settings.k3d5 == '-1') ? 'Random' : settings.k3d5}`);
-            if(game == 10) $('#ketQua').text('next result: ' + `${(settings.k3d10 == '-1') ? 'Random' : settings.k3d10}`);
+            if (!response || !response.data) return;
+            
+            showListOrder(response.data.gameslist || []);
+            
+            // 🔴 UPDATE FUNCTIONS CALL KIYE
+            messNewJoin2(response.bet || []);
+            messNewJoin3(response.bet || []);
+            updateJoinCards(response.bet || []); // <--- YEH NAYA ADD HUA HAI
+
+            const settings = (response.settings && response.settings[0]) || {};
+            const nextMap = { '1': 'k3d', '3': 'k3d3', '5': 'k3d5', '10': 'k3d10' };
+            const key = nextMap[String(game)];
+            if (key) {
+                $('#ketQua').text('next result: ' + (settings[key] == '-1' ? 'Random' : settings[key]));
+            }
             $(".reservation-chunk-sub-num").text(response.period);
             $('#preloader').fadeOut(0);
         }
     });
 }
 callListOrder();
+
 socket.on("data-server-k3", function (msg) {
-    //console.log("fixed",msg)
     if (msg) {
         callListOrder();
         $('.direct-chat-msg').html('');
     }
 });
 
+// ================= NEW JOIN ANIMATION (LIVE) =================
 function messNewJoin(data) {
     let game = $('html').attr('data-change');
     if (data.change == 1) return;
-    if (data.game != game) return;
+    if (String(data.game) != String(game)) return;
 
     let typeGame = '';
     if (data.gameJoin == 1) typeGame = 'total';
     if (data.gameJoin == 2) typeGame = 'two-same';
     if (data.gameJoin == 3) typeGame = 'three-same';
     if (data.gameJoin == 4) typeGame = 'unlike';
-    let result = '';
 
-    if (typeGame == 'total') {
-        result += `
-            <div class="direct-chat-infos clearfix mt-2">
-                <span class="direct-chat-name float-left"></span>
-            </div>
-            <img class="direct-chat-img" src="/images/myimg.png" alt="message user image">
-            <div class="direct-chat-text" style="background-color: #1eb93d"> Join Total(${data.listJoin}) with the A mount of money ${Number(data.money) * Number(data.xvalue)}</div>
-        `; 
-    }
-    if (typeGame == 'three-same') {
-        result += `
-            <div class="direct-chat-infos clearfix mt-2">
-                <span class="direct-chat-name float-left"></span>
-            </div>
-            <img class="direct-chat-img" src="/images/myimg.png" alt="message user image">
-            <div class="direct-chat-text" style="background-color: #1eb93d"> Join 3 same numbers(${data.listJoin}) with the A mount of money ${Number(data.money) * Number(data.xvalue)}</div>
-        `; 
-    }
+    const label = BET_LABELS[typeGame];
+    if (!label) return;
 
-    if (typeGame == 'two-same') {
-        result += `
-            <div class="direct-chat-infos clearfix mt-2">
-                <span class="direct-chat-name float-left"></span>
-            </div>
-            <img class="direct-chat-img" src="/images/myimg.png" alt="message user image">
-            <div class="direct-chat-text" style="background-color: #1eb93d"> Join 3 same numbers(${data.listJoin}) with the A mount of money ${Number(data.money) * Number(data.xvalue)}</div>
-        `; 
-    }
-    if (typeGame == 'unlike') {
-        result += `
-            <div class="direct-chat-infos clearfix mt-2">
-                <span class="direct-chat-name float-left"></span>
-            </div>
-            <img class="direct-chat-img" src="/images/myimg.png" alt="message user image">
-            <div class="direct-chat-text" style="background-color: #1eb93d"> Join another number(${data.listJoin}) with the A mount of money ${Number(data.money) * Number(data.xvalue)}</div>
-        `; 
-    }
+    const result = `
+        <div class="direct-chat-infos clearfix mt-2">
+            <span class="direct-chat-name float-left"></span>
+        </div>
+        <img class="direct-chat-img" src="/images/myimg.png" alt="user image">
+        <div class="direct-chat-text" style="background-color:#1eb93d">
+            ${label}(${data.listJoin}) with the A mount of money ${Number(data.money) * Number(data.xvalue)}
+        </div>`;
     $('.direct-chat-msg').append(result);
     $(".direct-chat-warning .direct-chat-messages").animate({
         scrollTop: $(".direct-chat-msg").prop("scrollHeight")
@@ -295,42 +243,21 @@ function messNewJoin(data) {
 function messNewJoin5(data) {
     let game = $('html').attr('data-change');
     if (data.change == 1) return;
-    if (data.game != game) return;
-    let typeGame = "";
-    if (data.gameJoin == 1) typeGame = "total";
-    if (data.gameJoin == 2) typeGame = "two-same";
-    if (data.gameJoin == 3) typeGame = "three-same";
-    if (data.gameJoin == 4) typeGame = "unlike";
+    if (String(data.game) != String(game)) return;
 
-    if (typeGame == "total") {
-        let money = Number($(`#total`).attr('totalMoney')) + Number(data.money) * Number(data.xvalue);
-        $(`#total`).attr('totalMoney', money);
-        $(`#total`).text(money);
-    }
-    if (typeGame == "two-same") {
-        let money = Number($(`#2-so-trung`).attr('totalMoney')) + Number(data.money) * Number(data.xvalue);
-        $(`#2-so-trung`).attr('totalMoney', money);
-        $(`#2-so-trung`).text(money);
-    }
-    if (typeGame == "three-same") {
-        let money = Number($(`#3-so-trung`).attr('totalMoney')) + Number(data.money) * Number(data.xvalue);
-        $(`#3-so-trung`).attr('totalMoney', money);
-        $(`#3-so-trung`).text(money);
-    }
-    if (typeGame == "unlike") {
-        let money = Number($(`#khac-so`).attr('totalMoney')) + Number(data.money) * Number(data.xvalue);
-        $(`#khac-so`).attr('totalMoney', money);
-        $(`#khac-so`).text(money);
-    }
+    // (Existing logic is fine for top stats, but we need to update cards too)
+    // Force update all data from server when someone joins live
+    callListOrder(); 
 }
 
 socket.on("data-server-k3", function (msg) {
+    if (!msg) return;
     messNewJoin(msg);
     messNewJoin5(msg);
-   
 });
 
-$('#manage .col-12').click(async function (e) { 
+// ================= GAME SWITCH =================
+$('#manage .col-12').click(async function (e) {
     e.preventDefault();
     $('#preloader').fadeIn(0);
     let game = $(this).attr('data');

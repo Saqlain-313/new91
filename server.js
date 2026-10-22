@@ -29,21 +29,21 @@ const corsdata = [
   "http://localhost:3000",
   "http://localhost:5173",
   "http://localhost:7805",
+<<<<<<< Updated upstream
   "https://max-win.site/",
   "http://max-win.site/",
+=======
+>>>>>>> Stashed changes
 ];
 
 // Socket IO setup with CORS
 const io = new Server(server, {
   cors: {
-    origin: corsdata,
+    // origin: corsdata, // Adjust to your actual client if needed
+    origin: "/", // Adjust to your actual client if needed
     methods: ["GET", "POST"],
-    credentials: true,
   },
 });
-
-app.set("io", io);
-
 
 // Log when a client connects or disconnects
 io.on("connection", (socket) => {
@@ -82,6 +82,7 @@ app.use(
 );
 
 // Disable cache
+<<<<<<< Updated upstream
 app.options(
   "*",
   cors({
@@ -90,6 +91,9 @@ app.options(
     credentials: true,
   }),
 );
+=======
+app.options("*", cors());
+>>>>>>> Stashed changes
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
   res.set("Pragma", "no-cache");
