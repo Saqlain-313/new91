@@ -29,19 +29,16 @@ const corsdata = [
   "http://localhost:3000",
   "http://localhost:5173",
   "http://localhost:7805",
-<<<<<<< Updated upstream
-  "https://max-win.site/",
-  "http://max-win.site/",
-=======
->>>>>>> Stashed changes
+  "https://max-win.site",
+  "http://max-win.site",
 ];
 
 // Socket IO setup with CORS
 const io = new Server(server, {
   cors: {
-    // origin: corsdata, // Adjust to your actual client if needed
-    origin: "/", // Adjust to your actual client if needed
-    methods: ["GET", "POST"],
+    origin: corsdata.map((origin) => origin.replace(/\/$/, "")),
+    methods: ["GET", "POST", "OPTIONS"],
+    credentials: true,
   },
 });
 
@@ -82,7 +79,6 @@ app.use(
 );
 
 // Disable cache
-<<<<<<< Updated upstream
 app.options(
   "*",
   cors({
@@ -91,9 +87,7 @@ app.options(
     credentials: true,
   }),
 );
-=======
 app.options("*", cors());
->>>>>>> Stashed changes
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
   res.set("Pragma", "no-cache");
@@ -1133,12 +1127,43 @@ startCountdown(5, requestData_5);
 
 //app.use(Sentry.Handlers.requestHandler());
 
-const port = process.env.PORT || 7805;
+const DEFAULT_PORT = Number(process.env.PORT) || 7805;
+const MAX_PORT_ATTEMPTS = 10;
 
-// Start server
-server.listen(port, () => {
-  console.log(`Server running on port ${port} - PID: ${process.pid}`);
-});
+// Start on the configured port. If it is already occupied, try the next ports
+// (7806, 7807, ...). The actual port is printed so the frontend can be updated
+// if the backend had to move to a different port.
+function startServer(port, attemptsLeft = MAX_PORT_ATTEMPTS) {
+  const handleListenError = (error) => {
+    server.removeListener("error", handleListenError);
+
+    if (error.code === "EADDRINUSE" && attemptsLeft > 1) {
+      const nextPort = port + 1;
+      console.warn(
+        `Port ${port} is already in use. Trying port ${nextPort}...`
+      );
+      startServer(nextPort, attemptsLeft - 1);
+      return;
+    }
+
+    console.error(`Unable to start server on port ${port}:`, error);
+    process.exitCode = 1;
+  };
+
+  server.once("error", handleListenError);
+  server.listen(port, "0.0.0.0", () => {
+    server.removeListener("error", handleListenError);
+    console.log(`Server running on port ${port} - PID: ${process.pid}`);
+    if (port !== DEFAULT_PORT) {
+      console.warn(
+        `IMPORTANT: Backend moved from configured port ${DEFAULT_PORT} to ${port}. ` +
+        `Update your frontend/API and Socket.IO URLs if they use a fixed port.`
+      );
+    }
+  });
+}
+
+startServer(DEFAULT_PORT);
 
 // Graceful shutdown on SIGINT (Ctrl+C)
 process.on("SIGINT", () => {
