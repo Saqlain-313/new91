@@ -1135,7 +1135,9 @@ function startServer(port, attemptsLeft = MAX_PORT_ATTEMPTS) {
 
     if (error.code === "EADDRINUSE" && attemptsLeft > 1) {
       const nextPort = port + 1;
-      console.warn(`Port ${port} is already in use. Trying port ${nextPort}...`);
+      console.warn(
+        `Port ${port} is already in use. Trying port ${nextPort}...`,
+      );
       startServer(nextPort, attemptsLeft - 1);
       return;
     }
@@ -1151,8 +1153,8 @@ function startServer(port, attemptsLeft = MAX_PORT_ATTEMPTS) {
 
     if (port !== DEFAULT_PORT) {
       console.warn(
-        `IMPORTANT: Backend is running on ${port}, not configured port ${DEFAULT_PORT}. ` +
-        `Update frontend/API and Socket.IO URLs if they use a fixed port.`
+        `IMPORTANT: Backend moved from configured port ${DEFAULT_PORT} to ${port}. ` +
+          `Update your frontend/API and Socket.IO URLs if they use a fixed port.`,
       );
     }
   });
