@@ -87,7 +87,6 @@ app.options(
     credentials: true,
   }),
 );
-app.options("*", cors());
 app.use((req, res, next) => {
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
   res.set("Pragma", "no-cache");
@@ -1130,9 +1129,6 @@ startCountdown(5, requestData_5);
 const DEFAULT_PORT = Number(process.env.PORT) || 7805;
 const MAX_PORT_ATTEMPTS = 10;
 
-// Start on the configured port. If it is already occupied, try the next ports
-// (7806, 7807, ...). The actual port is printed so the frontend can be updated
-// if the backend had to move to a different port.
 function startServer(port, attemptsLeft = MAX_PORT_ATTEMPTS) {
   const handleListenError = (error) => {
     server.removeListener("error", handleListenError);
@@ -1154,6 +1150,7 @@ function startServer(port, attemptsLeft = MAX_PORT_ATTEMPTS) {
   server.listen(port, "0.0.0.0", () => {
     server.removeListener("error", handleListenError);
     console.log(`Server running on port ${port} - PID: ${process.pid}`);
+
     if (port !== DEFAULT_PORT) {
       console.warn(
         `IMPORTANT: Backend moved from configured port ${DEFAULT_PORT} to ${port}. ` +
