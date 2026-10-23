@@ -431,7 +431,7 @@ const Main = () => {
 
             <Link
               className="flex flex-col items-center justify-center"
-              to={`https://h5.workorder.support.1xclube.com/?token=${Cookies.get(
+              to={`https://h5.workorder.support.max-win.site/?token=${Cookies.get(
                 "auth",
               )}`}
             >

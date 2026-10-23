@@ -1,11 +1,10 @@
 {
   "files": {
-    "main.css": "/static/css/main.c5f58000.css",
-    "main.js": "/static/js/main.f7267e41.js",
+    "main.css": "/static/css/main.ccb178bf.css",
+    "main.js": "/static/js/main.7ec8a669.js",
     "index.html": "/index.html",
     "static/media/trxbg.png": "/static/media/trxbg.1a3c4826999516b11de7.png",
     "static/media/bg-spin-front-img.png": "/static/media/bg-spin-front-img.2e2ad3330bd9c8c6c6ce.png",
-    "static/media/tickpopup.png": "/static/media/tickpopup.34835551abb0f921f351.png",
     "static/media/customerBg.png": "/static/media/customerBg.ddfa61cd8731600971d3.png",
     "static/media/vip10.png": "/static/media/vip10.4a35be9341e3386fc269.png",
     "static/media/sexy video.png": "/static/media/sexy video.fafac094eab009085f2c.png",
@@ -140,7 +139,7 @@
     "static/media/SliderActivities.svg": "/static/media/SliderActivities.6730a2b00a3881f28772.svg"
   },
   "entrypoints": [
-    "static/css/main.c5f58000.css",
-    "static/js/main.f7267e41.js"
+    "static/css/main.ccb178bf.css",
+    "static/js/main.7ec8a669.js"
   ]
 }

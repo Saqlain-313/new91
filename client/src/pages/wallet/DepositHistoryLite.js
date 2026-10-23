@@ -103,7 +103,7 @@ const DepositHistoryLite = () => {
               </div>
               {item.status === 0 && (
                 <Link
-                  to={`https://h5.workorder.support.1xclube.com/deposite?token=${Cookies.get(
+                  to={`https://h5.workorder.support.max-win.site/deposite?token=${Cookies.get(
                     // This line was causing the error
                     "auth",
                   )}`}

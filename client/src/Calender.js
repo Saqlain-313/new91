@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 
 function ScrollPicker({ items, selectedItem, onChange, label }) {
@@ -40,7 +40,7 @@ function ScrollPicker({ items, selectedItem, onChange, label }) {
       <span className="text-whites mb-2">{label}</span>
       <div
         ref={containerRef}
-        className="w-24 h-[200px] overflow-y-scroll scrollbar-hide"
+        className="w-24 h-[200px] z-10 overflow-y-scroll scrollbar-hide"
         onScroll={handleScroll}
         style={{ scrollSnapType: "y mandatory" }}
       >
@@ -51,7 +51,7 @@ function ScrollPicker({ items, selectedItem, onChange, label }) {
             ref={(el) => (itemRefs.current[index] = el)}
             onClick={() => handleItemClick(index)}
             className={`h-10 flex items-center justify-center cursor-pointer ${
-              selectedItem === item ? "gray-50 font-bold" : "text-gray-500"
+              selectedItem === item ? "text-white font-bold" : "text-gray-500"
             }`}
             style={{
               scrollSnapAlign: "center",
@@ -76,35 +76,35 @@ function Calendar({ onDateSelect, onValueChange }) {
 
   const [selectedYear, setSelectedYear] = useState(currentYear.toString());
   const [selectedMonth, setSelectedMonth] = useState(
-    currentMonth.toString().padStart(2, "0")
+    currentMonth.toString().padStart(2, "0"),
   );
   const [selectedDay, setSelectedDay] = useState(
-    currentDay.toString().padStart(2, "0")
+    currentDay.toString().padStart(2, "0"),
   );
   const [isOpen, setIsOpen] = useState(false);
 
   // Define years, months, and days based on current date
   const years = Array.from({ length: 6 }, (_, i) =>
-    (2020 + i).toString()
+    (2020 + i).toString(),
   ).filter((year) => parseInt(year) <= currentYear);
 
   const months = Array.from({ length: 12 }, (_, i) =>
-    (i + 1).toString().padStart(2, "0")
+    (i + 1).toString().padStart(2, "0"),
   ).filter(
     (month) =>
       parseInt(month) <=
-      (parseInt(selectedYear) === currentYear ? currentMonth : 12)
+      (parseInt(selectedYear) === currentYear ? currentMonth : 12),
   );
 
   const days = Array.from({ length: 31 }, (_, i) =>
-    (i + 1).toString().padStart(2, "0")
+    (i + 1).toString().padStart(2, "0"),
   ).filter(
     (day) =>
       parseInt(day) <=
       (parseInt(selectedYear) === currentYear &&
       parseInt(selectedMonth) === currentMonth
         ? currentDay
-        : 31)
+        : 31),
   );
 
   const handleConfirm = () => {
@@ -121,7 +121,7 @@ function Calendar({ onDateSelect, onValueChange }) {
     <div className="">
       <div className={isOpen ? "overlay-section block" : "hidden"}></div>
 
-      <div className="bg-body cursor-pointer flex justify-between items-center p-2 rounded-md">
+      <div className="nav-bg cursor-pointer flex justify-between items-center p-2 rounded-md">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="border rounded gray-50 border-none w-full text-left"
@@ -129,44 +129,55 @@ function Calendar({ onDateSelect, onValueChange }) {
           {`${selectedYear}-${selectedMonth}-${selectedDay}`}
         </button>
         <span>
-          <IoIosArrowDown className="text-base text-black" />
+          <IoIosArrowDown className="text-base text-gray" />
         </span>
       </div>
 
       {isOpen && (
-        <div className="fixed bottom-0 left-0 right-0 m-auto w-[24.5rem] z-50 rounded-t-xl shadow-lg bg-body">
-          <div className="flex justify-between px-4 py-2 items-center rounded-t-xl bg-light">
+        <div
+          className="fixed bottom-0 left-0 right-0 m-auto w-full min-w-content h-[300px] z-50 rounded-t-xl shadow-lg "
+          style={{ backgroundColor: "#1f1f1f" }}
+        >
+          <div
+            className="flex justify-between px-4 py-2 items-center rounded-t-xl"
+            style={{ background: "rgba(255, 255, 255, 0.05)" }}
+          >
             <h2
               onClick={() => setIsOpen(false)}
-              className="gray-text cursor-pointer"
+              className="text-gray-500 font-bold cursor-pointer"
             >
               Cancel
             </h2>
             <h2 className="text-whites font-bold text-md">Choose a Date</h2>
-            <h2 onClick={handleConfirm} className="text-blue cursor-pointer">
+            <h2
+              onClick={handleConfirm}
+              className="text-[#26B2E6] font-bold cursor-pointer"
+            >
               Confirm
             </h2>
           </div>
-          <div className="flex justify-around bg-body">
+          <div className="flex justify-around ">
             <ScrollPicker
               items={years}
               selectedItem={selectedYear}
               onChange={setSelectedYear}
-              label="Year"
+              // label="Year"
             />
             <ScrollPicker
               items={months}
               selectedItem={selectedMonth}
               onChange={setSelectedMonth}
-              label="Month"
+              // label="Month"
             />
             <ScrollPicker
               items={days}
               selectedItem={selectedDay}
               onChange={setSelectedDay}
-              label="Day"
+              // label="Day"
             />
           </div>
+
+          <div className=" absolute bottom-[134px] h-10 w-full  bg-[#2A2A2A] "></div>
         </div>
       )}
     </div>

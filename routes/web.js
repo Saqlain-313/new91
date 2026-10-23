@@ -239,12 +239,12 @@ const initWebRouter = (app) => {
     return val;
   }
 
-router.get("/api/ip-records", async (req, res) => {
-  try {
-    // Fix 1: Increase GROUP_CONCAT limit
-    await connection.query(`SET SESSION group_concat_max_len = 1000000`);
+  router.get("/api/ip-records", async (req, res) => {
+    try {
+      // Fix 1: Increase GROUP_CONCAT limit
+      await connection.query(`SET SESSION group_concat_max_len = 1000000`);
 
-    const [rows] = await connection.query(`
+      const [rows] = await connection.query(`
       SELECT 
         ip_address, 
         COUNT(*) AS total_activities,
@@ -265,36 +265,36 @@ router.get("/api/ip-records", async (req, res) => {
       LIMIT 50
     `);
 
-    const results = rows.map((row) => {
-      const risk = row.unique_users > 3 ? "High Risk" : "Normal";
-      return {
-        ip: row.ip_address,
-        risk,
-        activities: Number(row.total_activities),
-        users: Number(row.unique_users),
-        phones: row.user_actions ? row.user_actions.split(", ") : [],
-        lastActivity: row.last_activity
-          ? new Date(row.last_activity).toISOString().slice(0, 10)
-          : "Invalid Date",
-      };
-    });
+      const results = rows.map((row) => {
+        const risk = row.unique_users > 3 ? "High Risk" : "Normal";
+        return {
+          ip: row.ip_address,
+          risk,
+          activities: Number(row.total_activities),
+          users: Number(row.unique_users),
+          phones: row.user_actions ? row.user_actions.split(", ") : [],
+          lastActivity: row.last_activity
+            ? new Date(row.last_activity).toISOString().slice(0, 10)
+            : "Invalid Date",
+        };
+      });
 
-    const totalActiveIps = results.length;
-    const highRiskIps = results.filter((x) => x.risk === "High Risk").length;
-    const activeUsers = results.reduce((sum, x) => sum + x.users, 0);
+      const totalActiveIps = results.length;
+      const highRiskIps = results.filter((x) => x.risk === "High Risk").length;
+      const activeUsers = results.reduce((sum, x) => sum + x.users, 0);
 
-    res.json({
-      summary: { totalActiveIps, highRiskIps, activeUsers },
-      data: results,
-    });
-  } catch (err) {
-    console.error("IP records error:", err.message, err.sqlMessage || "");
-    res.status(500).json({ 
-      error: "Server error", 
-      details: err.sqlMessage || err.message 
-    });
-  }
-});
+      res.json({
+        summary: { totalActiveIps, highRiskIps, activeUsers },
+        data: results,
+      });
+    } catch (err) {
+      console.error("IP records error:", err.message, err.sqlMessage || "");
+      res.status(500).json({
+        error: "Server error",
+        details: err.sqlMessage || err.message,
+      });
+    }
+  });
 
   async function getDownlineByLevel(connection, rootCode, levels = 6) {
     let result = [];
@@ -752,6 +752,18 @@ router.get("/api/ip-records", async (req, res) => {
     accountController.getLoginupdate,
   );
 
+  router.post(
+    "/api/webapi/admin/k3/listOrders",
+    adminController.middlewareAdminController,
+    k3Controller.getAdminListOrders, // 👈 Naya function k3Controller se
+  );
+
+  router.post(
+    "/api/webapi/admin/5d/listOrders",
+    adminController.middlewareAdminController,
+    k5Controller.getAdminListOrders5D, // 👈 Naya function k5Controller se
+  );
+
   router.get(
     "/api/webapi/subordinatedata",
     middlewareController,
@@ -782,7 +794,6 @@ router.get("/api/ip-records", async (req, res) => {
   router.post("/api/webapi/login-admin", accountController.loginAdmin);
 
   router.post("/api/webapi/verify-admin-otp", accountController.verifyAdminOTP);
-
 
   router.get(
     "/admin/manager/promotions",

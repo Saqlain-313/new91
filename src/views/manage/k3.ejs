@@ -596,7 +596,8 @@
                   <span class="info-box-icon elevation-1"><%= item.id %></span>
                   <div class="info-box-content">
                     <span class="info-box-text"><%= item.text %></span>
-                    <span class="info-box-number orderNumber">0</span>
+                    <!-- ✅ YEH ID ADD KI GAYI HAI TAAKI JS UPDATE KAR SAKE -->
+                    <span class="info-box-number orderNumber" id="card_<%= item.id %>">0</span>
                   </div>
                 </div>
               </div>
@@ -704,6 +705,12 @@
 
   <!-- ✅ INLINE: changeDataAttribute + submit -->
   <script>
+    // ✅ YEH FUNCTION MISSING THA (Jisse submit crash ho raha tha)
+    const isNumber = (params) => {
+      let pattern = /^[0-9]*\d$/;
+      return pattern.test(params);
+    };
+
     function changeDataAttribute(element, url) {
       document.documentElement.setAttribute("data-change", String(url));
 
@@ -745,7 +752,7 @@
       }
       let arr = value.split('|');
       for (let i = 0; i < arr.length; i++) {
-        if (arr[i] === "" || arr[i].length !== 3 || !/^[0-9]*\d$/.test(arr[i])) {
+        if (arr[i] === "" || arr[i].length !== 3 || !isNumber(arr[i])) {
           alert("Please enter the correct format (e.g., 123|456|234).");
           return false;
         }

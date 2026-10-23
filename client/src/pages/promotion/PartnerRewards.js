@@ -154,7 +154,7 @@ const PartnerRewards = () => {
               bonus: "₹4,000",
             },
           ].map((item, i) => (
-            <div className="grid grid-cols-[1fr_3fr_1fr] text-center py-2 border-b border-[#1e1e2d] text-xs">
+            <div className="grid grid-cols-[1fr_3fr_1fr] text-center py-2 border-b border-[#3f3f63] text-xs">
               <div className="text-purple-400">
                 {i === 0 ? "1st deposit" : ""}
               </div>
@@ -190,7 +190,7 @@ const PartnerRewards = () => {
               bonus: "₹6,000",
             },
           ].map((item, i) => (
-            <div className="grid grid-cols-[1fr_3fr_1fr] text-center py-2 border-b border-[#1e1e2d] text-xs">
+            <div className="grid grid-cols-[1fr_3fr_1fr] text-center py-2 border-b border-[#3f3f63] text-xs">
               <div className="text-purple-400">
                 {i === 0 ? "2nd deposit" : ""}
               </div>
@@ -226,7 +226,7 @@ const PartnerRewards = () => {
               bonus: "₹10,000",
             },
           ].map((item, i) => (
-            <div className="grid grid-cols-[1fr_3fr_1fr] text-center py-2 text-xs border-b border-[#3A3947]">
+            <div className="grid grid-cols-[1fr_3fr_1fr] text-center py-2 text-xs border-b border-[#3f3f63]">
               <div className="text-purple-400">
                 {i === 0 ? "3rd deposit" : ""}
               </div>

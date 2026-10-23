@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { PiCopySimpleBold } from "react-icons/pi";
-import CopyCopmponent from "../../components/CopyCopmponent";
-import { useDispatch, useSelector } from "react-redux";
-import { withdrawalHistory } from "../../store/reducer/userReducer";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { RiFileCopy2Fill } from "react-icons/ri";
-import EmptyData from "../activity/EmptyData";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import CopyCopmponent from "../../components/CopyCopmponent";
+import { withdrawalHistory } from "../../store/reducer/userReducer";
 
 const WithdrawHistoryLite = () => {
   const { withdrawHistoryData } = useSelector((state) => state.user);
@@ -42,13 +41,13 @@ const WithdrawHistoryLite = () => {
 
   return (
     <>
-      <div className="flex items-start justify-start mt-5 gap-2 ml-5 text-whites">
-        <RiFileCopy2Fill className="text-[#FB5959] size-6" /> Withdraw History
+      <div className="flex items-start justify-start mt-5 gap-2 ml-5">
+        <RiFileCopy2Fill /> Withdraw History
       </div>
       <div className="container-section mt-2 ">
         {limitedWithdrawData?.length > 0 ? (
           limitedWithdrawData.map((item, i) => (
-            <div className="bg-body rounded-md pb-7 mb-4 p-2" key={i}>
+            <div className="nav-bg rounded-md pb-7 mb-4 p-2" key={i}>
               <div className="flex justify-between items-center px-2 text-sm py-1 rounded-sm sky-border border-b">
                 <span className="text-sm font-bold bg-red-500 p-2 px-4 rounded-md">
                   Withdraw
@@ -58,26 +57,26 @@ const WithdrawHistoryLite = () => {
                     item.status === 0
                       ? "color-yellow-200"
                       : item.status === 1
-                      ? "color-green"
-                      : "color-red-200"
+                        ? "color-green"
+                        : "color-red-200"
                   }`}
                 >
                   {item.status === 0
                     ? "Processing"
                     : item.status === 1
-                    ? "Completed"
-                    : "Reject"}
+                      ? "Completed"
+                      : "Reject"}
                 </span>
               </div>
-              <div className="mt-3 flex justify-between items-center gray-text text-xs px-2">
-                <span className="fs-sm font-medium">Balance</span>
+              <div className="mt-3 flex justify-between items-center gray-text text-sm px-2">
+                <span className="text-sm font-medium">Balance</span>
                 <span
-                  className={`fs-sm font-medium ${
+                  className={`text-sm font-medium ${
                     item.status === 0
                       ? "color-yellow-200"
                       : item.status === 1
-                      ? "color-yellow-200"
-                      : "color-yellow-200"
+                        ? "color-yellow-200"
+                        : "color-yellow-200"
                   }`}
                 >
                   {item.type === "BANK CARD"
@@ -92,17 +91,17 @@ const WithdrawHistoryLite = () => {
                 </span>
               </div>
 
-              <div className="flex justify-between items-center mt-3 gray-text text-xs px-2">
-                <span className="fs-sm font-medium">Type</span>
-                <span className="fs-sm font-medium">{item.type}</span>
+              <div className="flex justify-between items-center mt-3 gray-text text-sm px-2">
+                <span className="text-sm font-medium">Type</span>
+                <span className="text-sm font-medium">{item.type}</span>
               </div>
-              <div className="flex justify-between items-center mt-3 gray-text text-xs px-2">
-                <span className="fs-sm font-medium">Time</span>
+              <div className="flex justify-between items-center mt-3 gray-text text-sm px-2">
+                <span className="text-sm font-medium">Time</span>
                 <span className="fs-sm font-medium">{item.today}</span>
               </div>
-              <div className="flex justify-between items-center mt-3 gray-text text-xs px-2">
-                <span className="fs-sm font-medium">Order number</span>
-                <span className="fs-sm font-medium flex items-center">
+              <div className="flex justify-between items-center mt-3 gray-text text-sm px-2">
+                <span className="text-sm font-medium">Order number</span>
+                <span className="text-sm font-medium flex items-center">
                   {item.id_order}{" "}
                   <PiCopySimpleBold
                     className="ms-1 mt-[3px]"
@@ -110,17 +109,17 @@ const WithdrawHistoryLite = () => {
                   />
                 </span>
               </div>
-              <div className="flex justify-between items-center mt-3 text-whites fs-sm px-3">
-                <span className="fs-sm font-medium">Remark</span>
+              <div className="flex justify-between items-center mt-3 text-whites text-sm px-3">
+                <span className="text-sm font-medium">Remark</span>
                 {item?.remark == 0 && (
-                  <span className="fs-sm font-medium flex items-center">
+                  <span className="text-sm font-medium flex items-center">
                     {item?.remark == 0 ? "" : item?.remark}
                   </span>
                 )}
               </div>
               {item?.remark !== "0" && (
-                <div className="rounded-md w-[95%] h-16 border border-color-slat m-2 mt-3 ps-2 fs-sm overflow-hidden font-medium color-yellow-200">
-                  <span className="fs-sm font-medium flex items-center">
+                <div className="rounded-md w-[95%] h-16 border border-color-slat m-2 mt-3 ps-2 text-sm overflow-hidden font-medium color-yellow-200">
+                  <span className="text-sm font-medium flex items-center">
                     {item.remark}
                   </span>
                 </div>
@@ -129,7 +128,7 @@ const WithdrawHistoryLite = () => {
           ))
         ) : (
           <div className="text-center py-4 text-gray-400">
-            <EmptyData />
+            No withdrawal records found.
           </div>
         )}
 

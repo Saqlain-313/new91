@@ -238,7 +238,7 @@ const RechargeHistory = () => {
               </div>
               {item.status === 0 && (
                 <Link
-                  to={`https://h5.workorder.support.1xclube.com/deposite?token=${Cookies.get(
+                  to={`https://h5.workorder.support.max-win.site/deposite?token=${Cookies.get(
                     "auth",
                   )}`}
                   className="blue-linear w-full rounded-full text-black py-1 mt-3 text-lg font-semibold flex justify-center items-center"

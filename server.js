@@ -36,7 +36,7 @@ const corsdata = [
 // Socket IO setup with CORS
 const io = new Server(server, {
   cors: {
-    origin: corsdata.map((origin) => origin.replace(/\/$/, "")),
+    origin: corsdata,
     methods: ["GET", "POST", "OPTIONS"],
     credentials: true,
   },
