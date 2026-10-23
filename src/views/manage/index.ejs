@@ -476,7 +476,7 @@
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0">Dashboard V5</h1>
+              <h1 class="m-0">Dashboard V5 <small class="text-muted" id="gameLabel"></small></h1>
             </div>
           </div>
         </div>
@@ -682,7 +682,7 @@
   <script src="/js/admin/admin.js"></script>
   <script src="/js/admin/index.js"></script>
 
-  <!-- ================= SOCKET.IO TIMER — wired to server events ================= -->
+  <!-- ================= SOCKET.IO TIMER — FIXED ================= -->
   <script>
   (function () {
     "use strict";
@@ -695,25 +695,41 @@
     const socket = io();
 
     // Timer DOM refs
-    const min1El = document.getElementById("minute1"); // tens of minutes
-    const min2El = document.getElementById("minute2"); // units of minutes
-    const sec1El = document.getElementById("sec1");     // tens of seconds
-    const sec2El = document.getElementById("sec2");     // units of seconds
+    const min1El = document.getElementById("minute1");
+    const min2El = document.getElementById("minute2");
+    const sec1El = document.getElementById("sec1");
+    const sec2El = document.getElementById("sec2");
+    const labelEl = document.getElementById("gameLabel");
 
-    /**
-     * Your server emits: { minute, secondtime1, secondtime2 }
-     *   minute      = total minutes
-     *   secondtime1 = tens digit of seconds (0-5)
-     *   secondtime2 = units digit of seconds (0-9)
-     *
-     * Display as MM : SS — split "minute" into 2 digits.
-     */
+    // ---------- Detect which game this page belongs to ----------
+    // /admin/manager/index      -> 1 min   -> event timeUpdate_11
+    // /admin/manager/index/3    -> 3 min   -> event timeUpdate_3
+    // /admin/manager/index/5    -> 5 min   -> event timeUpdate_5
+    // /admin/manager/index/10   -> 30 sec  -> event timeUpdate_30
+    function detectGame() {
+      const path = window.location.pathname.replace(/\/+$/, "");
+      const m = path.match(/\/index(?:\/(\d+))?$/i);
+      const seg = m && m[1] ? String(m[1]) : "1";
+      switch (seg) {
+        case "3":  return { key: "3",  event: "timeUpdate_3",  label: "3 min",  maxSec: 59 };
+        case "5":  return { key: "5",  event: "timeUpdate_5",  label: "5 min",  maxSec: 59 };
+        case "10": return { key: "30", event: "timeUpdate_30", label: "30 sec", maxSec: 30 };
+        case "1":
+        default:   return { key: "1",  event: "timeUpdate_11", label: "1 min",  maxSec: 59 };
+      }
+    }
+
+    const GAME = detectGame();
+    console.log("[Timer] page game:", GAME.label, "| listening:", GAME.event);
+    if (labelEl) labelEl.textContent = "(" + GAME.label + ")";
+
+    // ---------- Render digits ----------
     function renderDigits(minute, secondtime1, secondtime2) {
-      minute = Math.max(0, parseInt(minute, 10) || 0);
+      minute      = Math.max(0, parseInt(minute, 10)      || 0);
       secondtime1 = Math.max(0, Math.min(9, parseInt(secondtime1, 10) || 0));
       secondtime2 = Math.max(0, Math.min(9, parseInt(secondtime2, 10) || 0));
 
-      const minTens = Math.floor(minute / 10) % 10;
+      const minTens  = Math.floor(minute / 10) % 10;
       const minUnits = minute % 10;
 
       if (min1El) min1El.textContent = minTens;
@@ -722,49 +738,24 @@
       if (sec2El) sec2El.textContent = secondtime2;
     }
 
-    // ---- Main events from your server ----
-    // 1-min game (this page: /admin/manager/index)
-    socket.on("timeUpdate_11", function (data) {
+    // ---------- ONLY listen to this page's event ----------
+    socket.on(GAME.event, function (data) {
       if (!data) return;
       renderDigits(data.minute, data.secondtime1, data.secondtime2);
     });
 
-    // 30-second game (route /admin/manager/index/10)
-    socket.on("timeUpdate_30", function (data) {
-      if (!data) return;
-      renderDigits(data.minute, data.secondtime1, data.secondtime2);
-    });
+    // ---------- Ignore the OTHER games' events (so they never overwrite) ----------
+    ["timeUpdate_11", "timeUpdate_30", "timeUpdate_3", "timeUpdate_5"]
+      .filter(e => e !== GAME.event)
+      .forEach(ev => socket.on(ev, function () { /* ignored on this page */ }));
 
-    // 3-min game
-    socket.on("timeUpdate_3", function (data) {
-      if (!data) return;
-      renderDigits(data.minute, data.secondtime1, data.secondtime2);
-    });
-
-    // 5-min game
-    socket.on("timeUpdate_5", function (data) {
-      if (!data) return;
-      renderDigits(data.minute, data.secondtime1, data.secondtime2);
-    });
-
-    // Latest periods for the table (handled elsewhere too, but logged here)
-    socket.on("data-server", function (payload) {
-      // console.log("[Timer] data-server:", payload);
-    });
+    // Initial placeholder
+    renderDigits(0, 0, 0);
 
     // Diagnostics
-    socket.on("connect", function () {
-      console.log("[Timer] connected:", socket.id);
-    });
-    socket.on("disconnect", function (reason) {
-      console.warn("[Timer] disconnected:", reason);
-    });
-    socket.on("connect_error", function (err) {
-      console.error("[Timer] connect_error:", err.message);
-    });
-
-    // Placeholder until first tick
-    renderDigits(0, 0, 0);
+    socket.on("connect",       () => console.log("[Timer] connected:", socket.id));
+    socket.on("disconnect",    (r) => console.warn("[Timer] disconnected:", r));
+    socket.on("connect_error", (e) => console.error("[Timer] connect_error:", e.message));
   })();
   </script>
   <!-- ================= END SOCKET.IO TIMER ================= -->

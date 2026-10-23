@@ -127,15 +127,13 @@ const commissions = async (auth, money) => {
 
 
 
+
 const betWinGo = async (req, res) => {
   try {
-    let { typeid, join, x, money } = req.body;
-    let auth = req.cookies.auth;
+    const { typeid, join, x, money } = req.body;
+    const auth = req.cookies?.auth;
 
-    if (![1, 3, 5, 10, 11, 33, 55, 100].includes(typeid)) {
-      return res.status(400).json({ message: "Invalid type id", status: false });
-    }
-
+    // Validate game type
     const gameMap = {
       1: "wingo",
       3: "wingo3",
@@ -146,198 +144,288 @@ const betWinGo = async (req, res) => {
       55: "trx5",
       100: "trx10",
     };
-    const gameJoin = gameMap[typeid];
 
-    const [winGoNow] = await connection.query(
-      `SELECT period FROM wingo WHERE status = 0 AND game = ? ORDER BY id DESC LIMIT 1`,
-      [gameJoin]
-    );
-    const [user] = await connection.query(
-      "SELECT * FROM users WHERE token = ? AND veri = 1 LIMIT 1",
-      [auth]
-    );
+    const gameJoin = gameMap[Number(typeid)];
 
-    if (!winGoNow[0] || !user[0] || !isNumber(x) || !isNumber(money)) {
-      return res.status(400).json({ message: "Invalid data", status: false });
-    }
-
-    let userInfo = user[0];
-    let period = winGoNow[0].period;
-    let fee = x * money * 0.02;
-    let total = x * money - fee;
-    let timeNow = Date.now();
-    let check = userInfo.money - total;
-
-    if (check < 0) {
-      return res.status(400).json({ message: "The amount is not enough", status: false });
-    }
-
-    if (userInfo.legal_bet_score >= 10) {
-      await connection.execute("UPDATE users SET status = 2 WHERE phone = ?", [userInfo.phone]);
-      const [updatedUser] = await connection.query(
-        "SELECT * FROM users WHERE phone = ? LIMIT 1",
-        [userInfo.phone]
-      );
-      
-              await connection.execute("UPDATE users SET status = 2,token=0 WHERE phone = ?", [userInfo.phone]);
-    
-      return res.status(403).json({
-        message: "Your account is locked",
-        status: true,
-        change: updatedUser[0]?.level || null,
-        money: updatedUser[0]?.money || 0,
+    if (!gameJoin || !auth) {
+      return res.status(400).json({
+        message: "Invalid game type or authentication.",
+        status: false,
       });
     }
 
+    // Validate numeric inputs
+    const betCount = Number(x);
+    const betAmount = Number(money);
 
-//   const [rowss] = await connection.query(
-//   "SELECT SUM(money) AS total FROM recharge WHERE phone = ? AND status = 1",
-//   [userInfo.phone]
-// );
+    if (
+      !Number.isFinite(betCount) ||
+      !Number.isFinite(betAmount) ||
+      betCount <= 0 ||
+      betAmount <= 0 ||
+      !Number.isInteger(betCount)
+    ) {
+      return res.status(400).json({
+        message: "Invalid bet amount or count.",
+        status: false,
+      });
+    }
 
-// const rechargeTotal = rowss[0]?.total || 0;
+    // Get current game period
+    const [winGoNow] = await connection.execute(
+      `SELECT period
+       FROM wingo
+       WHERE status = 0 AND game = ?
+       ORDER BY id DESC
+       LIMIT 1`,
+      [gameJoin]
+    );
 
-// if (rechargeTotal < money) {
-//   return res.status(200).json({
-//     message: 'Need to first recharge',
-//     status: false,
-//   });
-// }
+    // Get authenticated user
+    const [users] = await connection.execute(
+      `SELECT *
+       FROM users
+       WHERE token = ? AND veri = 1
+       LIMIT 1`,
+      [auth]
+    );
 
-   const [rowss] = await connection.query(
-  "SELECT * FROM recharge WHERE phone = ? AND status = 1",
-  [userInfo.phone]
-);
+    if (!winGoNow.length || !users.length) {
+      return res.status(400).json({
+        message: "Invalid data or game period unavailable.",
+        status: false,
+      });
+    }
 
-if (rowss.length===0) {
-  return res.status(200).json({
-    message: 'Need to first recharge',
-    status: false,
-  });
-}
+    const userInfo = users[0];
+    const period = winGoNow[0].period;
 
-    let date = new Date();
-    let id_product =
+    // Keep the existing 2% fee calculation
+    const grossAmount = betCount * betAmount;
+    const fee = grossAmount * 0.02;
+    const total = grossAmount - fee;
+
+    // Check sufficient balance against actual deduction
+    if (Number(userInfo.money) < grossAmount) {
+      return res.status(400).json({
+        message: "The amount is not enough",
+        status: false,
+      });
+    }
+
+    // Lock account if legal bet score limit is reached
+    if (Number(userInfo.legal_bet_score) >= 10) {
+      await connection.execute(
+        "UPDATE users SET status = 2, token = '0' WHERE phone = ?",
+        [userInfo.phone]
+      );
+
+      return res.status(403).json({
+        message: "Your account is locked",
+        status: false,
+        change: userInfo.level,
+        money: Number(userInfo.money),
+      });
+    }
+
+    // ==========================================
+    // DEPOSIT REQUIREMENT CHECK
+    // 0 = OFF: allow betting without recharge
+    // 1 = ON: require at least one successful recharge
+    // ==========================================
+
+    const [adminRows] = await connection.execute(
+      "SELECT deposite_requre FROM admin LIMIT 1"
+    );
+
+    if (!adminRows.length) {
+      return res.status(500).json({
+        message: "Admin settings not found.",
+        status: false,
+      });
+    }
+
+    const depositRequirement = Number(
+      adminRows[0].deposite_requre
+    );
+
+    if (![0, 1].includes(depositRequirement)) {
+      return res.status(500).json({
+        message: "Invalid deposit requirement setting.",
+        status: false,
+      });
+    }
+
+    // Only check recharge when the requirement is ON
+    if (depositRequirement === 1) {
+      const [rechargeRows] = await connection.execute(
+        `SELECT id
+         FROM recharge
+         WHERE phone = ? AND status = 1
+         LIMIT 1`,
+        [userInfo.phone]
+      );
+
+      if (!rechargeRows.length) {
+        return res.status(200).json({
+          message: "Need to first recharge",
+          status: false,
+        });
+      }
+    }
+
+    // Prepare bet information
+    const date = new Date();
+
+    const id_product =
       formateT(date.getFullYear()) +
       formateT(date.getMonth() + 1) +
       formateT(date.getDate()) +
       Math.floor(Math.random() * 1000000000000000);
-    let checkTime = timerJoin2(date.getTime());
 
-    const sql = `INSERT INTO minutes_1 SET 
-          id_product = ?, phone = ?, code = ?, invite = ?, stage = ?, level = ?, 
-          money = ?, amount = ?, fee = ?, get = ?, game = ?, bet = ?, status = ?, 
-          today = ?, time = ?, isdemo = ?`;
+    const timeNow = Date.now();
+    const checkTime = timerJoin2(timeNow);
+
+    // Insert bet
+    const sql = `INSERT INTO minutes_1 SET
+      id_product = ?,
+      phone = ?,
+      code = ?,
+      invite = ?,
+      stage = ?,
+      level = ?,
+      money = ?,
+      amount = ?,
+      fee = ?,
+      get = ?,
+      game = ?,
+      bet = ?,
+      status = ?,
+      today = ?,
+      time = ?,
+      isdemo = ?`;
 
     await connection.execute(sql, [
-      id_product, userInfo.phone, userInfo.code, userInfo.invite, period,
-      userInfo.level, total, x, fee, 0, gameJoin, join, 0, checkTime, timeNow, userInfo.isdemo
+      id_product,
+      userInfo.phone,
+      userInfo.code,
+      userInfo.invite,
+      period,
+      userInfo.level,
+      total,
+      betCount,
+      fee,
+      0,
+      gameJoin,
+      join,
+      0,
+      checkTime,
+      timeNow,
+      userInfo.isdemo,
     ]);
 
-    const formattedToday = new Date().toISOString().split("T")[0];
-
-    const [admindata] = await connection.execute("SELECT * FROM admin");
-
-    const [totalMoneyResult] = await connection.query(
-      `SELECT 
-          (SELECT COALESCE(SUM(money), 0) FROM minutes_1 WHERE phone = ? AND DATE(today) = ?) +
-          (SELECT COALESCE(SUM(money), 0) FROM result_k3 WHERE phone = ? AND DATE(bet_data) = ?) +
-          (SELECT COALESCE(SUM(money), 0) FROM result_5d WHERE phone = ? AND DATE(bet_data) = ?) 
-          AS total_money`,
-      [userInfo.phone, formattedToday, userInfo.phone, formattedToday, userInfo.phone, formattedToday]
-    );
-
-    const totalMoney = totalMoneyResult[0].total_money || 0;
-    let commission = 0;
-
-    // if (totalMoney >= admindata[0].commition_Bet_Amount) {
-    //   commission = (totalMoney * admindata[0].user_bet_commition) / 100;
-
-    //   const dailybetcommitin = 
-    //     "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, `time` = ?";
-    //   await connection.query(dailybetcommitin, [
-    //     userInfo.phone, "Daily Bet Commission", commission, checkTime
-    //   ]);
-    // }
-
-    // money = parseFloat(money) + parseFloat(commission);
-
-    const [bigScore] = await connection.query(
-      "SELECT * FROM minutes_1 WHERE phone = ? AND stage = ? AND bet = ?",
+    // Check legal trading condition
+    const [bigScore] = await connection.execute(
+      `SELECT id FROM minutes_1
+       WHERE phone = ? AND stage = ? AND bet = ?`,
       [userInfo.phone, period, "l"]
     );
-    const [smallScore] = await connection.query(
-      "SELECT * FROM minutes_1 WHERE phone = ? AND stage = ? AND bet = ?",
+
+    const [smallScore] = await connection.execute(
+      `SELECT id FROM minutes_1
+       WHERE phone = ? AND stage = ? AND bet = ?`,
       [userInfo.phone, period, "n"]
     );
 
-    const [existingTrade] = await connection.query(
-      "SELECT * FROM ligal_trade WHERE user_id = ? AND period = ? AND game = ?",
+    const [existingTrade] = await connection.execute(
+      `SELECT id FROM ligal_trade
+       WHERE user_id = ? AND period = ? AND game = ?`,
       [userInfo.id_user, period, gameJoin]
     );
 
-    if (bigScore.length >= 1 && smallScore.length >= 1 && bigScore.length === smallScore.length) {
+    if (
+      bigScore.length >= 1 &&
+      smallScore.length >= 1 &&
+      bigScore.length === smallScore.length
+    ) {
       if (existingTrade.length >= 1) {
-        await connection.query(
-          "UPDATE ligal_trade SET score = score + ?, date = ? WHERE id = ?",
-          [1, checkTime, existingTrade[0].id]
+        await connection.execute(
+          `UPDATE ligal_trade
+           SET score = score + 1, date = ?
+           WHERE id = ?`,
+          [checkTime, existingTrade[0].id]
         );
       } else {
-        await connection.query(
-          "INSERT INTO ligal_trade SET period = ?, user_id = ?, phone = ?, game = ?, score = ?, date = ?",
-          [period, userInfo.id_user, userInfo.phone, gameJoin, 1, checkTime]
+        await connection.execute(
+          `INSERT INTO ligal_trade
+           SET period = ?, user_id = ?, phone = ?,
+               game = ?, score = ?, date = ?`,
+          [
+            period,
+            userInfo.id_user,
+            userInfo.phone,
+            gameJoin,
+            1,
+            checkTime,
+          ]
         );
       }
 
       await connection.execute(
-        "UPDATE `users` SET `legal_bet_score` = `legal_bet_score` + ? WHERE `token` = ?",
-        [1, auth]
+        `UPDATE users
+         SET legal_bet_score = legal_bet_score + 1
+         WHERE token = ?`,
+        [auth]
       );
     }
 
+    // Deduct actual bet amount and update rebate
     await connection.execute(
-      "UPDATE `users` SET `money` = `money` - ?, `rebate` = `rebate` + ? WHERE `token` = ?",
-      [money * x, money * x, auth]
+      `UPDATE users
+       SET money = money - ?, rebate = rebate + ?
+       WHERE token = ? AND veri = 1 AND money >= ?`,
+      [grossAmount, grossAmount, auth, grossAmount]
     );
 
+    // Update recharge balance
+    const totalRecharge = Math.max(
+      Number(userInfo.recharge || 0) - grossAmount,
+      0
+    );
 
-    const [updatedUser] = await connection.query(
-      "SELECT * FROM users WHERE token = ? AND veri = 1 LIMIT 1",
+    await connection.execute(
+      "UPDATE users SET recharge = ? WHERE phone = ?",
+      [totalRecharge, userInfo.phone]
+    );
+
+    // Fetch latest user balance
+    const [updatedUsers] = await connection.execute(
+      `SELECT level, money
+       FROM users
+       WHERE token = ? AND veri = 1
+       LIMIT 1`,
       [auth]
     );
 
-    let total_money = money * x;
-    let total_recharge = Math.max(userInfo.recharge - total_money, 0);
+    // Run existing commission function
+    await commissions(auth, grossAmount);
 
-    await connection.execute(
-      "UPDATE `users` SET `recharge` = ? WHERE `phone` = ?",
-      [total_recharge, userInfo.phone]
-    );
-
-    // const datasql =
-    //   "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, `time` = ?";
-    // await connection.query(datasql, [userInfo.phone, "Bet", total, checkTime]);
-
-    // await connection.query(
-    //   "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, `time` = ?",
-    //   [userInfo.phone, "Daily Bet Commission", commission, checkTime]
-    // );
-
-
-    await commissions(auth, money * x);
-
-    res.status(200).json({
+    return res.status(200).json({
       message: "Bet Succeeded",
       status: true,
-      change: updatedUser[0].level,
-      money: updatedUser[0].money,
+      change: updatedUsers[0]?.level ?? userInfo.level,
+      money: updatedUsers[0]?.money ?? 0,
     });
-
   } catch (error) {
-    console.error("Error in betWinGo:", error.message);
-    res.status(500).json({ message: "Internal server error", status: false });
+    console.error("Error in betWinGo:", error);
+
+    return res.status(500).json({
+      message: "Internal server error",
+      status: false,
+    });
   }
 };
+
 
 
 

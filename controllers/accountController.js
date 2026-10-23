@@ -305,10 +305,12 @@ const register = async (req, res) => {
     });
   }
 
+  // If invitecode not provided by request body, use default
   if (!invitecode) {
     // invitecode = "xWtUd92947";
-    invitecode = "xWtUd92947";
+    invitecode = "46028100038";
   }
+
   try {
     const [admin] = await connection.query("SELECT * FROM `admin`");
     const sinupBonus = admin[0].sinupbonus;
@@ -421,7 +423,7 @@ const register = async (req, res) => {
           [invitecode],
         );
 
-        if (check_i.name_user !== "Admin") {
+        if (check_i[0].name_user !== "Admin") {
           let levels = [
             2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44,
           ];
@@ -466,6 +468,10 @@ const register = async (req, res) => {
     }
   } catch (error) {
     if (error) console.log(error);
+    return res.status(500).json({
+      message: "Something went wrong",
+      status: false,
+    });
   }
 };
 

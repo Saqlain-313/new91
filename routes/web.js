@@ -76,11 +76,9 @@ const maintenanceMode = (req, res, next) => {
   const clientIp =
     req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   if (allowedIps.includes(clientIp)) {
-    // Allow access if IP is in the allowed list
     return next();
   }
 
-  // Return a beautiful HTML page for maintenance mode
   res.status(503).send(`
         <!DOCTYPE html>
         <html lang="en">
@@ -130,9 +128,6 @@ const maintenanceMode = (req, res, next) => {
 const initWebRouter = (app) => {
   // app.use(maintenanceMode);
 
-  // app.use(maintenanceMode);
-  // page account
-
   router.delete("/delete/item/:id", async (req, res) => {
     const { id } = req.params;
 
@@ -156,42 +151,30 @@ const initWebRouter = (app) => {
   router.get("/gettime_now", (req, res) => {
     res.status(503)
       .send(`<form action="/support/submitGameProblem" method="POST" enctype="multipart/form-data">
-  <!-- Issue Description -->
   <div class="form-item">
     <label for="issueDescription">Explain the issue happen to you inside the game clear and detail:</label>
     <textarea id="issueDescription" name="issueDescription" rows="5" placeholder="Please enter content" maxlength="500" required></textarea>
   </div>
-
-  <!-- Tiranga ID -->
   <div class="form-item">
     <label for="tirangaId">Tiranga ID:</label>
     <input type="text" id="tirangaId" name="games_id" placeholder="Please enter username" required />
   </div>
-
-  <!-- Attach Photo -->
   <div class="form-item">
     <label for="photo">Attach Photo:</label>
     <input type="file" id="photo" name="photo" accept="image/*" />
   </div>
-
-  <!-- Attach PDF File -->
   <div class="form-item">
     <label for="pdfFile">Attach PDF File:</label>
     <input type="file" id="pdfFile" name="pdf" accept=".pdf,image/*,video/*" />
   </div>
-
-  <!-- Attach Video -->
   <div class="form-item">
     <label for="video">Attach Video:</label>
     <input type="file" id="video" name="video_path" accept=".pdf,image/*,video/*" />
   </div>
-
-  <!-- Submit Button -->
   <div class="form-item">
     <button type="submit">Submit</button>
   </div>
 </form>
-
 `);
   });
 
@@ -222,7 +205,6 @@ const initWebRouter = (app) => {
           status = "Active";
         }
       }
-      // You can also treat some reserved IPs as Low risk
       if (
         ip.startsWith("192.168.") ||
         ip.startsWith("10.") ||
@@ -239,12 +221,11 @@ const initWebRouter = (app) => {
     return val;
   }
 
-router.get("/api/ip-records", async (req, res) => {
-  try {
-    // Fix 1: Increase GROUP_CONCAT limit
-    await connection.query(`SET SESSION group_concat_max_len = 1000000`);
+  router.get("/api/ip-records", async (req, res) => {
+    try {
+      await connection.query(`SET SESSION group_concat_max_len = 1000000`);
 
-    const [rows] = await connection.query(`
+      const [rows] = await connection.query(`
       SELECT 
         ip_address, 
         COUNT(*) AS total_activities,
@@ -265,36 +246,36 @@ router.get("/api/ip-records", async (req, res) => {
       LIMIT 50
     `);
 
-    const results = rows.map((row) => {
-      const risk = row.unique_users > 3 ? "High Risk" : "Normal";
-      return {
-        ip: row.ip_address,
-        risk,
-        activities: Number(row.total_activities),
-        users: Number(row.unique_users),
-        phones: row.user_actions ? row.user_actions.split(", ") : [],
-        lastActivity: row.last_activity
-          ? new Date(row.last_activity).toISOString().slice(0, 10)
-          : "Invalid Date",
-      };
-    });
+      const results = rows.map((row) => {
+        const risk = row.unique_users > 3 ? "High Risk" : "Normal";
+        return {
+          ip: row.ip_address,
+          risk,
+          activities: Number(row.total_activities),
+          users: Number(row.unique_users),
+          phones: row.user_actions ? row.user_actions.split(", ") : [],
+          lastActivity: row.last_activity
+            ? new Date(row.last_activity).toISOString().slice(0, 10)
+            : "Invalid Date",
+        };
+      });
 
-    const totalActiveIps = results.length;
-    const highRiskIps = results.filter((x) => x.risk === "High Risk").length;
-    const activeUsers = results.reduce((sum, x) => sum + x.users, 0);
+      const totalActiveIps = results.length;
+      const highRiskIps = results.filter((x) => x.risk === "High Risk").length;
+      const activeUsers = results.reduce((sum, x) => sum + x.users, 0);
 
-    res.json({
-      summary: { totalActiveIps, highRiskIps, activeUsers },
-      data: results,
-    });
-  } catch (err) {
-    console.error("IP records error:", err.message, err.sqlMessage || "");
-    res.status(500).json({ 
-      error: "Server error", 
-      details: err.sqlMessage || err.message 
-    });
-  }
-});
+      res.json({
+        summary: { totalActiveIps, highRiskIps, activeUsers },
+        data: results,
+      });
+    } catch (err) {
+      console.error("IP records error:", err.message, err.sqlMessage || "");
+      res.status(500).json({
+        error: "Server error",
+        details: err.sqlMessage || err.message,
+      });
+    }
+  });
 
   async function getDownlineByLevel(connection, rootCode, levels = 6) {
     let result = [];
@@ -311,7 +292,7 @@ router.get("/api/ip-records", async (req, res) => {
       result.push(users);
       prevLevelCodes = users.map((u) => u.code);
     }
-    return result; // [level1Users, level2Users, ..., level6Users]
+    return result;
   }
 
   router.get("/api/agent-downline-dashboard", async (req, res) => {
@@ -319,7 +300,6 @@ router.get("/api/ip-records", async (req, res) => {
       const userId = req.query.userId;
       if (!userId) return res.status(400).json({ error: "Missing userId" });
 
-      // 1. Find agent
       const [agentArr] = await connection.query(
         "SELECT id_user, name_user,money, phone, code, today AS created_at FROM users WHERE id_user = ?",
         [userId],
@@ -328,15 +308,12 @@ router.get("/api/ip-records", async (req, res) => {
         return res.status(404).json({ error: "Agent not found" });
       const agent = agentArr[0];
 
-      // 2. Get downline (level 1 to 6)
       const downlines = await getDownlineByLevel(connection, agent.code, 6);
 
-      // 3. Level-by-level stats + first/second/third deposit lists
       let levelDetails = [];
       for (let i = 0; i < 6; i++) {
         const users = downlines[i];
         if (!users.length) {
-          // Empty level
           levelDetails.push({
             level: `Level ${i + 1}`,
             users: 0,
@@ -352,21 +329,17 @@ router.get("/api/ip-records", async (req, res) => {
           continue;
         }
         const phones = users.map((u) => u.phone);
-        // Total deposits for this level
         const [[{ depositSum }]] = await connection.query(
           "SELECT COALESCE(SUM(money),0) as depositSum FROM recharge WHERE phone IN (?) AND status=1",
           [phones],
         );
-        // Total withdrawals for this level
         const [[{ withdrawSum }]] = await connection.query(
           "SELECT COALESCE(SUM(money),0) as withdrawSum FROM withdraw WHERE phone IN (?) AND status=1",
           [phones],
         );
-        // Total bet & win for this level (optional: skip if you don’t track bets)
         let betSum = 0,
           winSum = 0;
         if (phones.length > 0) {
-          // Bet amount
           const [betData] = await connection.query(
             `SELECT 
                 SUM(IFNULL(money, 0)) AS grand_total_bet
@@ -381,7 +354,6 @@ router.get("/api/ip-records", async (req, res) => {
           );
           betSum = betData[0]?.grand_total_bet || 0;
 
-          // Winning amount
           const [winData] = await connection.query(
             `SELECT 
                 SUM(IFNULL(get, 0)) AS grand_total_win
@@ -399,7 +371,6 @@ router.get("/api/ip-records", async (req, res) => {
 
         const profitLoss = betSum - winSum;
 
-        // First/Second/Third deposit per user
         let firstDeposits = [],
           secondDeposits = [],
           thirdDeposits = [];
@@ -462,7 +433,6 @@ router.get("/api/ip-records", async (req, res) => {
     }
   });
 
-  // Utility: getDateRange
   function getDateRange(interval) {
     const today = new Date();
     let from;
@@ -497,7 +467,6 @@ router.get("/api/ip-records", async (req, res) => {
       limit = Math.max(parseInt(limit), 1);
       const fromDate = getDateRange(interval);
 
-      // 1. Get all distinct users active in this period, include their balance (money field)
       let userSql = `
       SELECT DISTINCT u.id_user, u.name_user, u.phone, u.money
       FROM users u
@@ -521,45 +490,38 @@ router.get("/api/ip-records", async (req, res) => {
 
       if (!users.length) return res.json([]);
 
-      // 2. For each user, fetch correct stats (NO JOIN MULTIPLICATION!)
       const performers = [];
       for (let i = 0; i < users.length; ++i) {
         const { phone, name_user, id_user, money } = users[i];
 
-        // Deposits
         const [[deposit]] = await connection.query(
           `SELECT COALESCE(SUM(money),0) AS amount, COUNT(*) AS count
          FROM recharge WHERE phone=? AND status=1 ${fromDate ? "AND today >= ?" : ""}`,
           fromDate ? [phone, fromDate] : [phone],
         );
 
-        // Withdrawals
         const [[withdrawal]] = await connection.query(
           `SELECT COALESCE(SUM(money),0) AS amount
          FROM withdraw WHERE phone=? AND status=1 ${fromDate ? "AND today >= ?" : ""}`,
           fromDate ? [phone, fromDate] : [phone],
         );
 
-        // Bets - minutes_1
         const [[m1bet]] = await connection.query(
           `SELECT COALESCE(SUM(money),0) AS bet, COALESCE(SUM(\`get\`),0) AS win
          FROM minutes_1 WHERE phone=? AND isdemo=0 ${fromDate ? "AND today >= ?" : ""}`,
           fromDate ? [phone, fromDate] : [phone],
         );
-        // Bets - result_k3
         const [[k3bet]] = await connection.query(
           `SELECT COALESCE(SUM(money),0) AS bet, COALESCE(SUM(\`get\`),0) AS win
          FROM result_k3 WHERE phone=? ${fromDate ? "AND bet_data >= ?" : ""}`,
           fromDate ? [phone, fromDate] : [phone],
         );
-        // Bets - result_5d
         const [[d5bet]] = await connection.query(
           `SELECT COALESCE(SUM(money),0) AS bet, COALESCE(SUM(\`get\`),0) AS win
          FROM result_5d WHERE phone=? ${fromDate ? "AND bet_data >= ?" : ""}`,
           fromDate ? [phone, fromDate] : [phone],
         );
 
-        // Combine bet and win
         const betsAmount =
           Number(m1bet.bet) + Number(k3bet.bet) + Number(d5bet.bet);
         const winAmount =
@@ -568,23 +530,20 @@ router.get("/api/ip-records", async (req, res) => {
         const depositAmount = Number(deposit.amount) || 0;
         const depositCount = Number(deposit.count) || 0;
         const withdrawalAmount = Number(withdrawal.amount) || 0;
-        const currentBalance = Number(money) || 0; // This is the user's live wallet
+        const currentBalance = Number(money) || 0;
 
         const winRate = betsAmount
           ? Math.round((winAmount / betsAmount) * 100)
           : null;
-        //const roi = depositAmount ? Math.round(((winAmount - depositAmount) / depositAmount) * 100) : -100;
         const withdrawalRatio = depositAmount
           ? Math.round((withdrawalAmount / depositAmount) * 100)
           : 0;
-        // const balance = depositAmount + winAmount - withdrawalAmount;
 
         performers.push({
           rank: i + 1,
           name: name_user || `User${id_user}`,
           phone,
           status: "Active",
-          //roi,
           deposits: {
             amount: depositAmount,
             transactions: depositCount,
@@ -603,23 +562,18 @@ router.get("/api/ip-records", async (req, res) => {
         });
       }
 
-      // Sort by total bets descending (or change key as needed)
-      performers.sort((a, b) => b.betting.bets - a.betting.bets); // or any sorting logic
+      performers.sort((a, b) => b.betting.bets - a.betting.bets);
 
-      // Now update the rank fields to match the sorted order
       performers.forEach((item, idx) => {
         item.rank = idx + 1;
       });
 
-      // Now send response
       res.json(performers.slice(0, limit));
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message });
     }
   });
-
-  // Main rou
 
   router.get("/api/handleCaptcha", accountController.handleCaptcha);
 
@@ -648,7 +602,6 @@ router.get("/api/ip-records", async (req, res) => {
   router.post("/api/sent/otp/verify/reset", accountController.verifyCodePass);
   router.post("/api/resetPasword", accountController.forGotPassword);
 
-  // router.get('/salery_send', homeController.salerySend);
   router.post("/api/sent/otp/verify1", accountController.verifyCodeforregister);
   router.post("/api/addutr", userController.addutr);
 
@@ -658,7 +611,6 @@ router.get("/api/ip-records", async (req, res) => {
 
   router.post("/api/webapi/feedback", userController.feedback);
 
-  // all game apis
   router.post("/api/spribeapi/checkBalance", allGameController.checkBalance);
   router.post(
     "/api/spribeapi/transferBalance",
@@ -681,11 +633,6 @@ router.get("/api/ip-records", async (req, res) => {
     allGameController.gameListByGameTypeAndProvider,
   );
   router.post("/api/spribeapi/gameHistory/:id", allGameController.gameHistory);
-
-  // page home
-  // router.get('/', (req, res) => {
-  //     return res.redirect('/#');
-  // });
 
   router.post(
     "/api/webapi/initiateTrexoPayPayment",
@@ -720,8 +667,6 @@ router.get("/api/ip-records", async (req, res) => {
 
   router.get("/checkDes", middlewareController, homeController.checkDes);
   router.get("/checkRecord", middlewareController, homeController.checkRecord);
-
-  // router.get('/wallet/transfer', middlewareController, homeController.transfer);
 
   router.get(
     "/api/webapi/downlinerecharge/list",
@@ -783,7 +728,6 @@ router.get("/api/ip-records", async (req, res) => {
 
   router.post("/api/webapi/verify-admin-otp", accountController.verifyAdminOTP);
 
-
   router.get(
     "/admin/manager/promotions",
     adminController.middlewareAdminController,
@@ -800,7 +744,6 @@ router.get("/api/ip-records", async (req, res) => {
     try {
       let auth = req.cookies.auth;
 
-      // Fetch user based on the token
       const [user] = await connection.query(
         "SELECT * FROM users WHERE token = ?",
         [auth],
@@ -812,7 +755,6 @@ router.get("/api/ip-records", async (req, res) => {
 
       let userId = user[0].phone;
 
-      // Fetch user permissions
       const [rows] = await connection.query(
         "SELECT permission_key, permission_value FROM user_permissions WHERE user_id = ?",
         [userId],
@@ -841,12 +783,6 @@ router.get("/api/ip-records", async (req, res) => {
     adminController.middlewareAdminController,
     adminController.getAllAdmins,
   );
-
-  //router.post(
-  //  "/webapi/deleteadmin",
-  //  adminController.middlewareAdminController,
-  //  adminController.deleteadmin
-  //);
 
   router.post(
     "/webapi/deleteadmin",
@@ -883,25 +819,18 @@ router.get("/api/ip-records", async (req, res) => {
   );
   router.post(
     "/api/webapi/daily-bet-commition",
-    // adminController.middlewareAdminController,
     userController.dailyBetCommition,
   );
   router.post(
     "/api/webapi/update-attendencs-bonus",
-    // adminController.middlewareAdminController,
     adminController.attendanceBonus,
   );
 
   router.get(
     "/api/webapi/get-attendencs-bonus",
-    // adminController.middlewareAdminController,
     adminController.getattendanceBonus,
   );
-  router.post(
-    "/api/webapi/get-ligalTrade-data",
-    // adminController.middlewareAdminController,
-    adminController.ligalTrade,
-  );
+  router.post("/api/webapi/get-ligalTrade-data", adminController.ligalTrade);
   router.post(
     "/api/webapi/get-profit-loss",
     adminController.middlewareAdminController,
@@ -930,6 +859,8 @@ router.get("/api/ip-records", async (req, res) => {
     adminController.geWebsiteMode,
   );
   router.post("/api/webapi/set-sinup-bonus", adminController.setSinupBonus);
+  router.get("/api/webapi/get-signup-bonus", adminController.getSignupBonus);
+
   router.post("/api/webapi/set-vip-data", adminController.vipData);
   router.post(
     "/api/webapi/set-userBet-commition",
@@ -937,7 +868,6 @@ router.get("/api/ip-records", async (req, res) => {
   );
   router.post(
     "/api/webapi/set-recharge-bonus",
-    // adminController.middlewareAdminController,
     adminController.setRechargeBonus,
   );
   router.delete(
@@ -947,12 +877,10 @@ router.get("/api/ip-records", async (req, res) => {
 
   router.post(
     "/api/webapi/update-recharge-bonus",
-    // adminController.middlewareAdminController,
     adminController.updateRechargeBonus,
   );
   router.get(
     "/api/webapi/getrecharge-bonus",
-    // adminController.middlewareAdminController,
     adminController.getRechargeBonusCount,
   );
   router.get(
@@ -967,22 +895,18 @@ router.get("/api/ip-records", async (req, res) => {
   );
   router.post(
     "/api/webapi/set-invitation-bonus",
-    // adminController.middlewareAdminController,
     adminController.setInvitationBonus,
   );
   router.post(
     "/api/webapi/update-inviaion-bonus",
-    // adminController.middlewareAdminController,
     adminController.updateInvitationBonus,
   );
   router.delete(
     "/api/webapi/delete-inviaion-bonus",
-    // adminController.middlewareAdminController,
     adminController.deleteInvitationBonus,
   );
   router.get(
     "/api/webapi/get-invitation-bonus",
-    // adminController.middlewareAdminController,
     userController.getInvitationBonus,
   );
 
@@ -1033,61 +957,41 @@ router.get("/api/ip-records", async (req, res) => {
     homeController.transactionhistoryPage,
   );
 
+  // ============================================
+  // PAYMENT ROUTES — KwikPay + UPI_MANUAL ONLY
+  // ============================================
+
+  // ---- Manual UPI Payment ----
   router.get(
     "/wallet/paynow/manual_upi",
     middlewareController,
     paymentController.initiateManualUPIPayment,
-  );
-  router.get(
-    "/wallet/paynow/manual_usdt",
-    middlewareController,
-    paymentController.initiateManualUSDTPayment,
   );
   router.post(
     "/wallet/paynow/manual_upi_request",
     middlewareController,
     paymentController.addManualUPIPaymentRequest,
   );
+
+  // ---- KwikPay Gateway ----
   router.post(
-    "/wallet/paynow/manual_usdt_request",
+    "/api/wallet/paynow/kwikpay",
     middlewareController,
-    paymentController.addManualUSDTPaymentRequest,
+    paymentController.initiateKwikPayPayment,
   );
+  // Callback — public (no auth), called by KwikPay server
   router.post(
-    "/wallet/paynow/wowpay",
-    middlewareController,
-    paymentController.initiateWowPayPayment,
+    "/api/wallet/verify/kwikpay",
+    paymentController.verifyKwikPayPayment,
   );
-  router.post(
-    "/wallet/verify/wowpay",
-    middlewareController,
-    paymentController.verifyWowPayPayment,
-  );
+  // Optional status check on user return
   router.get(
-    "/wallet/verify/wowpay",
+    "/api/wallet/check/kwikpay",
     middlewareController,
-    paymentController.verifyWowPayPayment,
+    paymentController.checkKwikPayStatus,
   );
-  router.post(
-    "/wallet/paynow/upi",
-    middlewareController,
-    paymentController.initiateUPIPayment,
-  );
-  router.post(
-    "/wallet/paynow/verify-sunpay",
-    limiter,
-    paymentController.verifySunpayPayment,
-  );
-  router.post(
-    "/wallet/paynow/sunpay",
-    middlewareController,
-    paymentController.initiateSunpayPayment,
-  );
-  router.get(
-    "/wallet/verify/upi",
-    middlewareController,
-    paymentController.verifyUPIPayment,
-  );
+
+  // ============================================
 
   router.get("/mian", middlewareController, homeController.mianPage);
 
@@ -1140,33 +1044,33 @@ router.get("/api/ip-records", async (req, res) => {
     "/api/webapi/action/5d/join",
     middlewareController,
     k5Controller.betK5D,
-  ); // register
+  );
   router.post(
     "/api/webapi/5d/GetNoaverageEmerdList",
     middlewareController,
     k5Controller.listOrderOld,
-  ); // register
+  );
   router.post(
     "/api/webapi/5d/GetMyEmerdList",
     middlewareController,
     k5Controller.GetMyEmerdList,
-  ); // register
+  );
 
   router.post(
     "/api/webapi/action/cargame/join",
     middlewareController,
     carController.betcargame,
-  ); // register
+  );
   router.post(
     "/api/webapi/cargame/GetNoaverageEmerdList",
     middlewareController,
     carController.listOrderOld,
-  ); // register
+  );
   router.post(
     "/api/webapi/cargame/GetMyEmerdList",
     middlewareController,
     carController.GetMyEmerdList,
-  ); // register
+  );
 
   // BET K3
   router.get("/k3", middlewareController, k3Controller.K3Page);
@@ -1175,92 +1079,91 @@ router.get("/api/ip-records", async (req, res) => {
     "/api/webapi/action/k3/join",
     middlewareController,
     k3Controller.betK3,
-  ); // register
+  );
   router.post(
     "/api/webapi/k3/GetNoaverageEmerdList",
     middlewareController,
     k3Controller.listOrderOld,
-  ); // register
+  );
   router.post(
     "/api/webapi/k3/GetMyEmerdList",
     middlewareController,
     k3Controller.GetMyEmerdList,
-  ); // register
+  );
 
   // login | register
-  router.post("/api/webapi/login", accountController.login); // login
+  router.post("/api/webapi/login", accountController.login);
   router.post(
     "/api/webapi/notification",
     middlewareController,
     accountController.deleteLoginDetail,
-  ); // delete
+  );
   router.get(
     "/api/webapi/notification",
     middlewareController,
     accountController.getLoginDetail,
-  ); //show
-  router.post("/api/webapi/register", accountController.register); // register
+  );
+  router.post("/api/webapi/register", accountController.register);
   router.get("/aviator", middlewareController, userController.aviator);
   router.get(
     "/api/webapi/GetUserInfo",
     middlewareController,
     userController.userInfo,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/change/userInfo",
     middlewareController,
     userController.changeUser,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/change/pass",
     middlewareController,
     userController.changePassword,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/change/userPhoto",
     middlewareController,
     userController.changeUserPhoto,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/rebateCreate",
     middlewareController,
     userController.rebateCreate,
-  ); // get info account
+  );
   router.get(
     "/api/webapi/getRebate",
     middlewareController,
     userController.getRebate,
-  ); // get info account
+  );
 
   // bet wingo
   router.post(
     "/api/webapi/action/join",
     middlewareController,
     winGoController.betWinGo,
-  ); // register
+  );
   router.post(
     "/api/webapi/GetNoaverageEmerdList",
     middlewareController,
     winGoController.listOrderOld,
-  ); // register
+  );
   router.post(
     "/api/webapi/GetMyEmerdList",
     middlewareController,
     winGoController.GetMyEmerdList,
-  ); // register
+  );
 
   router.get(
     "/api/webapi/totalcommission",
     middlewareController,
     userController.totalCommission,
-  ); // register
-  // promotion
+  );
   router.get(
     "/api/webapi/promotion",
     middlewareController,
     userController.promotion,
-  ); // register
+  );
 
   router.get("/api/webapi/promotioncron", commissionController.promotion);
   router.get(
@@ -1280,54 +1183,54 @@ router.get("/api/ip-records", async (req, res) => {
     "/api/webapi/totalcommission",
     middlewareController,
     userController.totalCommission,
-  ); // register
+  );
   router.get(
     "/api/webapi/transactionhistory",
     middlewareController,
     userController.transactionHistory,
-  ); // register
+  );
   router.post(
     "/api/webapi/checkIn",
     middlewareController,
     userController.checkInHandling,
-  ); // register
+  );
   router.get(
     "/api/webapi/check/Info",
     middlewareController,
     userController.infoUserBank,
-  ); // register
+  );
   router.post(
     "/api/webapi/addBank",
     middlewareController,
     userController.addBank,
-  ); // register
+  );
 
   router.post(
     "/api/webapi/addusdt",
     middlewareController,
     userController.addUSDT,
-  ); // register
+  );
 
   router.post(
     "/api/webapi/otp",
     middlewareController,
     userController.verifyCode,
-  ); // register
+  );
   router.post(
     "/api/webapi/use/redenvelope",
     middlewareController,
     userController.useRedenvelope,
-  ); // register
+  );
   router.get(
     "/api/webapi/get/redenvelope",
     middlewareController,
     userController.getRedenvelope,
-  ); // register
+  );
   router.get(
     "/api/webapi/new-subordinate",
     middlewareController,
     userController.newSubordinateData,
-  ); // register
+  );
   router.get(
     "/api/webapi/calculateDownlineBonuses",
     middlewareController,
@@ -1337,21 +1240,19 @@ router.get("/api/ip-records", async (req, res) => {
   router.post(
     "/api/webapi/recharge",
     middlewareController,
-    // upload.none(),
     userController.recharge,
   );
   router.get("/api/webapi/bhatclub_callback", userController.handleCallback);
   router.post(
     "/api/webapi/online-recharge",
     middlewareController,
-    // upload.none(),
     userController.onlineRecharge,
   );
   router.post(
     "/api/webapi/cancel_recharge",
     middlewareController,
     userController.cancelRecharge,
-  ); // register
+  );
   router.post("/wowpay/create", middlewareController, userController.wowpay);
   router.post(
     "/api/webapi/confirm_recharge",
@@ -1413,7 +1314,6 @@ router.get("/api/ip-records", async (req, res) => {
     }
   });
 
-  // Update an existing bonus setting
   router.post("/api/webapi/bonus-settings_update", async (req, res) => {
     try {
       const { betrequriment, bonus, type, id } = req.body;
@@ -1448,7 +1348,6 @@ router.get("/api/ip-records", async (req, res) => {
     }
   });
 
-  // Delete a bonus setting
   router.delete("/api/webapi/bonus-settings/:id", async (req, res) => {
     try {
       const { id } = req.params;
@@ -1480,62 +1379,60 @@ router.get("/api/ip-records", async (req, res) => {
     "/api/webapi/myTeam",
     middlewareController,
     userController.listMyTeam,
-  ); // register
+  );
   router.get(
     "/api/webapi/recharge/list",
     middlewareController,
     userController.listRecharge,
-  ); // register
+  );
 
   router.get(
     "/api/webapi/recharge/list2",
     middlewareController,
     userController.listRecharge2,
-  ); // register
+  );
 
   router.get(
     "/api/webapi/withdraw/list",
     middlewareController,
     userController.listWithdraw,
-  ); // register
+  );
   router.get(
     "/api/webapi/recharge/check",
     middlewareController,
     userController.recharge2,
-  ); // register
+  );
   router.post(
     "/api/webapi/withdrawal",
     middlewareController,
     userController.withdrawal3,
-  ); // register
+  );
   router.post(
     "/api/webapi/callback_bank",
     middlewareController,
     userController.callback_bank,
-  ); // register
+  );
   router.post(
     "/api/webapi/recharge/update",
     middlewareController,
     userController.updateRecharge,
-  ); // update recharge
-  // router.post('/api/webapi/transfer', middlewareController, userController.transfer); // register
-  // router.get('/api/webapi/transfer_history', middlewareController, userController.transferHistory); //
+  );
   router.get(
     "/api/webapi/confirm_recharge_usdt",
     middlewareController,
     userController.confirmUSDTRecharge,
-  ); //
+  );
   router.post(
     "/api/webapi/confirm_recharge_usdt",
     middlewareController,
     userController.confirmUSDTRecharge,
-  ); //
+  );
 
   router.post(
     "/api/webapi/search",
     middlewareController,
     userController.search,
-  ); // register
+  );
 
   // daily
 
@@ -1660,35 +1557,27 @@ router.get("/api/ip-records", async (req, res) => {
     "/manager/infoCtv",
     dailyController.middlewareDailyController,
     dailyController.infoCtv,
-  ); // get info account
+  );
   router.post(
     "/manager/infoCtv/select",
     dailyController.middlewareDailyController,
     dailyController.infoCtv2,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/manager/listMember",
     dailyController.middlewareDailyController,
     dailyController.listMember,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/manager/buff",
     dailyController.middlewareDailyController,
     dailyController.buffMoney,
-  ); // get info account
-
-  router.post(
-    "/admin/manager/settings/need",
-    // adminController.middlewareAdminController,
-    adminController.settingneed,
   );
 
-  router.post(
-    "/admin/manager/set-spin-data",
-    // adminController.middlewareAdminController,
-    adminController.spinController,
-  );
+  router.post("/admin/manager/settings/need", adminController.settingneed);
+
+  router.post("/admin/manager/set-spin-data", adminController.spinController);
   router.get(
     "/api/webapi/get-spin-data",
     middlewareController,
@@ -1706,70 +1595,68 @@ router.get("/api/ip-records", async (req, res) => {
     userController.spineHistory,
   );
 
-  // admin
-
-  //  user problem
+  // user problem
   router.post(
     "/api/webapi/userProblem",
     middlewareController,
     userController.userProblem,
-  ); // register
+  );
   router.post(
     "/api/webapi/userProblem-get",
     middlewareController,
     userController.userProblemGet,
-  ); // register
+  );
   router.get(
     "/api/webapi/admin/livechat",
     middlewareController,
     userController.adminProblemGet,
-  ); // register
+  );
   router.post(
     "/api/webapi/admin/livechatupdate",
     middlewareController,
     userController.adminProblemSubmit,
-  ); // register
+  );
 
   router.get(
     "/api/webapi/admin/get-commission",
     middlewareController,
     winGoController.tradeCommissionGet,
-  ); // register
+  );
 
   router.get(
     "/api/webapi/admin/update-commission",
     middlewareController,
     winGoController.tradeCommissionadmin,
-  ); // register
+  );
 
   router.get(
     "/admin/manager/lives",
     adminController.middlewareAdminController,
     adminController.livePage,
-  ); // get info account
+  );
 
   router.get(
     "/admin/manager/userlevel",
     adminController.middlewareAdminController,
     adminController.userlevelPage,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/userlevelAll",
     adminController.middlewareAdminController,
     adminController.userlevelAllPage,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/admin/manager/user-data",
     adminController.middlewareAdminController,
     adminController.downlinerecharge_data_admin,
-  ); // get promotion data
+  );
 
   router.post(
     "/api/webapi/admin/manager/user-data-all",
     adminController.middlewareAdminController,
     adminController.downlinerecharge_data_adminAll,
-  ); // get promotion data
+  );
 
   router.post(
     "/admin/manager/addust",
@@ -1890,34 +1777,34 @@ router.get("/api/ip-records", async (req, res) => {
     "/admin/manager/index",
     adminController.middlewareAdminController,
     adminController.adminPage,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/index/3",
     adminController.middlewareAdminController,
     adminController.adminPage3,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/index/5",
     adminController.middlewareAdminController,
     adminController.adminPage5,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/index/10",
     adminController.middlewareAdminController,
     adminController.adminPage10,
-  ); // get info account
+  );
 
   router.post(
     "/api/admin/enableWithdraw",
     adminController.middlewareAdminController,
     adminController.enableWithdraw,
-  ); // get info account
+  );
 
   router.get(
     "/admin/manager/motobike",
     adminController.middlewareAdminController,
     adminController.adminCarPage,
-  ); // get info account
+  );
 
   router.get(
     "/admin/manager/Home",
@@ -1930,151 +1817,151 @@ router.get("/api/ip-records", async (req, res) => {
     "/admin/manager/trx",
     adminController.middlewareAdminController,
     adminController.admintrxPage,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/trx/3",
     adminController.middlewareAdminController,
     adminController.admintrxPage3,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/trx/5",
     adminController.middlewareAdminController,
     adminController.admintrxPage5,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/trx/10",
     adminController.middlewareAdminController,
     adminController.admintrxPage10,
-  ); // get info account
+  );
 
   router.get(
     "/admin/manager/5d",
     adminController.middlewareAdminController,
     adminController.adminPage5d,
-  ); // get info account
+  );
 
   router.get(
     "/admin/manager/5d/3",
     adminController.middlewareAdminController,
     adminController.adminPage5d,
-  ); // get info account
+  );
 
   router.get(
     "/admin/manager/5d/5",
     adminController.middlewareAdminController,
     adminController.adminPage5d,
-  ); // get info account
+  );
 
   router.get(
     "/admin/manager/5d/10",
     adminController.middlewareAdminController,
     adminController.adminPage5d,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/k3",
     adminController.middlewareAdminController,
     adminController.adminPageK3,
-  ); // get info account
+  );
 
   router.get(
     "/admin/manager/members",
     adminController.middlewareAdminController,
     adminController.membersPage,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/createBonus",
     adminController.middlewareAdminController,
     adminController.giftPage,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/ctv",
     adminController.middlewareAdminController,
     adminController.ctvPage,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/demouser",
     adminController.middlewareAdminController,
     adminController.demouser,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/ctv/profile/:phone",
     adminController.middlewareAdminController,
     adminController.ctvProfilePage,
-  ); // get info account
+  );
 
   router.get(
     "/admin/manager/turnover",
     adminController.middlewareAdminController,
     adminController.turnover,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/betting",
     adminController.middlewareAdminController,
     adminController.betting,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/today_report",
     adminController.middlewareAdminController,
     adminController.todayreport,
-  ); // get info account
+  );
 
   router.post(
     "/admin/manager/settings/message",
     adminController.middlewareAdminController,
     adminController.settingMessage,
-  ); // get info account
+  );
 
   router.get(
     "/admin/manager/settings",
     adminController.middlewareAdminController,
     adminController.settings,
-  ); // get info account
+  );
 
   router.get(
     "/admin/manager/listRedenvelops",
     adminController.middlewareAdminController,
     adminController.listRedenvelops,
-  ); // get info account
+  );
   router.post(
     "/admin/manager/infoCtv",
     adminController.middlewareAdminController,
     adminController.infoCtv,
-  ); // get info account
+  );
   router.post(
     "/admin/manager/infoCtv/select",
     adminController.middlewareAdminController,
     adminController.infoCtv2,
-  ); // get info account
+  );
   router.post(
     "/admin/manager/settings/bank",
     adminController.middlewareAdminController,
     adminController.settingBank,
-  ); // get info account
+  );
   router.post(
     "/admin/manager/settings/cskh",
     adminController.middlewareAdminController,
     adminController.settingCskh,
-  ); // get info account
+  );
   router.post(
     "/admin/manager/settings/buff",
     adminController.middlewareAdminController,
     adminController.settingbuff,
-  ); // get info account
+  );
   router.post(
     "/admin/manager/create/ctv",
     adminController.middlewareAdminController,
     adminController.register,
-  ); // get info account
+  );
   router.post(
     "/admin/manager/settings/get",
     adminController.middlewareAdminController,
     adminController.settingGet,
-  ); // get info account
+  );
   router.post(
     "/admin/manager/createBonus",
     adminController.middlewareAdminController,
     adminController.createBonus,
-  ); // get info account
+  );
 
   router.post(
     "/admin/member/listRecharge/:phone",
@@ -2101,39 +1988,38 @@ router.get("/api/ip-records", async (req, res) => {
     "/admin/manager/export/todayrecharge",
     adminController.middlewareAdminController,
     adminController.todayrechargeexport,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/recharge",
     adminController.middlewareAdminController,
     adminController.rechargePage,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/allrecharge",
     adminController.middlewareAdminController,
     adminController.rechargeAllPage,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/successrecharge",
     adminController.middlewareAdminController,
     adminController.rechargeSuccessPage,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/pandingrecharge",
     adminController.middlewareAdminController,
     adminController.rechargePandingPage,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/failrecharge",
     adminController.middlewareAdminController,
     adminController.rechargeFailPage,
-  ); // get info account
+  );
 
   router.get(
     "/admin/manager/withdraw",
     adminController.middlewareAdminController,
     adminController.withdraw,
-  ); // get info account
-  // router.get('/admin/manager/level', adminController.middlewareAdminController, adminController.level); // get info account
+  );
   router.get(
     "/admin/manager/levelSetting",
     adminController.middlewareAdminController,
@@ -2148,17 +2034,17 @@ router.get("/api/ip-records", async (req, res) => {
     "/admin/manager/rechargeRecord",
     adminController.middlewareAdminController,
     adminController.rechargeRecord,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/withdrawRecord",
     adminController.middlewareAdminController,
     adminController.withdrawRecord,
-  ); // get info account
+  );
   router.get(
     "/admin/manager/statistical",
     adminController.middlewareAdminController,
     adminController.statistical,
-  ); // get info account
+  );
   router.get(
     "/admin/member/info/:id",
     adminController.middlewareAdminController,
@@ -2184,12 +2070,12 @@ router.get("/api/ip-records", async (req, res) => {
     "/api/webapi/admin/updateLevel",
     adminController.middlewareAdminController,
     adminController.updateLevel,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/admin/CreatedSalary",
     adminController.middlewareAdminController,
     adminController.CreatedSalary,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/getweeldetails",
@@ -2201,23 +2087,23 @@ router.get("/api/ip-records", async (req, res) => {
     "/api/webapi/admin/listMember",
     adminController.middlewareAdminController,
     adminController.listMember,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/admin/listctv",
     adminController.middlewareAdminController,
     adminController.listCTV,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/admin/withdraw",
     adminController.middlewareAdminController,
     adminController.handlWithdraw,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/admin/withdraw2",
     adminController.middlewareAdminController,
     adminController.handlWithdraw2,
-  ); // get info account
+  );
 
   router.post(
     "/api/handlWithdrawCallback",
@@ -2228,119 +2114,115 @@ router.get("/api/ip-records", async (req, res) => {
     "/api/webapi/admin/recharge",
     adminController.middlewareAdminController,
     adminController.recharge,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/admin/rechargeDuyet",
     adminController.middlewareAdminController,
     adminController.rechargeDuyet,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/admin/spinset",
     adminController.middlewareAdminController,
     adminController.spinset,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/admin/member/info",
     adminController.middlewareAdminController,
     adminController.userInfo,
-  ); // get info account
-  router.post(
-    "/api/webapi/admin/statistical",
-    // adminController.middlewareAdminController,
-    adminController.statistical2,
-  ); // get info account
+  );
+  router.post("/api/webapi/admin/statistical", adminController.statistical2);
 
   router.post(
     "/api/webapi/admin/banned",
     adminController.middlewareAdminController,
     adminController.banned,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/admin/eliga-unblock",
     adminController.middlewareAdminController,
     adminController.eligaUnblockUser,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/admin/turnover",
     adminController.middlewareAdminController,
     adminController.turnover_report,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/admin/betting",
     adminController.middlewareAdminController,
     adminController.betting_report,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/admin/todayreport",
     adminController.middlewareAdminController,
     adminController.today_report,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/admin/racing/totalJoin",
     adminController.middlewareAdminController,
     adminController.totalJoinRacing,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/admin/change",
     adminController.middlewareAdminController,
     adminController.changeAdmin,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/admin/racing/change",
     adminController.middlewareAdminController,
     adminController.changeAdminRacing,
-  ); // get info account
+  );
 
   router.post(
     "/api/webapi/admin/profileUser",
     adminController.middlewareAdminController,
     adminController.profileUser,
-  ); // get info account
+  );
 
   // admin 5d
   router.post(
     "/api/webapi/admin/5d/listOrders",
     adminController.middlewareAdminController,
     adminController.listOrderOld,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/admin/k3/listOrders",
     adminController.middlewareAdminController,
     adminController.listOrderOldK3,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/admin/5d/editResult",
     adminController.middlewareAdminController,
     adminController.editResult,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/admin/k3/editResult",
     adminController.middlewareAdminController,
     adminController.editResult2,
-  ); // get info account
+  );
   // my admin code
   router.get(
     "/admin/manager/notification",
     adminController.middlewareAdminController,
     adminController.notificationPage,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/admin/create-notification",
     adminController.middlewareAdminController,
     adminController.createNotification,
-  ); // get info account
+  );
   router.post(
     "/api/webapi/admin/delete-notification/:id",
     adminController.middlewareAdminController,
     adminController.singleNotificationDelete,
-  ); // get info account
+  );
 
   router.get(
     "/api/webapi/GetTopBettingboardGame/:app_id",
@@ -2348,9 +2230,6 @@ router.get("/api/ip-records", async (req, res) => {
     bettingController.boardGame,
   );
   router.get("/api/webapi/jilihistory/:account", jilliController.gamehistory);
-  // router.get('/api/webapi/GetJilliboardGame/:gameId', middlewareController, jilliController.boardGame);
-  // router.get('/api/webapi/getboardGameInfo', middlewareController, jilliController.getboardGameInfo);
-  // router.get('/api/webapi/transferMoneyToMainWallet', middlewareController, jilliController.transferMoneyToMainWallet);
 
   router.get(
     "/api/webapi/GetJilliboardGame/:gameId",
@@ -2379,7 +2258,7 @@ router.get("/api/ip-records", async (req, res) => {
     adminController.convertAgent,
   );
 
-  //   pages
+  // pages
   router.get(
     "/admin/manager/deposite",
     adminController.middlewareAdminController,
@@ -2418,7 +2297,7 @@ router.get("/api/ip-records", async (req, res) => {
     adminController.gameProblems,
   );
 
-  // suport system
+  // support system
   router.get("/api/recharge/:auth", getRecharge);
   router.get("/api/withdrawl2/:auth", getwithdrawl2);
 
@@ -2445,15 +2324,15 @@ router.get("/api/ip-records", async (req, res) => {
   router.post("/api/password", updatePassword2);
 
   //get details api
-  router.get("/api/webapi/getdetails", getDepositNotReceived); //
+  router.get("/api/webapi/getdetails", getDepositNotReceived);
   router.get("/api/webapi/usdtdetails", getUsdtAddress);
 
   router.get("/api/webapi/modificationdetails", getifscModification);
   router.get("/api/webapi/userbankdetails", getUserBank);
 
-  router.get("/api/webapi/bankdetails", getBankModification); //
-  router.get("/api/webapi/bonusdetails", bonusDetails); //
-  router.get("/api/webapi/problemsdetails", problemsDetails); //
+  router.get("/api/webapi/bankdetails", getBankModification);
+  router.get("/api/webapi/bonusdetails", bonusDetails);
+  router.get("/api/webapi/problemsdetails", problemsDetails);
   router.get("/api/webapi/withproblem", getwithdrawlProblems);
 
   router.post("/api/withdrawlproblem", withdrawlProblems);

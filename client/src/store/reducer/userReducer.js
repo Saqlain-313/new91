@@ -16,7 +16,7 @@ export const recharge = createAsyncThunk(
     }
   },
 );
-// For UPI
+
 export const upi = createAsyncThunk(
   "auth/addUPI",
   async (info, { rejectWithValue, fulfillWithValue }) => {
@@ -70,6 +70,62 @@ export const rechargeList2 = createAsyncThunk(
       return fulfillWithValue(data);
     } catch (error) {
       return rejectWithValue(error.response.data);
+    }
+  },
+);
+
+// ============================================
+// NEW: KwikPay Payment
+// ============================================
+export const kwikpayRecharge = createAsyncThunk(
+  "auth/kwikpay-recharge",
+  async ({ money }, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.post(
+        "/wallet/paynow/kwikpay",
+        { money },
+        { withCredentials: true },
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { message: "Network error" });
+    }
+  },
+);
+
+// ============================================
+// NEW: Manual UPI Payment
+// ============================================
+export const manualUPIRecharge = createAsyncThunk(
+  "auth/manual-upi-recharge",
+  async ({ money, utr }, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.post(
+        "/wallet/paynow/manual_upi_request",
+        { money, utr },
+        { withCredentials: true },
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { message: "Network error" });
+    }
+  },
+);
+
+// ============================================
+// NEW: Check KwikPay status (optional)
+// ============================================
+export const kwikpayStatus = createAsyncThunk(
+  "auth/kwikpay-status",
+  async ({ orderId }, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.get("/wallet/check/kwikpay", {
+        params: { orderId },
+        withCredentials: true,
+      });
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { message: "Network error" });
     }
   },
 );
@@ -166,7 +222,7 @@ export const bannerGet = createAsyncThunk(
   async (_, { rejectWithValue, fulfillWithValue }) => {
     try {
       const { data } = await api.get(`/webapi/banner`);
-      return fulfillWithValue(data); // Return data directly
+      return fulfillWithValue(data);
     } catch (error) {
       return rejectWithValue(
         error.response ? error.response.data : "An unknown error occurred",
@@ -182,10 +238,8 @@ export const recharheBonus = createAsyncThunk(
       const { data } = await api.get(`/webapi/getrecharge-bonus`, {
         withCredentials: true,
       });
-      //console.log("recharge bonus:", data); // Debug API response
       return fulfillWithValue(data);
     } catch (error) {
-      // console.error("Error rechatge:", error); // Debug API error
       return rejectWithValue(
         error.response ? error.response.data : "An unknown error occurred",
       );
@@ -237,7 +291,11 @@ export const userReducer = createSlice({
     rechargegetData: null,
     rechargelistData: null,
     rechargeBonusData: null,
-    // add userDetail to initialState
+
+    // NEW state fields
+    kwikpayData: null,       // { payment_url, recharge, ... }
+    manualUpiData: null,     // { recharge, ... }
+    kwikpayStatusData: null, // { status, message }
   },
   reducers: {
     messageClear: (state) => {
@@ -248,6 +306,9 @@ export const userReducer = createSlice({
       state.rechargeData = "";
       state.rechargegetData = "";
       state.rechargelistData = "";
+      state.kwikpayData = null;
+      state.manualUpiData = null;
+      state.kwikpayStatusData = null;
     },
   },
   extraReducers: (builder) => {
@@ -256,7 +317,6 @@ export const userReducer = createSlice({
         state.loader = true;
       })
       .addCase(recharge.rejected, (state, { payload }) => {
-        // console.log('register rejected payload:', payload); // Log payload
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
@@ -271,21 +331,19 @@ export const userReducer = createSlice({
         state.loader = true;
       })
       .addCase(upi.rejected, (state, { payload }) => {
-        // console.log('register rejected payload:', payload); // Log payload
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
       .addCase(upi.fulfilled, (state, { payload }) => {
         state.successMessage = payload.message;
         state.loader = false;
-        state.upiData = payload; // ✅ important to store API response
+        state.upiData = payload;
       })
 
       .addCase(rechargeGet.pending, (state) => {
         state.loader = true;
       })
       .addCase(rechargeGet.rejected, (state, { payload }) => {
-        // console.log('register rejected payload:', payload); // Log payload
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
@@ -299,7 +357,6 @@ export const userReducer = createSlice({
         state.loader = true;
       })
       .addCase(rechargeList.rejected, (state, { payload }) => {
-        // console.log('register rejected payload:', payload); // Log payload
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
@@ -313,7 +370,6 @@ export const userReducer = createSlice({
         state.loader = true;
       })
       .addCase(rechargeList2.rejected, (state, { payload }) => {
-        // console.log('register rejected payload:', payload); // Log payload
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
@@ -322,11 +378,62 @@ export const userReducer = createSlice({
         state.loader = false;
       })
 
+      // ============================================
+      // NEW: KwikPay reducers
+      // ============================================
+      .addCase(kwikpayRecharge.pending, (state) => {
+        state.loader = true;
+        state.errorMessage = "";
+        state.successMessage = "";
+      })
+      .addCase(kwikpayRecharge.rejected, (state, { payload }) => {
+        state.errorMessage = payload?.message || "KwikPay payment failed";
+        state.loader = false;
+      })
+      .addCase(kwikpayRecharge.fulfilled, (state, { payload }) => {
+        state.successMessage = payload.message;
+        state.loader = false;
+        state.kwikpayData = payload; // { payment_url, recharge, status, ... }
+      })
+
+      // ============================================
+      // NEW: Manual UPI reducers
+      // ============================================
+      .addCase(manualUPIRecharge.pending, (state) => {
+        state.loader = true;
+        state.errorMessage = "";
+        state.successMessage = "";
+      })
+      .addCase(manualUPIRecharge.rejected, (state, { payload }) => {
+        state.errorMessage = payload?.message || "Manual UPI request failed";
+        state.loader = false;
+      })
+      .addCase(manualUPIRecharge.fulfilled, (state, { payload }) => {
+        state.successMessage = payload.message;
+        state.loader = false;
+        state.manualUpiData = payload; // { recharge, status, ... }
+      })
+
+      // ============================================
+      // NEW: KwikPay status check reducers
+      // ============================================
+      .addCase(kwikpayStatus.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(kwikpayStatus.rejected, (state, { payload }) => {
+        state.errorMessage = payload?.message || "Status check failed";
+        state.loader = false;
+      })
+      .addCase(kwikpayStatus.fulfilled, (state, { payload }) => {
+        state.loader = false;
+        state.kwikpayStatusData = payload;
+        state.successMessage = payload.message || "";
+      })
+
       .addCase(addBank.pending, (state) => {
         state.loader = true;
       })
       .addCase(addBank.rejected, (state, { payload }) => {
-        // console.log('register rejected payload:', payload); // Log payload
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
@@ -340,7 +447,6 @@ export const userReducer = createSlice({
         state.loader = true;
       })
       .addCase(addusdt.rejected, (state, { payload }) => {
-        // console.log('register rejected payload:', payload); // Log payload
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
@@ -353,7 +459,6 @@ export const userReducer = createSlice({
         state.loader = true;
       })
       .addCase(getBank.rejected, (state, { payload }) => {
-        // console.log('register rejected payload:', payload); // Log payload
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
@@ -367,7 +472,6 @@ export const userReducer = createSlice({
         state.loader = true;
       })
       .addCase(withdrawal.rejected, (state, { payload }) => {
-        // console.log('register rejected payload:', payload); // Log payload
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
@@ -381,7 +485,6 @@ export const userReducer = createSlice({
         state.loader = true;
       })
       .addCase(withdrawalHistory.rejected, (state, { payload }) => {
-        // console.log('register rejected payload:', payload); // Log payload
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
@@ -412,7 +515,6 @@ export const userReducer = createSlice({
         state.loader = false;
       })
       .addCase(recharheBonus.fulfilled, (state, { payload }) => {
-        // //console.log("Fulfilled payload:", payload);
         state.successMessage = payload.message || "";
         state.rechargeBonusData = payload?.data || [];
         state.loader = false;
@@ -421,7 +523,6 @@ export const userReducer = createSlice({
         state.loader = true;
       })
       .addCase(zilpayRecharge.rejected, (state, { payload }) => {
-        // console.log('register rejected payload:', payload); // Log payload
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
@@ -433,7 +534,6 @@ export const userReducer = createSlice({
         state.loader = true;
       })
       .addCase(TrexoPayment.rejected, (state, { payload }) => {
-        // console.log('register rejected payload:', payload); // Log payload
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
@@ -445,7 +545,7 @@ export const userReducer = createSlice({
         state.loader = true;
       })
       .addCase(recharge3.rejected, (state, { payload }) => {
-        console.log("register rejected payload:", payload); // Log payload
+        console.log("register rejected payload:", payload);
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
