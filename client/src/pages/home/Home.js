@@ -238,8 +238,8 @@ const Home = () => {
                   {bannergetData?.gameall?.name} . To ensure you are on the
                   legitimate {bannergetData?.gameall?.name} website (
                   <span>
-                    <Link className="text-blue-700" to="https://1xclube.com">
-                      1xclube.com
+                    <Link className="text-blue-700" to="https://max-win.site/">
+                      max-win.site
                     </Link>
                   </span>
                   ) please verify authenticity through our official channels.

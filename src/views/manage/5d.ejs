@@ -13,7 +13,6 @@
   <link rel="stylesheet" href="/css/pages__parity.css">
   <link rel="stylesheet" href="/css/vantjs.css">
   <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-default@5.0.15/default.min.css" rel="stylesheet" />
-
   <link rel="stylesheet" href="/css/admin.css">
 
   <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"
@@ -575,7 +574,7 @@
                   <span class="info-box-icon1 elevation-1"><%= item.id %></span>
                   <div class="info-box-content">
                     <span class="info-box-text"><%= item.text %></span>
-                    <!-- ID yahan add ki gayi hai taaki JS isko easily target kar sake -->
+                    <!-- ✅ ID YAHAN ADD KI GAYI HAI -->
                     <span totalMoney="0" class="info-box-number" id="card_<%= item.id %>">0</span>
                   </div>
                 </div>
@@ -594,15 +593,15 @@
                   <div class="card">
                     <div class="reservation-card">
                       <div class="card-header">
-                        <h2 data-v-04e3b381="" class="reservation-chunk-sub-num card-title">Reservation Details</h2>
+                        <h2 class="reservation-chunk-sub-num card-title">Reservation Details</h2>
                       </div>
                       <div class="card-body1 time">
-                        <div data-v-7d40872f="" class="time-container time">
-                          <span data-v-7d40872f="" class="time-unit minute1 time-sub" id="minute1">0</span>
-                          <span data-v-7d40872f="" class="time-unit minute2 time-sub" id="minute2">0</span>
-                          <span data-v-7d40872f="" class="time-separator">:</span>
-                          <span data-v-7d40872f="" class="time-unit sec1 time-sub" id="sec1">0</span>
-                          <span data-v-7d40872f="" class="time-unit sec2 time-sub" id="sec2">0</span>
+                        <div class="time-container time">
+                          <span class="time-unit minute1 time-sub" id="minute1">0</span>
+                          <span class="time-unit minute2 time-sub" id="minute2">0</span>
+                          <span class="time-separator">:</span>
+                          <span class="time-unit sec1 time-sub" id="sec1">0</span>
+                          <span class="time-unit sec2 time-sub" id="sec2">0</span>
                         </div>
                       </div>
                     </div>
@@ -627,12 +626,12 @@
 
                 <div class="col-md-6 card-width2 mb-3">
                   <div class="periods-header">
-                    <div data-v-a9660e98="" class="wrap">
-                      <div data-v-a9660e98="" class="van-row">
-                        <div data-v-a9660e98="" class="van-col van-col--8" style="padding-right: 50px !important;">Stage</div>
-                        <div data-v-a9660e98="" class="van-col van-col--5">Result</div>
-                        <div data-v-a9660e98="" class="van-col van-col--5" style="padding-left: 50px !important;">Big/Small</div>
-                        <div data-v-a9660e98="" class="van-col van-col--6" style="padding-left: 70px !important;">Parity</div>
+                    <div class="wrap">
+                      <div class="van-row">
+                        <div class="van-col van-col--8" style="padding-right: 50px !important;">Stage</div>
+                        <div class="van-col van-col--5">Result</div>
+                        <div class="van-col van-col--5" style="padding-left: 50px !important;">Big/Small</div>
+                        <div class="van-col van-col--6" style="padding-left: 70px !important;">Parity</div>
                       </div>
                     </div>
                   </div>
@@ -681,8 +680,14 @@
   <script src="/5d/admin/main.js"></script>
 
   <script>
+    // ✅ YEH FUNCTION MISSING THA (Jisse JS crash ho raha tha)
+    const isNumber = (params) => {
+      let pattern = /^[0-9]*\d$/;
+      return pattern.test(params);
+    };
+
     function changeDataAttribute(element, url) {
-      document.documentElement.setAttribute("data-change", url);
+      document.documentElement.setAttribute("data-change", String(url));
 
       document.querySelectorAll(".col-12.col-sm-6.col-md-3 .active-label").forEach(label => label.remove());
       document.querySelectorAll(".col-12.col-sm-6.col-md-3.active-button").forEach(el => el.classList.remove("active-button"));
@@ -698,7 +703,7 @@
       window.dispatchEvent(new CustomEvent("game-changed", { detail: { game: parseInt(url, 10) } }));
     }
 
-    // Default Active Card Fix
+    // ✅ Default Active Card Fix
     window.addEventListener("load", function () {
       let firstItem = document.querySelector("#manage .col-md-3");
       if (firstItem && !document.querySelector(".active-button")) {
@@ -741,7 +746,6 @@
       return;
     }
 
-    // ✅ Shared Socket (Main.js se)
     const socket = window.appSocket || io();
     window.appSocket = socket;
 

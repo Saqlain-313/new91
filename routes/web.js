@@ -697,6 +697,18 @@ const initWebRouter = (app) => {
     accountController.getLoginupdate,
   );
 
+  router.post(
+    "/api/webapi/admin/k3/listOrders",
+    adminController.middlewareAdminController,
+    k3Controller.getAdminListOrders, // 👈 Naya function k3Controller se
+  );
+
+  router.post(
+    "/api/webapi/admin/5d/listOrders",
+    adminController.middlewareAdminController,
+    k5Controller.getAdminListOrders5D, // 👈 Naya function k5Controller se
+  );
+
   router.get(
     "/api/webapi/subordinatedata",
     middlewareController,

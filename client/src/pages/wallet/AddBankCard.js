@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { AiOutlineExclamationCircle } from "react-icons/ai";
 import { BsBank2 } from "react-icons/bs";
 import { FaMobileAlt, FaUser } from "react-icons/fa";
 import { HiKey } from "react-icons/hi";
-import { MdOutlineCreditCard, MdVerifiedUser } from "react-icons/md";
-
+import { MdEmail, MdOutlineCreditCard } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import { addBank } from "../../store/reducer/userReducer";
-import CustomeNavbar from "../../components/CustomeNavbar";
 import { useNavigate } from "react-router-dom";
-import { otpSend } from "../../store/reducer/authReducer";
+import CustomeNavbar from "../../components/CustomeNavbar";
+import { addBank } from "../../store/reducer/userReducer";
+
+// Bank list (aapke dusre code se)
 const bankData = [
   "Bank of Baroda",
   "Union Bank of India",
@@ -196,254 +196,303 @@ const bankData = [
 ];
 
 const AddBankCard = () => {
-  // const { successMessage } = useSelector((state) => state.user);
-  const [alerts, setAlerts] = useState(false);
-  const [bank, setBank] = useState("Please Select a bank");
+  const { successMessage } = useSelector((state) => state.user);
+  const [showAlert, setShowAlert] = useState(false);
+  const [selectedBankName, setSelectedBankName] = useState(
+    "Please Select a bank",
+  );
+  const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [open, setOpne] = useState(false);
   const navigate = useNavigate();
-  const [successMessage, setSuccessMessage] = useState("");
-  const [countdown, setCountdown] = useState(0);
-  const [state, setState] = useState({
+  const dispatch = useDispatch();
+
+  const [bankDetails, setBankDetails] = useState({
     name_bank: "",
     name_user: "",
-    stk: "", ////account number
-    ifsc: "", // ifsc code
-    tinh: "", //phone number
-    sdt: "0", //usdt
-    otp: 123456,
+    stk: "",
+    email: "",
+    tinh: "",
+    ifsc: "",
+    sdt: "0",
   });
 
-  const inputHandle = (e) => {
-    setState({
-      ...state,
-      [e.target.name]: e.target.value,
-    });
+  // Dropdown toggle
+  const handleToggle = () => {
+    setOpen((prev) => !prev);
   };
 
-  const dispatch = useDispatch();
+  // Bank select from inline list
+  const handleBanks = (item) => {
+    setSelectedBankName(item);
+    setBankDetails((prev) => ({ ...prev, name_bank: item }));
+    setSearchTerm("");
+    setOpen(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    let newValue = value;
+    if (name === "name_user" || name === "ifsc") {
+      newValue = value.toUpperCase();
+    }
+    setBankDetails((prev) => ({ ...prev, [name]: newValue }));
+  };
+
+  const areAllFieldsFilled =
+    selectedBankName !== "Please Select a bank" &&
+    bankDetails.name_user.trim() !== "" &&
+    bankDetails.stk.trim() !== "" &&
+    bankDetails.tinh.trim() !== "" &&
+    bankDetails.email.trim() !== "" &&
+    bankDetails.ifsc.trim() !== "";
+
   const handleSubmit = async () => {
-    dispatch(addBank(state)).then((res) => {
-      setAlerts(true);
-      setSuccessMessage(res.payload.message);
+    if (!areAllFieldsFilled) {
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 2000);
+      return;
+    }
+    try {
+      const res = await dispatch(addBank(bankDetails));
+      setShowAlert(true);
       setTimeout(() => {
-        if (res.payload.status) {
+        if (res.payload?.status) {
           navigate("/wallet/Withdraw");
         }
-        setAlerts(false);
+        setShowAlert(false);
       }, 2000);
-    });
+    } catch (error) {
+      console.error("Error adding bank:", error);
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 2000);
+    }
   };
 
-  const handleTogle = () => {
-    setOpne(!open);
-  };
-
-  const handleBanks = (item) => {
-    setBank(item);
-    setState({
-      ...state,
-      name_bank: item,
-    });
-
-    handleTogle();
-  };
-
-  // Filter bank names based on search term
+  // Filter banks by search
   const filteredBanks = bankData.filter((item) =>
-    item.toLowerCase().includes(searchTerm.toLowerCase())
+    item.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  // const handleOtp = async () => {
-  //   dispatch(otpSend(state.tinh)).then((res) => {
-  //     setSuccessMessage(res.payload.message);
-  //     setAlerts(true);
-  //     if (res.payload.status) {
-  //       setCountdown(60);
-  //     }
-  //   });
-  // };
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setInterval(() => {
-        setCountdown((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer); // Clean up
-    }
-  }, [countdown]);
   return (
     <>
       <CustomeNavbar name="Add Bank" />
-      <div className="container-section">
-        <div className="flex items-center p-1 px-3 rounded-full bg-body mt-2">
-          <span>
-            <AiOutlineExclamationCircle className="color-red-200 text-lg" />
-          </span>
-          <p className="text-sm ms-2 leading-4  color-red-200">
-            To ensure the safety of your founds, please bind your bank account
+
+      <div
+        className="container-section"
+        style={{ fontFamily: '"Bahnschrift", sans-serif' }}
+      >
+        <div className="flex items-center p-1 px-3 rounded-full nav-bg mt-2">
+          <AiOutlineExclamationCircle className="color-red-200 text-lg" />
+          <p className="text-sm ms-2 leading-4 color-red-200">
+            To ensure the safety of your funds, please bind your bank account
           </p>
         </div>
 
+        {/* BANK NAME FIELD - INLINE DROPDOWN */}
+
         <div className="mt-7">
-          <div className="flex ">
-            <span>
-              <BsBank2 className="text-blue text-lg mr-1" />
-            </span>
+          <div className="flex items-center">
+            <BsBank2 className="color-blue text-lg mr-2" />
             <p className="text-sm text-whites">Bank name</p>
           </div>
-          <input
-            type="text"
-            className="w-full mt-2 blue-linear text-whites text-black rounded-md p-2 focus:border-slate-700 ps-6 flex items-center focus:border focus:outline-none cursor-pointer   placeholder:text-sm placeholder:text-slate-500"
-            placeholder="Please enter the bank name"
-            name="name_bank"
-            value={bank}
-            onClick={handleTogle}
-          />
 
+          {/* Dropdown trigger */}
+          <div
+            className={`w-full mt-2 rounded-md p-2 ps-6 flex items-center justify-between cursor-pointer transition-all duration-200 ${
+              selectedBankName === "Please Select a bank"
+                ? "blue-linear text-slate-800 font-medium" // Adjusted placeholder text color for visibility on blue-linear
+                : "bg-[#171B34] text-whites"
+            }`}
+            onClick={handleToggle}
+          >
+            <div className="flex-1">
+              {selectedBankName === "Please Select a bank" ? (
+                <span className="text-sx text-slate-700">
+                  {selectedBankName}
+                </span>
+              ) : (
+                <span className="text-whites">{selectedBankName}</span>
+              )}
+            </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`h-5 w-5 text-white transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+
+          {/* Dropdown list with search - FIXED DARK THEME */}
           {open && (
-            <div className="bank-option bg-body p-4">
+            <div className="mt-2 bg-[#171B34] rounded-md p-3 max-h-64 overflow-y-auto border border-gray-600 shadow-xl custom-scrollbar">
               <input
                 type="text"
-                className="w-full mt-2 bg-body text-whites rounded-lg p-2 border focus:border-slate-700 ps-6 flex items-center focus:border focus:outline-none placeholder:text-sm placeholder:text-slate-500"
+                className="w-full bg-[#0F1222] text-whites rounded-lg p-2 border border-gray-700 focus:border-blue-500 ps-4 mb-2 focus:outline-none placeholder:text-sm placeholder:text-slate-500"
                 placeholder="Search bank name"
-                name="name_bank"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
               />
-
-              {filteredBanks.map((item) => (
-                <p
-                  key={item}
-                  className="text-whites text-sm p-2 border-b border-zinc-700"
-                  onClick={() => handleBanks(item)}
-                >
-                  {item}
+              {filteredBanks.length > 0 ? (
+                filteredBanks.map((item) => (
+                  <p
+                    key={item}
+                    className="text-slate-200 text-sm p-2 border-b border-gray-700 cursor-pointer hover:bg-[#252A4A] hover:text-white transition-colors"
+                    onClick={() => handleBanks(item)}
+                  >
+                    {item}
+                  </p>
+                ))
+              ) : (
+                <p className="text-slate-500 text-sm p-2 text-center">
+                  No bank found
                 </p>
-              ))}
+              )}
+            </div>
+          )}
+
+          {/* Selected bank info box + Change Bank */}
+          {selectedBankName !== "Please Select a bank" && (
+            <div className="mt-3 p-3 bg-blue-900 bg-opacity-20 rounded-md border border-blue-800 border-opacity-30">
+              <div className="flex items-center text-xs text-blue-200">
+                <BsBank2 className="mr-2" />
+                <span>Selected Bank: {selectedBankName}</span>
+              </div>
+              <button
+                className="mt-2 text-xs text-blue-400 hover:text-blue-300 flex items-center"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedBankName("Please Select a bank");
+                  setBankDetails((prev) => ({ ...prev, name_bank: "" }));
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-3 w-3 mr-1"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Change Bank
+              </button>
             </div>
           )}
         </div>
+
+        {/* NAME */}
         <div className="mt-7">
-          <div className="flex ">
-            <span>
-              <FaUser className="text-blue text-lg mr-1" />
-            </span>
+          <div className="flex">
+            <FaUser className="color-blue text-lg mr-1" />
             <p className="text-sm text-whites">Full recipient's name</p>
           </div>
           <input
             type="text"
-            className="w-full mt-2 bg-body rounded-md p-2 focus:border-slate-700 ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-slate-500"
+            className="w-full mt-2 nav-bg rounded-md p-2 focus:outline-none focus:border focus:border-blue-500 focus:border-opacity-50 ps-6 placeholder:text-sm placeholder:text-slate-500"
             placeholder="Please enter the recipient's name"
             name="name_user"
-            onChange={inputHandle}
-            value={state.name_user}
+            onChange={handleInputChange}
+            value={bankDetails.name_user}
+            style={{ fontFamily: '"Bahnschrift", sans-serif' }}
           />
         </div>
+
+        {/* ACCOUNT NUMBER */}
         <div className="mt-7">
-          <div className="flex ">
-            <span>
-              <MdOutlineCreditCard className="text-blue text-lg mr-1" />
-            </span>
+          <div className="flex">
+            <MdOutlineCreditCard className="color-blue text-lg mr-1" />
             <p className="text-sm text-whites">Bank account number</p>
           </div>
           <input
             type="number"
-            className="w-full mt-2 bg-body rounded-md p-2 focus:border-slate-700 ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-slate-500"
+            className="w-full mt-2 nav-bg rounded-md p-2 focus:outline-none focus:border focus:border-blue-500 focus:border-opacity-50 ps-6 placeholder:text-sm placeholder:text-slate-500"
             placeholder="Please enter the recipient's account number"
             name="stk"
-            onChange={inputHandle}
-            value={state.stk}
+            onChange={handleInputChange}
+            value={bankDetails.stk}
+            style={{ fontFamily: '"Bahnschrift", sans-serif' }}
           />
         </div>
+
+        {/* PHONE NUMBER */}
         <div className="mt-7">
-          <div className="flex ">
-            <span>
-              <FaMobileAlt className="text-blue text-lg mr-1" />
-            </span>
+          <div className="flex">
+            <FaMobileAlt className="color-blue text-lg mr-1" />
             <p className="text-sm text-whites">Phone number</p>
           </div>
           <input
             type="number"
-            className="w-full mt-2 bg-body rounded-md p-2 focus:border-slate-700 ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-slate-500 placeholder:font-bold"
+            className="w-full mt-2 nav-bg rounded-md p-2 focus:outline-none focus:border focus:border-blue-500 focus:border-opacity-50 ps-6 placeholder:text-sm placeholder:text-slate-500"
             placeholder="Please enter the recipient's phone number"
             name="tinh"
-            onChange={inputHandle}
-            value={state.tinh}
+            onChange={handleInputChange}
+            value={bankDetails.tinh}
+            style={{ fontFamily: '"Bahnschrift", sans-serif' }}
           />
         </div>
+
+        {/* EMAIL ADDRESS */}
         <div className="mt-7">
-          <div className="flex ">
-            <span>
-              <HiKey className="text-blue text-lg mr-1" />
-            </span>
+          <div className="flex">
+            <MdEmail className="color-blue text-lg mr-1" />
+            <p className="text-sm text-whites">Email address</p>
+          </div>
+          <input
+            type="email"
+            className="w-full mt-2 nav-bg rounded-md p-2 focus:outline-none focus:border focus:border-blue-500 focus:border-opacity-50 ps-6 placeholder:text-sm placeholder:text-slate-500"
+            placeholder="Please enter the recipient's email address"
+            name="email"
+            onChange={handleInputChange}
+            value={bankDetails.email}
+            style={{ fontFamily: '"Bahnschrift", sans-serif' }}
+          />
+        </div>
+
+        {/* IFSC CODE */}
+        <div className="mt-7">
+          <div className="flex">
+            <HiKey className="color-blue text-lg mr-1" />
             <p className="text-sm text-whites">IFSC code</p>
           </div>
           <input
             type="text"
-            className="w-full mt-2 bg-body rounded-md p-2 focus:border-slate-700 ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-slate-500"
-            placeholder="Please enter the recipient's ifsc code"
+            className="w-full mt-2 nav-bg rounded-md p-2 focus:outline-none focus:border focus:border-blue-500 focus:border-opacity-50 ps-6 placeholder:text-sm placeholder:text-slate-500"
+            placeholder="Please enter the recipient's IFSC code"
             name="ifsc"
-            onChange={inputHandle}
-            value={state.ifsc}
+            onChange={handleInputChange}
+            value={bankDetails.ifsc}
+            style={{ fontFamily: '"Bahnschrift", sans-serif' }}
           />
         </div>
-        {/* <div className="mt-4">
-          <div className="flex items-center ">
-            <span>
-              <MdVerifiedUser className="color-l text-2xl" />
-            </span>
-            <label htmlFor="" className="font-medium ms-1 gray-50">
-              Verification Code
-            </label>
-          </div>
-
-          <div className="mt-3 flex justify-between relative">
-            <input
-              type="text"
-              name="otp"
-              onChange={inputHandle}
-              value={state.otp}
-              className="w-full  bg-body border border-[--bgbody] rounded-lg p-2 py-3 focus:[var(--grey-100)] ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-[var(--grey-200)]"
-              placeholder="Please enter the confirmation code"
-            />
-            <span
-              onClick={handleOtp}
-              disabled={countdown > 0}
-              type="submit"
-              className="absolute blue-linear right-3 top-2 text-white cursor-pointer text-sm px-6 py-2 rounded-full"
-            >
-              {countdown > 0 ? `Wait ${countdown}s` : "Send"}
-            </span>
-          </div>
-        </div> */}
-
-        {/* <div className='mt-7'>
-            <div className='flex '>
-                <span><HiKey
-                 className='text-blue text-lg mr-1' /></span>
-                <p className='text-sm text-whites'>USDT Address</p>
-            </div>
-            <input type="text" className='w-full mt-2 bg-body border border-slate-300 rounded-md p-2 focus:border-slate-700 ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-slate-500' placeholder="Please enter the recipient's usdt address" 
-            name="sdt"
-            onChange={inputHandle}
-            value={state.sdt}
-            />
-        </div> */}
 
         <button
-          className="blue-linear text-white w-full rounded-full p-2 mt-4"
+          className={`w-full rounded-full p-2 mt-4 text-white font-bold text-2xl ${
+            areAllFieldsFilled
+              ? "blue-linear"
+              : "bg-gray-500 opacity-50 cursor-not-allowed"
+          }`}
           onClick={handleSubmit}
+          disabled={!areAllFieldsFilled}
+          style={{ fontFamily: '"Bahnschrift", sans-serif' }}
         >
           Save
         </button>
       </div>
 
-      <div className={`place-bet-popup ${alerts ? "active" : ""}`}>
-        <div className="text-sm">{successMessage} </div>
+      <div className={`place-bet-popup ${showAlert ? "active" : ""}`}>
+        <div className="text-sm">
+          {successMessage || "Please select a bank and fill all fields"}
+        </div>
       </div>
     </>
   );

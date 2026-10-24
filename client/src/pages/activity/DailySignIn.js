@@ -1,15 +1,17 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import debounce from "lodash/debounce";
+import { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import Coins from "../../assets/coins.png";
 import GIftImg from "../../assets/day7Bg.png";
-import { useDispatch, useSelector } from "react-redux";
-import { attendance } from "../../store/reducer/activityReducer";
-import  debounce  from "lodash/debounce";
 import CustomeNavbar from "../../components/CustomeNavbar";
 import Loader from "../../components/Loader";
+import { attendance } from "../../store/reducer/activityReducer";
 
 const DailySignIn = () => {
-  const { attendanceData, successMessage,loader } = useSelector((state) => state.activity);
+  const { attendanceData, successMessage, loader } = useSelector(
+    (state) => state.activity,
+  );
 
   const [alerts, setAlerts] = useState(false);
   const dispatch = useDispatch();
@@ -28,7 +30,7 @@ const DailySignIn = () => {
     debounce(() => {
       dispatch(attendance());
     }, 500),
-    [dispatch]
+    [dispatch],
   );
 
   useEffect(() => {
@@ -42,13 +44,12 @@ const DailySignIn = () => {
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [alerts,successMessage]);
-
+  }, [alerts, successMessage]);
 
   return (
     <>
-   
-       <CustomeNavbar name="Attendance"/>
+      {loader && <Loader />}
+      <CustomeNavbar name="Attendance" />
       <div className="daily-signin-banner">
         <div className="w-[70%]">
           <h3 className="heading-h3 font-bold">Attendance bonus</h3>
@@ -82,14 +83,14 @@ const DailySignIn = () => {
           {[1, 2, 3, 4, 5, 6].map((day) => (
             <div
               key={day}
-              className={`col-span-4 flex flex-col items-center bg-light rounded-md pb-2 shadow-sm p-2`}
+              className={`col-span-4 flex flex-col items-center nav-bg rounded-md pb-2 shadow-sm p-2`}
               onClick={
                 attendanceData?.[`total${day}`] !== 0
                   ? () => handleSubmit(day)
                   : undefined
               }
             >
-              <p className="fs-sm text-whites font-medium">
+              <p className="text-lg text-whites font-medium">
                 ₹{attendanceData?.[`total${day}`]?.toFixed(2) || "0.00"}
               </p>
               <img
@@ -106,25 +107,25 @@ const DailySignIn = () => {
           ))}
         </div>
 
-        <div className="bg-body mt-2 p-3 rounded-md pb-10 flex items-center justify-between shadow-sm">
+        <div className="nav-bg mt-2 p-3 rounded-md pb-10 flex items-center justify-between shadow-sm">
           <img src={GIftImg} alt="" className="w-36" />
           <div
-            className="flex flex-col justify-center items-center mr-10"
+            className="flex flex-col justify-center  items-center mr-20"
             onClick={
               attendanceData?.[`total7`] !== 0
                 ? () => handleSubmit(7)
                 : undefined
             }
           >
-            <p className="fs-sm text-whites font-medium">
+            <p className="text-2xl text-whites  font-medium">
               ₹{attendanceData?.[`total7`]?.toFixed(2) || "0.00"}
             </p>
-            <p className="text-gray-500 font-light">7 Day</p>
+            <p className="text-gray-500 text-lg  font-light">7 Day</p>
           </div>
         </div>
 
         <button
-          className="w-[70%] color-orange m-auto flex justify-center text-lg rounded-full p-2 mt-4 border border-[#FA6F6B] bg-[#FA6F6B]"
+          className="blue-linear w-[70%] color-orange m-auto flex justify-center rounded-full p-2 mt-4"
           disabled
         >
           Attendance

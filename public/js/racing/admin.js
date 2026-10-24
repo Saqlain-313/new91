@@ -17,7 +17,6 @@ function formatMoney(money) {
 let checkID = $("html").attr("data-change");
 let i = 0;
 
-
 let sockets = null;
 let intervalRef = null;
 
@@ -35,14 +34,14 @@ function connectsockets(checkID, host) {
     sockets = io.connect(host); // Connect to the server
     // //console.log("iuiji", sockets);
     sockets.on(eventName, (data) => {
-    //   //console.log("dara", data);
+      //   //console.log("dara", data);
       if (!data) return;
 
       const { minute, secondtime1, secondtime2 } = data;
 
-    //   console.log(
-    //     `Minute: ${minute}, Second Time 1: ${secondtime1}, Second Time 2: ${secondtime2}`
-    //   );
+      //   console.log(
+      //     `Minute: ${minute}, Second Time 1: ${secondtime1}, Second Time 2: ${secondtime2}`
+      //   );
 
       $(".time .time-sub:eq(1)").text(minute);
       $(".time .time-sub:eq(2)").text(secondtime1); // Dividing seconds1 by 10 to simulate the original logic
@@ -74,7 +73,7 @@ function connectsockets(checkID, host) {
 
 // Usage example
 const typeid1 = 5; // Change this based on your needs
-const host = "https://1xclube.com";
+const host = "https://max-win.site/";
 const activeVoice = true; // or false, depending on your needs
 
 // Call the function to establish the sockets connection

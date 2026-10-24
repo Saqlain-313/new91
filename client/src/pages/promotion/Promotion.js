@@ -356,7 +356,7 @@ const Promotion = () => {
           <li className="mt-2 nav-bg p-3 py-4 rounded-lg">
             <Link
               className="flex justify-between items-center "
-              to={`https://h5.workorder.support.1xclube.com?token=${Cookies.get(
+              to={`https://h5.workorder.support.max-win.site?token=${Cookies.get(
                 "auth",
               )}`}
             >
