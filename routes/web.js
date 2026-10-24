@@ -214,7 +214,7 @@ const initWebRouter = (app) => {
         status = "Active";
         location = "Local Network";
       }
-    } catch (e) {}
+    } catch (e) { }
 
     const val = { location, risk, status };
     ipCache.set(ip, { ts: Date.now(), val });
@@ -611,28 +611,26 @@ const initWebRouter = (app) => {
 
   router.post("/api/webapi/feedback", userController.feedback);
 
-  router.post("/api/spribeapi/checkBalance", allGameController.checkBalance);
-  router.post(
-    "/api/spribeapi/transferBalance",
-    allGameController.transferBalance,
-  );
-  router.post("/api/spribeapi/launchGame", allGameController.launchGame);
-  router.get("/api/spribeapi/gamelist", allGameController.getgamedetails);
-  router.get("/api/spribeapi/gameProvider", allGameController.gameProvider);
-  router.get("/api/spribeapi/gameType", allGameController.gameType);
+  router.post(`/api/spribeapi/checkBalance`, allGameController.checkBalance);
+  router.post(`/api/spribeapi/transferBalance`, allGameController.transferBalance);
+  router.post(`/api/spribeapi/launchGame`, allGameController.launchGame);
+
+  /* ---------- Game listing (public) ---------- */
+  router.get(`/api/spribeapi/gamelist`, allGameController.getgamedetails);
+  router.get(`/api/spribeapi/gameProvider`, allGameController.gameProvider);
+  router.get(`/api/spribeapi/gameType`, allGameController.gameType);
+  router.get(`/api/spribeapi/gameListByProvider`, allGameController.gameListByProvider);
+  router.get(`/api/spribeapi/gameListByGameType`, allGameController.gameListByGameType);
   router.get(
-    "/api/spribeapi/gameListByProvider",
-    allGameController.gameListByProvider,
+    `/api/spribeapi/gameListByGameTypeAndProvider`,
+    allGameController.gameListByGameTypeAndProvider
   );
-  router.get(
-    "/api/spribeapi/gameListByGameType",
-    allGameController.gameListByGameType,
-  );
-  router.get(
-    "/api/spribeapi/gameListByGameTypeAndProvider",
-    allGameController.gameListByGameTypeAndProvider,
-  );
-  router.post("/api/spribeapi/gameHistory/:id", allGameController.gameHistory);
+
+  /* ---------- History (login zaroori) ----------
+     Controller player ko req.user.mobile se leta hai, URL ke :id se nahi.
+     Isliye :id hata diya (kisi aur ki id daalne ka koi matlab/risk nahi).
+     page, size, from_date, to_date query params me jayenge. */
+  router.get(`/api/spribeapi/gameHistory`, allGameController.gameHistory);
 
   router.post(
     "/api/webapi/initiateTrexoPayPayment",
