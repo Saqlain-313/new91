@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.51c3e7ad.css",
-    "main.js": "/static/js/main.b3bb4e2c.js",
+    "main.css": "/static/css/main.a84d31ce.css",
+    "main.js": "/static/js/main.0b3e8c96.js",
     "index.html": "/index.html",
     "static/media/trxbg.png": "/static/media/trxbg.1a3c4826999516b11de7.png",
     "static/media/bg-spin-front-img.png": "/static/media/bg-spin-front-img.2e2ad3330bd9c8c6c6ce.png",
@@ -139,7 +139,7 @@
     "static/media/SliderActivities.svg": "/static/media/SliderActivities.6730a2b00a3881f28772.svg"
   },
   "entrypoints": [
-    "static/css/main.51c3e7ad.css",
-    "static/js/main.b3bb4e2c.js"
+    "static/css/main.a84d31ce.css",
+    "static/js/main.0b3e8c96.js"
   ]
 }
