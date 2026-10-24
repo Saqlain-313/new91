@@ -3,9 +3,9 @@ import { FaSquare } from "react-icons/fa";
 import { GiSwipeCard, GiWhiteBook } from "react-icons/gi";
 import { IoMdWallet } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import UpiIcon from "../../assets/mp1.png";
 import RefereshImg from "../../assets/refresh.png";
 import EWalletIcon from "../../assets/upi1.png";
-import UpiIcon from "../../assets/mp1.png";
 import CopyCopmponent from "../../components/CopyCopmponent";
 import { userDetail } from "../../store/reducer/authReducer";
 import {
@@ -349,16 +349,12 @@ export default function Recharge() {
                             >
                               <span
                                 className={`mx-2 ${
-                                  Number(amount) === data.am
-                                    ? "text-white"
-                                    : "gray-text"
+                                  amount == data.am ? "text-white" : "gray-text"
                                 }`}
                               >
                                 ₹
                               </span>{" "}
-                              {data.am >= 1000
-                                ? `${data.am / 1000}k`
-                                : data.am}
+                              {data.am >= 1000 ? `${data.am / 1000}k` : data.am}
                             </button>
                           ))}
                         </Fragment>
@@ -510,9 +506,7 @@ export default function Recharge() {
           <button
             type="button"
             className={`font-bold py-3 px-6 rounded shadow-md hover:opacity-90 transition-opacity p-2 ${
-              !isSubmitDisabled
-                ? "blue-linear text-black"
-                : "bg-gray-500 text-black"
+              amount >= 1 ? "blue-linear text-black" : "bg-gray-500 text-black"
             }`}
             disabled={isSubmitDisabled}
             onClick={handleSubmit}
@@ -520,9 +514,7 @@ export default function Recharge() {
             {loader
               ? "Processing..."
               : `Deposit ₹${
-                  amountNumber >= 1000
-                    ? `${amountNumber / 1000}k`
-                    : amountNumber || ""
+                  amount >= 1000 ? `${amount / 1000}k` : amount || ""
                 }`}
           </button>
         </div>
