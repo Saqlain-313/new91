@@ -135,7 +135,7 @@ const LotterSection = () => {
           {/* Aviator */}
           <div
             className="col-span-6 cursor-pointer"
-            onClick={() => handleCheck("a04d1f3eb8ccec8a4823bdf18e3f0e84")}
+            onClick={() => handleJilliOpen("a04d1f3eb8ccec8a4823bdf18e3f0e84")}
           >
             <img
               src="https://i.ibb.co/XfwVQ9SS/Blueaviatorcard-min.png"

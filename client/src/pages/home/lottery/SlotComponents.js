@@ -300,7 +300,7 @@ const SlotComponents = () => {
               <div className="lottery-game-section mt-5">
                 <LotterSection />
 
-                <div className="flex items-center w-full mt-5">
+                {/* <div className="flex items-center w-full mt-5">
                   <div
                     className="w-1/2 flex flex-col items-center cursor-pointer"
                     onClick={() => handleCheck(games[0].apiKey)}
@@ -322,7 +322,7 @@ const SlotComponents = () => {
                       className="w-full h-auto rounded object-contain"
                     />
                   </div>
-                </div>
+                </div> */}
               </div>
             )}
 
