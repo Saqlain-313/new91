@@ -3,9 +3,9 @@ import { FaSquare } from "react-icons/fa";
 import { GiSwipeCard, GiWhiteBook } from "react-icons/gi";
 import { IoMdWallet } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import UpiIcon from "../../assets/mp1.png";
 import RefereshImg from "../../assets/refresh.png";
 import EWalletIcon from "../../assets/upi1.png";
-import UpiIcon from "../../assets/mp1.png";
 import CopyCopmponent from "../../components/CopyCopmponent";
 import { userDetail } from "../../store/reducer/authReducer";
 import {
@@ -45,8 +45,8 @@ export default function Recharge() {
   // KwikPay Submit — creates payment link, redirects
   // ============================================
   const handleSubmitKwikPay = async () => {
-    if (!amount || Number(amount) < 100) {
-      setSuccessMessage("Minimum deposit is ₹100");
+    if (!amount || Number(amount) < 1) {
+      setSuccessMessage("Minimum deposit is ₹1");
       setAlerts(true);
       setTimeout(() => setSuccessMessage(""), 3000);
       return;
@@ -71,8 +71,8 @@ export default function Recharge() {
   // UPI Manual Submit — sends UTR for admin approval
   // ============================================
   const handleSubmitManualUPI = async () => {
-    if (!amount || Number(amount) < 100) {
-      setSuccessMessage("Minimum deposit is ₹100");
+    if (!amount || Number(amount) < 1) {
+      setSuccessMessage("Minimum deposit is ₹1");
       setAlerts(true);
       setTimeout(() => setSuccessMessage(""), 3000);
       return;
@@ -139,6 +139,7 @@ export default function Recharge() {
 
   // ============================================
   // Static channels — simplified for 2 tabs only
+  // Minimum deposit now ₹1 instead of ₹100
   // ============================================
   const chennals = [
     {
@@ -146,15 +147,15 @@ export default function Recharge() {
       chennalItem: [
         {
           label: "KwikPay Gateway",
-          balance: "100 - 100K",
+          balance: "1 - 100K",
           depositAmount: [
+            { am: 1 },
+            { am: 10 },
+            { am: 50 },
             { am: 100 },
             { am: 500 },
             { am: 1000 },
-            { am: 2000 },
             { am: 5000 },
-            { am: 10000 },
-            { am: 50000 },
           ],
         },
       ],
@@ -164,15 +165,15 @@ export default function Recharge() {
       chennalItem: [
         {
           label: "Manual UPI Transfer",
-          balance: "100 - 100K",
+          balance: "1 - 100K",
           depositAmount: [
+            { am: 1 },
+            { am: 10 },
+            { am: 50 },
             { am: 100 },
             { am: 500 },
             { am: 1000 },
-            { am: 2000 },
             { am: 5000 },
-            { am: 10000 },
-            { am: 50000 },
           ],
         },
       ],
@@ -307,16 +308,12 @@ export default function Recharge() {
                             >
                               <span
                                 className={`mx-2 ${
-                                  amount == data.am
-                                    ? "text-white"
-                                    : "gray-text"
+                                  amount == data.am ? "text-white" : "gray-text"
                                 }`}
                               >
                                 ₹
                               </span>{" "}
-                              {data.am >= 1000
-                                ? `${data.am / 1000}k`
-                                : data.am}
+                              {data.am >= 1000 ? `${data.am / 1000}k` : data.am}
                             </button>
                           ))}
                         </Fragment>
@@ -414,21 +411,19 @@ export default function Recharge() {
           </div>
           <button
             className={`font-bold py-3 px-6 rounded shadow-md hover:opacity-90 transition-opacity p-2 ${
-              amount > 99
-                ? "blue-linear text-black"
-                : "bg-gray-500 text-black"
+              amount >= 1 ? "blue-linear text-black" : "bg-gray-500 text-black"
             }`}
             disabled={
-              loader || amount < 100 || (activeTab === "UPI Manual" && utr.length !== 12)
+              loader ||
+              amount < 1 ||
+              (activeTab === "UPI Manual" && utr.length !== 12)
             }
             onClick={handleSubmit}
           >
             {loader
               ? "Processing..."
               : `Deposit ₹${
-                  amount >= 1000
-                    ? `${amount / 1000}k`
-                    : amount || ""
+                  amount >= 1000 ? `${amount / 1000}k` : amount || ""
                 }`}
           </button>
         </div>
