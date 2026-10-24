@@ -441,18 +441,13 @@ const checkInHandling = async (req, res) => {
       });
     }
 
-    const [attendencs_bonus] = await connection.query(
-      "SELECT * FROM `attendencs-bonus`",
-    );
-    const attendencsDta = attendencs_bonus[0];
-
     const [point_listss] = await connection.query(
       "SELECT * FROM point_list WHERE `phone` = ? ",
       [phone],
     );
     const point_list = point_listss[0];
 
-    if (!point_list || !attendencsDta) {
+    if (!point_list) {
       return res.status(200).json({
         message: "Failed",
         status: false,
@@ -478,28 +473,11 @@ const checkInHandling = async (req, res) => {
 
     const totalKey = `total${n}`; // safe: n is validated 1..7
     const amount = Number(point_list[totalKey]) || 0;
-    const required = Number(attendencsDta[`day${n}rech`]) || 0;
 
     // This day's bonus was already claimed earlier
     if (amount === 0) {
       return res.status(200).json({
         message: "You have already received this gift",
-        status: false,
-        timeStamp: timeNow,
-      });
-    }
-
-    // Today's successful recharge total
-    const [recharge] = await connection.query(
-      "SELECT SUM(money) AS totalMoney FROM recharge WHERE `phone` = ? AND status = 1 AND DATE(today) = ?",
-      [phone, formattedDate],
-    );
-    const check = Number(recharge[0].totalMoney) || 0;
-
-    // Recharge requirement not met
-    if (check < required) {
-      return res.status(200).json({
-        message: `Recharge ₹${required} today to claim this bonus`,
         status: false,
         timeStamp: timeNow,
       });
