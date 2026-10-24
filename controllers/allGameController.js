@@ -20,12 +20,27 @@ const {
 const apiUrl = process.env.GAME_API_URL || "https://www.api-doc.space/api";
 const launchUrl =
   process.env.GAME_LAUNCH_URL || "https://www.api-doc.space/api/launch-game";
+
+// ⚠️ IMPORTANT: Do NOT hardcode a fallback key in production.
+// The old fallback "C2T9WqU7caTFOETomkuR" is what triggered
+// "Key is required1111" — it is invalid/expired on the server side.
 const key = process.env.GAME_API_KEY || "C2T9WqU7caTFOETomkuR";
+
+if (!key) {
+  console.error(
+    "[FATAL] GAME_API_KEY is not set. Set it in your environment/.env file. " +
+      "The game API will reject all requests without a valid key."
+  );
+}
+
 const DEFAULT_HISTORY_UID = "e333695bcff28acdbecc641ae6ee2b23";
 
 const zapHeaders = {
   "Content-Type": "application/json",
   "x-domain": process.env.GAME_X_DOMAIN || "max-win.site",
+  // Some deployments of this API also accept the key as a header.
+  // Harmless to send both; remove if the provider documents otherwise.
+  ...(key ? { key } : {}),
 };
 
 /* =========================
@@ -65,6 +80,20 @@ const paginate = (list, page, size) => {
   return list.slice(start, start + s);
 };
 
+/**
+ * Extract a useful error message from an axios error (or any error).
+ * The old code just returned error.message which hides the API's
+ * actual body ("Key is required1111", etc.) from the caller.
+ */
+function extractApiError(error) {
+  if (error?.response?.data) {
+    const d = error.response.data;
+    if (typeof d === "string") return d;
+    return d.message || d.msg || JSON.stringify(d);
+  }
+  return error?.message || "Unknown error";
+}
+
 /* =========================
    BALANCE
 ========================= */
@@ -75,11 +104,16 @@ const checkBalance = async (req, res) => {
     if (!playerid) {
       return res.status(400).json({ message: "Undefined token", status: false });
     }
+    if (!key) {
+      return res
+        .status(500)
+        .json({ message: "Server misconfigured: missing API key", status: false });
+    }
 
     const response = await axios.post(
       `${apiUrl}/Userbalance`,
       { playerid, key },
-      { headers: zapHeaders }
+      { headers: zapHeaders, timeout: 15000 }
     );
 
     if (response.data.status) {
@@ -89,15 +123,18 @@ const checkBalance = async (req, res) => {
         data: response.data,
       });
     }
-    return res
-      .status(500)
-      .json({ message: "Internal server error", status: false });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Internal server error",
+    // Pass through the API's real message instead of a generic one
+    return res.status(502).json({
+      message: extractApiError({ response }),
       status: false,
-      error: error.message,
+      data: response.data,
+    });
+  } catch (error) {
+    console.error("checkBalance error:", extractApiError(error));
+    return res.status(502).json({
+      message: "Upstream game API error",
+      status: false,
+      error: extractApiError(error),
     });
   }
 };
@@ -108,30 +145,45 @@ const transferBalance = async (req, res) => {
     if (!playerid) {
       return res.status(400).json({ message: "Undefined token", status: false });
     }
+    if (!key) {
+      return res
+        .status(500)
+        .json({ message: "Server misconfigured: missing API key", status: false });
+    }
 
     const balanceRes = await axios.post(
       `${apiUrl}/Userbalance`,
       { playerid, key },
-      { headers: zapHeaders }
+      { headers: zapHeaders, timeout: 15000 }
     );
+
+    if (!balanceRes.data.status) {
+      return res.status(502).json({
+        message: extractApiError({ response: balanceRes }),
+        status: false,
+        data: balanceRes.data,
+      });
+    }
 
     const gameBalance = Number(balanceRes.data.Balance);
     if (!gameBalance || gameBalance <= 0) {
       return res
-        .status(500)
+        .status(400)
         .json({ message: "Insufficient balance", status: false });
     }
 
     const response = await axios.post(
       `${apiUrl}/Setbalance`,
       { playerid, key, opening_balance: -gameBalance },
-      { headers: zapHeaders }
+      { headers: zapHeaders, timeout: 15000 }
     );
 
     if (!response.data.status) {
-      return res
-        .status(500)
-        .json({ message: "Internal server error", status: false });
+      return res.status(502).json({
+        message: extractApiError({ response }),
+        status: false,
+        data: response.data,
+      });
     }
 
     // API success hone ke baad hi DB update + history (taaki fake entry na bane)
@@ -151,11 +203,11 @@ const transferBalance = async (req, res) => {
       data: response.data,
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Internal server error",
+    console.error("transferBalance error:", extractApiError(error));
+    return res.status(502).json({
+      message: "Upstream game API error",
       status: false,
-      error: error.message,
+      error: extractApiError(error),
     });
   }
 };
@@ -176,6 +228,11 @@ const launchGame = async (req, res) => {
     if (!uid) {
       return res.status(400).json({ message: "Undefined gameId", status: false });
     }
+    if (!key) {
+      return res
+        .status(500)
+        .json({ message: "Server misconfigured: missing API key", status: false });
+    }
 
     const [users] = await connection.execute(
       "SELECT * FROM users WHERE phone = ?",
@@ -192,16 +249,17 @@ const launchGame = async (req, res) => {
     const response = await axios.post(
       launchUrl,
       { playerid, key, uid, opening_balance: openingBalance },
-      { headers: zapHeaders }
+      { headers: zapHeaders, timeout: 15000 }
     );
 
     resdata = response.data;
 
     if (!resdata.status) {
-      return res.status(500).json({
-        message: "Internal server error (game launch failed)",
+      return res.status(502).json({
+        message: "Game launch rejected by provider",
         status: false,
-        error: resdata,
+        error: extractApiError({ response }),
+        data: resdata,
       });
     }
 
@@ -217,7 +275,7 @@ const launchGame = async (req, res) => {
 
       if (openingBalance > 0) {
         await conn.query(
-          "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, status = ?, `time` = ?",
+          "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, type = ?, `time` = ?",
           [playerid, "Game moved in", openingBalance, 2, timerJoin2(Date.now())]
         );
       }
@@ -239,12 +297,12 @@ const launchGame = async (req, res) => {
     if (error.response && error.response.data) {
       resdata = error.response.data;
     }
-    console.error("Launch game error:", error.message);
+    console.error("Launch game error:", extractApiError(error));
 
-    return res.status(500).json({
-      message: "Internal server error",
+    return res.status(502).json({
+      message: "Upstream game API error",
       status: false,
-      error: error.message,
+      error: extractApiError(error),
       data: resdata,
     });
   }
@@ -265,7 +323,7 @@ const getgamedetails = async (req, res) => {
 
     const response = await axios.get(
       `${apiUrl}/getgamedetails?page=${page}&size=${size}`,
-      { headers: zapHeaders }
+      { headers: zapHeaders, timeout: 15000 }
     );
 
     if (response.data.status) {
@@ -275,15 +333,17 @@ const getgamedetails = async (req, res) => {
         data: response.data,
       });
     }
-    return res
-      .status(500)
-      .json({ message: "Internal server error", status: false });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Internal server error",
+    return res.status(502).json({
+      message: extractApiError({ response }),
       status: false,
-      error: error.message,
+      data: response.data,
+    });
+  } catch (error) {
+    console.error("getgamedetails error:", extractApiError(error));
+    return res.status(502).json({
+      message: "Upstream game API error",
+      status: false,
+      error: extractApiError(error),
     });
   }
 };
@@ -292,7 +352,7 @@ const gameProvider = async (req, res) => {
   try {
     const response = await axios.get(
       `${apiUrl}/getgamedetails?provider_list=1`,
-      { headers: zapHeaders }
+      { headers: zapHeaders, timeout: 15000 }
     );
 
     if (response.data.status) {
@@ -302,15 +362,17 @@ const gameProvider = async (req, res) => {
         data: response.data,
       });
     }
-    return res
-      .status(500)
-      .json({ message: "Internal server error", status: false });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Internal server error",
+    return res.status(502).json({
+      message: extractApiError({ response }),
       status: false,
-      error: error.message,
+      data: response.data,
+    });
+  } catch (error) {
+    console.error("gameProvider error:", extractApiError(error));
+    return res.status(502).json({
+      message: "Upstream game API error",
+      status: false,
+      error: extractApiError(error),
     });
   }
 };
@@ -319,7 +381,7 @@ const gameType = async (req, res) => {
   try {
     const response = await axios.get(
       `${apiUrl}/getgamedetails?gametype_list=1`,
-      { headers: zapHeaders }
+      { headers: zapHeaders, timeout: 15000 }
     );
 
     if (response.data.status) {
@@ -329,15 +391,17 @@ const gameType = async (req, res) => {
         data: response.data,
       });
     }
-    return res
-      .status(500)
-      .json({ message: "Internal server error", status: false });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Internal server error",
+    return res.status(502).json({
+      message: extractApiError({ response }),
       status: false,
-      error: error.message,
+      data: response.data,
+    });
+  } catch (error) {
+    console.error("gameType error:", extractApiError(error));
+    return res.status(502).json({
+      message: "Upstream game API error",
+      status: false,
+      error: extractApiError(error),
     });
   }
 };
@@ -366,11 +430,11 @@ const gameListByProvider = async (req, res) => {
       data: { data: paginate(filteredGames, page, size) },
     });
   } catch (error) {
-    console.error(error);
+    console.error("gameListByProvider error:", extractApiError(error));
     return res.status(500).json({
       message: "Internal server error",
       status: false,
-      error: error.message,
+      error: extractApiError(error),
     });
   }
 };
@@ -389,11 +453,11 @@ const gameListByGameType = async (req, res) => {
       data: { data: paginate(filteredGames, page, size) },
     });
   } catch (error) {
-    console.error(error);
+    console.error("gameListByGameType error:", extractApiError(error));
     return res.status(500).json({
       message: "Internal server error",
       status: false,
-      error: error.message,
+      error: extractApiError(error),
     });
   }
 };
@@ -429,11 +493,14 @@ const gameListByGameTypeAndProvider = async (req, res) => {
       data: { data: paginate(filteredGames, page, size) },
     });
   } catch (error) {
-    console.error(error);
+    console.error(
+      "gameListByGameTypeAndProvider error:",
+      extractApiError(error)
+    );
     return res.status(500).json({
       message: "Internal server error",
       status: false,
-      error: error.message,
+      error: extractApiError(error),
     });
   }
 };
@@ -452,6 +519,11 @@ const gameHistory = async (req, res) => {
         .status(400)
         .json({ message: "Undefined page & size", status: false });
     }
+    if (!key) {
+      return res
+        .status(500)
+        .json({ message: "Server misconfigured: missing API key", status: false });
+    }
 
     const payload = {
       playerid,
@@ -463,6 +535,7 @@ const gameHistory = async (req, res) => {
 
     const response = await axios.post(`${apiUrl}/history`, payload, {
       headers: zapHeaders,
+      timeout: 15000,
     });
 
     if (response.data.status) {
@@ -472,15 +545,17 @@ const gameHistory = async (req, res) => {
         data: response.data,
       });
     }
-    return res
-      .status(500)
-      .json({ message: "Internal server error", status: false });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Internal server error",
+    return res.status(502).json({
+      message: extractApiError({ response }),
       status: false,
-      error: error.message,
+      data: response.data,
+    });
+  } catch (error) {
+    console.error("gameHistory error:", extractApiError(error));
+    return res.status(502).json({
+      message: "Upstream game API error",
+      status: false,
+      error: extractApiError(error),
     });
   }
 };
