@@ -381,46 +381,47 @@ const changePassword = async (req, res) => {
 };
 
 const checkInHandling = async (req, res) => {
-  try {
-    let auth = req.cookies.auth;
-    let data = req.body.data;
+  const timeNow = Date.now();
 
-    if (!auth)
+  try {
+    const auth = req.cookies.auth;
+    const data = req.body.data;
+
+    if (!auth) {
       return res.status(200).json({
         message: "Failed",
         status: false,
         timeStamp: timeNow,
       });
+    }
+
     const [rows] = await connection.query(
       "SELECT * FROM users WHERE `token` = ? ",
       [auth],
     );
 
-    const [attendencs_bonus] = await connection.query(
-      "SELECT * FROM `attendencs-bonus`",
-    );
-
-    let attendencsDta = attendencs_bonus[0];
-
-    // //console.log("attendencsDta", attendencsDta);
-
-    if (!rows)
+    // rows is always an array, so check length (not just !rows)
+    if (!rows || rows.length === 0) {
       return res.status(200).json({
         message: "Failed",
         status: false,
         timeStamp: timeNow,
       });
+    }
+
+    const phone = rows[0].phone;
+
+    // No day selected -> just return the current state
     if (!data) {
       const [point_list] = await connection.query(
         "SELECT * FROM point_list WHERE `phone` = ? ",
-        [rows[0].phone],
+        [phone],
       );
       const [historys] = await connection.query(
         "SELECT * FROM attendance_history WHERE `phone` = ? ",
-        [rows[0].phone],
+        [phone],
       );
 
-      // //console.log("point_list[0]", point_list[0]);
       return res.status(200).json({
         messages: "No More Data",
         datas: point_list[0],
@@ -430,398 +431,120 @@ const checkInHandling = async (req, res) => {
       });
     }
 
+    // Validate the day (1 to 7 only)
+    const n = Number(data);
+    if (!Number.isInteger(n) || n < 1 || n > 7) {
+      return res.status(200).json({
+        message: "Invalid day",
+        status: false,
+        timeStamp: timeNow,
+      });
+    }
+
+    const [attendencs_bonus] = await connection.query(
+      "SELECT * FROM `attendencs-bonus`",
+    );
+    const attendencsDta = attendencs_bonus[0];
+
     const [point_listss] = await connection.query(
       "SELECT * FROM point_list WHERE `phone` = ? ",
-      [rows[0].phone],
+      [phone],
     );
+    const point_list = point_listss[0];
+
+    if (!point_list || !attendencsDta) {
+      return res.status(200).json({
+        message: "Failed",
+        status: false,
+        timeStamp: timeNow,
+      });
+    }
+
+    // Today's date as YYYY-MM-DD
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
-
     const formattedDate = `${year}-${month}-${day}`;
 
-    if (data && formattedDate !== point_listss[0].today) {
-      if (data == 1) {
-        const [point_lists] = await connection.query(
-          "SELECT * FROM point_list WHERE `phone` = ? ",
-          [rows[0].phone],
-        );
-
-        const [recharge] = await connection.query(
-          "SELECT SUM(money) AS totalMoney FROM recharge WHERE `phone` = ? AND status=1 AND DATE(today) = ?",
-          [rows[0].phone, formattedDate],
-        );
-
-        let check = Number(recharge[0].totalMoney) || 0; // Ensure it's a number and handle null values
-
-        let point_list = point_lists[0];
-        let get = Number(attendencsDta.day1rech);
-        if (check >= data && point_list.total1 != 0) {
-          await connection.query(
-            "UPDATE users SET money = money + ? WHERE phone = ? ",
-            [point_list.total1, rows[0].phone],
-          );
-          await connection.query(
-            "UPDATE point_list SET total1 = ?, today = ? WHERE phone = ? ",
-            [0, formattedDate, rows[0].phone],
-          );
-          await connection.query(
-            "INSERT INTO attendance_history SET phone = ?,amount=?,status=?,date=? ",
-            [rows[0].phone, point_list.total1, 1, formattedDate],
-          );
-
-          const datasql =
-            "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, `time` = ?";
-          await connection.query(datasql, [
-            rows[0].phone,
-            "Attendance bonus",
-            point_list.total1,
-            formattedDate,
-          ]);
-          return res.status(200).json({
-            message: `You just received ₹ ${point_list.total1}.00`,
-            status: true,
-            timeStamp: timeNow,
-          });
-        } else if (check < get && point_list.total1 != 0) {
-          return res.status(200).json({
-            message: `Please Recharge ₹ ${attendencsDta.day1rech} to claim gift.`,
-            status: false,
-            timeStamp: timeNow,
-          });
-        } else if (point_list.total1 == 0) {
-          return res.status(200).json({
-            message: "You have already received this gift",
-            status: false,
-            timeStamp: timeNow,
-          });
-        }
-      }
-      if (data == 2) {
-        const [point_lists] = await connection.query(
-          "SELECT * FROM point_list WHERE `phone` = ? ",
-          [rows[0].phone],
-        );
-        const [recharge] = await connection.query(
-          "SELECT SUM(money) AS totalMoney FROM recharge WHERE `phone` = ? AND status=1 AND DATE(today) = ?",
-          [rows[0].phone, formattedDate],
-        );
-
-        let check = Number(recharge[0].totalMoney) || 0; // Ensure it's a number and handle null values
-        let point_list = point_lists[0];
-        let get = Number(attendencsDta.day2rech);
-        if (check >= get && point_list.total2 != 0) {
-          await connection.query(
-            "UPDATE users SET money = money + ? WHERE phone = ? ",
-            [point_list.total2, rows[0].phone],
-          );
-          await connection.query(
-            "UPDATE point_list SET total2 = ?, today = ? WHERE phone = ? ",
-            [0, formattedDate, rows[0].phone],
-          );
-          await connection.query(
-            "INSERT INTO attendance_history SET phone = ?,amount=?,status=?,date=? ",
-            [rows[0].phone, point_list.total2, 1, formattedDate],
-          );
-          const datasql =
-            "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, `time` = ?";
-          await connection.query(datasql, [
-            rows[0].phone,
-            "Attendance bonus",
-            point_list.total2,
-            formattedDate,
-          ]);
-          return res.status(200).json({
-            message: `You just received ₹ ${point_list.total2}.00`,
-            status: true,
-            timeStamp: timeNow,
-          });
-        } else if (check < get && point_list.total2 != 0) {
-          return res.status(200).json({
-            message: `Please Recharge ₹ ${attendencsDta.day2rech} to claim gift.`,
-            status: false,
-            timeStamp: timeNow,
-          });
-        } else if (point_list.total2 == 0) {
-          return res.status(200).json({
-            message: "You have already received this gift",
-            status: false,
-            timeStamp: timeNow,
-          });
-        }
-      }
-      if (data == 3) {
-        const [point_lists] = await connection.query(
-          "SELECT * FROM point_list WHERE `phone` = ? ",
-          [rows[0].phone],
-        );
-        const [recharge] = await connection.query(
-          "SELECT SUM(money) AS totalMoney FROM recharge WHERE `phone` = ? AND status=1 AND DATE(today) = ?",
-          [rows[0].phone, formattedDate],
-        );
-
-        let check = Number(recharge[0].totalMoney) || 0; // Ensure it's a number and handle null values
-        let point_list = point_lists[0];
-        let get = Number(attendencsDta.day3rech);
-        if (check >= get && point_list.total3 != 0) {
-          await connection.query(
-            "UPDATE users SET money = money + ? WHERE phone = ? ",
-            [point_list.total3, rows[0].phone],
-          );
-          await connection.query(
-            "UPDATE point_list SET total3 = ?, today = ? WHERE phone = ? ",
-            [0, formattedDate, rows[0].phone],
-          );
-          await connection.query(
-            "INSERT INTO attendance_history SET phone = ?,amount=?,status=?,date=? ",
-            [rows[0].phone, point_list.total3, 1, formattedDate],
-          );
-          const datasql =
-            "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, `time` = ?";
-          await connection.query(datasql, [
-            rows[0].phone,
-            "Attendance bonus",
-            point_list.total3,
-            formattedDate,
-          ]);
-          return res.status(200).json({
-            message: `You just received ₹ ${point_list.total3}.00`,
-            status: true,
-            timeStamp: timeNow,
-          });
-        } else if (check < get && point_list.total3 != 0) {
-          return res.status(200).json({
-            message: `Please Recharge ₹ ${attendencsDta.day3rech} to claim gift.`,
-            status: false,
-            timeStamp: timeNow,
-          });
-        } else if (point_list.total3 == 0) {
-          return res.status(200).json({
-            message: "You have already received this gift",
-            status: false,
-            timeStamp: timeNow,
-          });
-        }
-      }
-      if (data == 4) {
-        const [point_lists] = await connection.query(
-          "SELECT * FROM point_list WHERE `phone` = ? ",
-          [rows[0].phone],
-        );
-        const [recharge] = await connection.query(
-          "SELECT SUM(money) AS totalMoney FROM recharge WHERE `phone` = ? AND status=1 AND DATE(today) = ?",
-          [rows[0].phone, formattedDate],
-        );
-
-        let check = Number(recharge[0].totalMoney) || 0; // Ensure it's a number and handle null values
-        let point_list = point_lists[0];
-        let get = Number(attendencsDta.day4rech);
-        if (check >= get && point_list.total4 != 0) {
-          await connection.query(
-            "UPDATE users SET money = money + ? WHERE phone = ? ",
-            [point_list.total4, rows[0].phone],
-          );
-          await connection.query(
-            "UPDATE point_list SET total4 = ?, today = ? WHERE phone = ? ",
-            [0, formattedDate, rows[0].phone],
-          );
-          await connection.query(
-            "INSERT INTO attendance_history SET phone = ?,amount=?,status=?,date=? ",
-            [rows[0].phone, point_list.total4, 1, formattedDate],
-          );
-          const datasql =
-            "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, `time` = ?";
-          await connection.query(datasql, [
-            rows[0].phone,
-            "Attendance bonus",
-            point_list.total4,
-            formattedDate,
-          ]);
-          return res.status(200).json({
-            message: `You just received ₹ ${point_list.total4}.00`,
-            status: true,
-            timeStamp: timeNow,
-          });
-        } else if (check < get && point_list.total4 != 0) {
-          return res.status(200).json({
-            message: `Please Recharge ₹ ${attendencsDta.day4rech} to claim gift.`,
-            status: false,
-            timeStamp: timeNow,
-          });
-        } else if (point_list.total4 == 0) {
-          return res.status(200).json({
-            message: "You have already received this gift",
-            status: false,
-            timeStamp: timeNow,
-          });
-        }
-      }
-      if (data == 5) {
-        const [point_lists] = await connection.query(
-          "SELECT * FROM point_list WHERE `phone` = ? ",
-          [rows[0].phone],
-        );
-        const [recharge] = await connection.query(
-          "SELECT SUM(money) AS totalMoney FROM recharge WHERE `phone` = ? AND status=1 AND DATE(today) = ?",
-          [rows[0].phone, formattedDate],
-        );
-
-        let check = Number(recharge[0].totalMoney) || 0; // Ensure it's a number and handle null values
-        let point_list = point_lists[0];
-        let get = Number(attendencsDta.day5rech);
-        if (check >= get && point_list.total5 != 0) {
-          await connection.query(
-            "UPDATE users SET money = money + ? WHERE phone = ? ",
-            [point_list.total5, rows[0].phone],
-          );
-          await connection.query(
-            "UPDATE point_list SET total5 = ?, today = ? WHERE phone = ? ",
-            [0, formattedDate, rows[0].phone],
-          );
-          await connection.query(
-            "INSERT INTO attendance_history SET phone = ?,amount=?,status=?,date=? ",
-            [rows[0].phone, point_list.total5, 1, formattedDate],
-          );
-          const datasql =
-            "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, `time` = ?";
-          await connection.query(datasql, [
-            rows[0].phone,
-            "Attendance bonus",
-            point_list.total5,
-            formattedDate,
-          ]);
-          return res.status(200).json({
-            message: `You just received ₹ ${point_list.total5}.00`,
-            status: true,
-            timeStamp: timeNow,
-          });
-        } else if (check < get && point_list.total5 != 0) {
-          return res.status(200).json({
-            message: `Please Recharge ₹ ${attendencsDta.day5rech} to claim gift.`,
-            status: false,
-            timeStamp: timeNow,
-          });
-        } else if (point_list.total5 == 0) {
-          return res.status(200).json({
-            message: "You have already received this gift",
-            status: false,
-            timeStamp: timeNow,
-          });
-        }
-      }
-      if (data == 6) {
-        const [point_lists] = await connection.query(
-          "SELECT * FROM point_list WHERE `phone` = ? ",
-          [rows[0].phone],
-        );
-        const [recharge] = await connection.query(
-          "SELECT SUM(money) AS totalMoney FROM recharge WHERE `phone` = ? AND status=1 AND DATE(today) = ?",
-          [rows[0].phone, formattedDate],
-        );
-
-        let check = Number(recharge[0].totalMoney) || 0; // Ensure it's a number and handle null values
-        let point_list = point_lists[0];
-        let get = Number(attendencsDta.day6rech);
-        if (check >= get && point_list.total6 != 0) {
-          await connection.query(
-            "UPDATE users SET money = money + ? WHERE phone = ? ",
-            [point_list.total6, rows[0].phone],
-          );
-          await connection.query(
-            "UPDATE point_list SET total6 = ?, today = ? WHERE phone = ? ",
-            [0, formattedDate, rows[0].phone],
-          );
-          await connection.query(
-            "INSERT INTO attendance_history SET phone = ?,amount=?,status=?,date=? ",
-            [rows[0].phone, point_list.total6, 1, formattedDate],
-          );
-          const datasql =
-            "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, `time` = ?";
-          await connection.query(datasql, [
-            rows[0].phone,
-            "Attendance bonus",
-            point_list.total6,
-            formattedDate,
-          ]);
-          return res.status(200).json({
-            message: `You just received ₹ ${point_list.total6}.00`,
-            status: true,
-            timeStamp: timeNow,
-          });
-        } else if (check < get && point_list.total6 != 0) {
-          return res.status(200).json({
-            message: `Please Recharge ₹ ${attendencsDta.day6rech} to claim gift.`,
-            status: false,
-            timeStamp: timeNow,
-          });
-        } else if (point_list.total6 == 0) {
-          return res.status(200).json({
-            message: "You have already received this gift",
-            status: false,
-            timeStamp: timeNow,
-          });
-        }
-      }
-      if (data == 7) {
-        const [point_lists] = await connection.query(
-          "SELECT * FROM point_list WHERE `phone` = ? ",
-          [rows[0].phone],
-        );
-        const [recharge] = await connection.query(
-          "SELECT SUM(money) AS totalMoney FROM recharge WHERE `phone` = ? AND status=1 AND DATE(today) = ?",
-          [rows[0].phone, formattedDate],
-        );
-
-        let check = Number(recharge[0].totalMoney) || 0; // Ensure it's a number and handle null values
-        let point_list = point_lists[0];
-        let get = Number(attendencsDta.day7rech);
-        if (check >= get && point_list.total7 != 0) {
-          await connection.query(
-            "UPDATE users SET money = money + ? WHERE phone = ? ",
-            [point_list.total7, rows[0].phone],
-          );
-          await connection.query(
-            "UPDATE point_list SET total7 = ?, today = ? WHERE phone = ? ",
-            [0, formattedDate, rows[0].phone],
-          );
-          const datasql =
-            "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, `time` = ?";
-          await connection.query(datasql, [
-            rows[0].phone,
-            "Attendance bonus",
-            point_list.total7,
-            formattedDate,
-          ]);
-          return res.status(200).json({
-            message: `You just received ₹ ${point_list.total7}.00`,
-            status: true,
-            timeStamp: timeNow,
-          });
-        } else if (check < get && point_list.total7 != 0) {
-          return res.status(200).json({
-            message: `Please Recharge ₹ ${attendencsDta.day7rech} to claim gift.`,
-            status: false,
-            timeStamp: timeNow,
-          });
-        } else if (point_list.total7 == 0) {
-          return res.status(200).json({
-            message: "You have already received this gift",
-            status: false,
-            timeStamp: timeNow,
-          });
-        }
-      }
-    } else {
+    // Only one claim per day
+    if (formattedDate === point_list.today) {
       return res.status(200).json({
         message: "You have already received this gift",
         status: false,
         timeStamp: timeNow,
       });
     }
+
+    const totalKey = `total${n}`; // safe: n is validated 1..7
+    const amount = Number(point_list[totalKey]) || 0;
+    const required = Number(attendencsDta[`day${n}rech`]) || 0;
+
+    // This day's bonus was already claimed earlier
+    if (amount === 0) {
+      return res.status(200).json({
+        message: "You have already received this gift",
+        status: false,
+        timeStamp: timeNow,
+      });
+    }
+
+    // Today's successful recharge total
+    const [recharge] = await connection.query(
+      "SELECT SUM(money) AS totalMoney FROM recharge WHERE `phone` = ? AND status = 1 AND DATE(today) = ?",
+      [phone, formattedDate],
+    );
+    const check = Number(recharge[0].totalMoney) || 0;
+
+    // Recharge requirement not met
+    if (check < required) {
+      return res.status(200).json({
+        message: `Recharge ₹${required} today to claim this bonus`,
+        status: false,
+        timeStamp: timeNow,
+      });
+    }
+
+    // Atomically mark as claimed first (prevents double-click / double-claim)
+    const [claim] = await connection.query(
+      `UPDATE point_list SET ${totalKey} = 0, today = ? WHERE phone = ? AND ${totalKey} != 0 AND (today IS NULL OR today != ?)`,
+      [formattedDate, phone, formattedDate],
+    );
+
+    if (!claim.affectedRows) {
+      return res.status(200).json({
+        message: "You have already received this gift",
+        status: false,
+        timeStamp: timeNow,
+      });
+    }
+
+    // Credit balance
+    await connection.query(
+      "UPDATE users SET money = money + ? WHERE phone = ? ",
+      [amount, phone],
+    );
+
+    await connection.query(
+      "INSERT INTO attendance_history SET phone = ?, amount = ?, status = ?, date = ? ",
+      [phone, amount, 1, formattedDate],
+    );
+
+    await connection.query(
+      "INSERT INTO transaction_history SET phone = ?, detail = ?, balance = ?, `time` = ?",
+      [phone, "Attendance bonus", amount, formattedDate],
+    );
+
+    return res.status(200).json({
+      message: `You just received ₹ ${amount}.00`,
+      status: true,
+      timeStamp: timeNow,
+    });
   } catch (error) {
     console.error("Error :", error.message);
-    res.status(500).json({ message: "Internal server error", status: false });
+    return res
+      .status(500)
+      .json({ message: "Internal server error", status: false });
   }
 };
 
@@ -4724,21 +4447,21 @@ const useRedenvelope = async (req, res) => {
     const currentTime = timerJoin2(Date.now());
     const checkTime2 = timerJoin4(Date.now());
 
-    if (redenvelopes[0].recharge > 10) {
-      const [recharge] = await connection.query(
-        "SELECT * FROM recharge WHERE phone = ? AND money >=? AND status=1 AND DATE(today)=?",
-        [userInfo.phone, redenvelopes[0].recharge, checkTime2],
-      );
+    // if (redenvelopes[0].recharge > 10) {
+    //   const [recharge] = await connection.query(
+    //     "SELECT * FROM recharge WHERE phone = ? AND money >=? AND status=1 AND DATE(today)=?",
+    //     [userInfo.phone, redenvelopes[0].recharge, checkTime2],
+    //   );
 
-      if (recharge.length === 0) {
-        return res.status(200).json({
-          message: `You need to recharge ${redenvelopes[0].recharge} today`,
-          status: true,
-          timeStamp: currentTime,
-          data: recharge,
-        });
-      }
-    }
+    //   if (recharge.length === 0) {
+    //     return res.status(200).json({
+    //       message: `You need to recharge ${redenvelopes[0].recharge} today`,
+    //       status: true,
+    //       timeStamp: currentTime,
+    //       data: recharge,
+    //     });
+    //   }
+    // }
 
     if (redenvelopes[0].used == 0) {
       return res.status(200).json({
