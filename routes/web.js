@@ -978,7 +978,7 @@ const initWebRouter = (app) => {
     paymentController.initiateManualUPIPayment,
   );
   router.post(
-    "/wallet/paynow/manual_upi_request",
+    "/api/wallet/paynow/manual_upi_request",
     middlewareController,
     paymentController.addManualUPIPaymentRequest,
   );
