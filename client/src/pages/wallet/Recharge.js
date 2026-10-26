@@ -2,7 +2,6 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { FaSquare } from "react-icons/fa";
 import { GiSwipeCard, GiWhiteBook } from "react-icons/gi";
 import { IoMdWallet } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
 import UpiIcon from "../../assets/mp1.png";
 import RefereshImg from "../../assets/refresh.png";
 import EWalletIcon from "../../assets/upi1.png";
@@ -21,12 +20,14 @@ import CustomeNavbar from "../../components/CustomeNavbar";
 import DepositHistoryLite from "./DepositHistoryLite";
 
 const MIN_AMOUNT = 1;
+const UTR_LENGTH = 12;
 
 export default function Recharge() {
-  const { bannergetData, manualUpiDetailsData, manualUpiDetailsLoading } = useSelector((state) => state.user);
+  const { manualUpiDetailsData, manualUpiDetailsLoading } = useSelector(
+    (state) => state.user
+  );
   const { userInfo, loader } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const [amount, setAmount] = useState("");
   const [activeTab, setActiveTab] = useState("KwikPay");
@@ -36,21 +37,17 @@ export default function Recharge() {
   const [alerts, setAlerts] = useState(false);
   const [alertsuccess, setAlertsuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-
-  // Manual UPI specific
   const [utr, setUtr] = useState("");
+  const [submitting, setSubmitting] = useState(false); // FIX: local submitting state
 
-  // Prevent stale timers
   const alertTimerRef = useRef(null);
+  const copyTimerRef = useRef(null); // FIX: track copy timer for cleanup
 
   const tabs = [
     { label: "KwikPay", Icons: EWalletIcon, g: false },
     { label: "UPI Manual", Icons: UpiIcon, g: false },
   ];
 
-  // ============================================
-  // Channel definition
-  // ============================================
   const chennals = [
     {
       label: "KwikPay",
@@ -121,44 +118,53 @@ export default function Recharge() {
   // ============================================
   // KwikPay Submit
   // ============================================
-  const handleSubmitKwikPay = () => {
+  const handleSubmitKwikPay = async () => {
     const amt = Number(amount);
-
     if (!amt || amt < MIN_AMOUNT) {
       showAlert(`Minimum deposit is ₹${MIN_AMOUNT}`);
       return;
     }
 
-    dispatch(kwikpayRecharge({ money: amt })).then((res) => {
+    setSubmitting(true); // FIX: prevent double-submit
+    try {
+      const res = await dispatch(kwikpayRecharge({ money: amt }));
       if (res.meta.requestStatus === "fulfilled" && res.payload?.payment_url) {
         showAlert(res.payload.message || "Redirecting to payment...", true);
-        // Redirect to KwikPay payment page
         window.location.href = res.payload.payment_url;
       } else {
         showAlert(res.payload?.message || "Payment failed");
       }
-    });
+    } catch (err) {
+      // FIX: catch unexpected errors so button doesn't hang
+      showAlert("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // ============================================
   // Manual UPI Submit
   // ============================================
-  const handleSubmitManualUPI = () => {
+  const handleSubmitManualUPI = async () => {
     const amt = Number(amount);
-
     if (!amt || amt < MIN_AMOUNT) {
       showAlert(`Minimum deposit is ₹${MIN_AMOUNT}`);
       return;
     }
-
-    if (!utr || utr.length !== 12) {
-      showAlert("Please enter a valid 12-digit UTR");
+    if (!utr || utr.length !== UTR_LENGTH) {
+      showAlert(`Please enter a valid ${UTR_LENGTH}-digit UTR`);
+      return;
+    }
+    if (!manualUpiDetailsData?.upi_id) {
+      showAlert("UPI details not loaded. Please retry.");
       return;
     }
 
-    dispatch(
-      manualUPIRecharge({ money: amt, utr: String(utr).trim() })
-    ).then((res) => {
+    setSubmitting(true);
+    try {
+      const res = await dispatch(
+        manualUPIRecharge({ money: amt, utr: String(utr).trim() })
+      );
       if (res.meta.requestStatus === "fulfilled" && res.payload?.status) {
         showAlert(
           res.payload.message ||
@@ -170,13 +176,18 @@ export default function Recharge() {
       } else {
         showAlert(res.payload?.message || "Request failed");
       }
-    });
+    } catch (err) {
+      showAlert("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // ============================================
   // Generic submit
   // ============================================
   const handleSubmit = () => {
+    if (submitting) return; // FIX: guard against double-click
     if (activeTab === "KwikPay") {
       handleSubmitKwikPay();
     } else if (activeTab === "UPI Manual") {
@@ -190,7 +201,9 @@ export default function Recharge() {
   const handleRefesh = () => {
     setCopyPopup(true);
     dispatch(userDetail());
-    setTimeout(() => setCopyPopup(false), 1500);
+    // FIX: clear previous timer before scheduling new one
+    clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopyPopup(false), 1500);
   };
 
   // ============================================
@@ -203,21 +216,27 @@ export default function Recharge() {
 
     return () => {
       clearTimeout(alertTimerRef.current);
+      clearTimeout(copyTimerRef.current); // FIX: cleanup copy timer
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Load UPI account details when Manual UPI is selected and an amount is entered.
+  // ============================================
+  // Load UPI details when Manual UPI tab is active
+  // ============================================
   useEffect(() => {
-    if (activeTab === "UPI Manual" && Number(amount) >= MIN_AMOUNT) {
-      dispatch(getManualUPIDetails({ amount: Number(amount) }));
+    if (activeTab === "UPI Manual" && !manualUpiDetailsData?.upi_id) {
+      // FIX: only fetch if not already loaded (avoid refetch on re-render)
+      dispatch(getManualUPIDetails({ amount: 0 }));
     }
-  }, [activeTab, amount, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
 
   // ============================================
   // Tab switch handler
   // ============================================
   const handleTabChange = (tabLabel) => {
+    if (tabLabel === activeTab) return; // FIX: avoid resetting on same tab click
     setActiveTab(tabLabel);
     setActiveIndex(0);
     setAmount("");
@@ -234,8 +253,23 @@ export default function Recharge() {
   // ============================================
   const amountNumber = Number(amount);
   const isAmountValid = !!amountNumber && amountNumber >= MIN_AMOUNT;
-  const isManualUtrValid = activeTab !== "UPI Manual" || utr.length === 12;
-  const isSubmitDisabled = loader || !isAmountValid || !isManualUtrValid;
+  const isManualUtrValid =
+    activeTab !== "UPI Manual" || utr.length === UTR_LENGTH;
+  const isManualUpiReady =
+    activeTab !== "UPI Manual" || !!manualUpiDetailsData?.upi_id;
+  const isSubmitDisabled =
+    loader ||
+    submitting || // FIX: disable while submitting
+    !isAmountValid ||
+    !isManualUtrValid ||
+    !isManualUpiReady;
+
+  // FIX: display helper for preset button + deposit button
+  const formatAmount = (val) => {
+    const num = Number(val);
+    if (!num) return "";
+    return num >= 1000 ? `${num / 1000}k` : `${num}`;
+  };
 
   return (
     <>
@@ -245,7 +279,9 @@ export default function Recharge() {
         link="/wallet/RechargeHistory"
       />
 
-      <div className="container-section mt-5 text-white">
+      <div className="container-section mt-5 text-white pb-32">
+        {/* FIX: added pb-32 so sticky footer doesn't cover content */}
+
         {/* Balance card */}
         <div className="total-img rounded p-4">
           <div className="flex items-center">
@@ -255,7 +291,7 @@ export default function Recharge() {
             <h3 className="heaing-h3 text-xl font-bold">
               ₹{" "}
               {userInfo?.money_user
-                ? Number(userInfo?.money_user).toLocaleString("en-IN", {
+                ? Number(userInfo.money_user).toLocaleString("en-IN", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })
@@ -263,7 +299,7 @@ export default function Recharge() {
             </h3>
             <img
               src={RefereshImg}
-              alt=""
+              alt="Refresh balance"
               className="w-5 ms-2 mb-[2px] cursor-pointer"
               onClick={handleRefesh}
             />
@@ -345,16 +381,18 @@ export default function Recharge() {
                                   ? "blue-linear color-orange"
                                   : "border color-blue sky-border"
                               }`}
-                              onClick={() => setAmount(data.am)}
+                              onClick={() => setAmount(String(data.am))} // FIX: store as string consistently
                             >
                               <span
                                 className={`mx-2 ${
-                                  amount == data.am ? "text-white" : "gray-text"
+                                  Number(amount) === data.am
+                                    ? "text-white"
+                                    : "gray-text"
                                 }`}
                               >
                                 ₹
                               </span>{" "}
-                              {data.am >= 1000 ? `${data.am / 1000}k` : data.am}
+                              {formatAmount(data.am)}
                             </button>
                           ))}
                         </Fragment>
@@ -373,12 +411,24 @@ export default function Recharge() {
                 className="w-full bgs-body p-2 ps-6 flex items-center focus:outline-none placeholder:text-sm placeholder:text-[var(--text_color_L3)]"
                 placeholder="Enter amount"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => {
+                  // FIX: clamp to MIN_AMOUNT
+                  const val = e.target.value;
+                  if (val === "") {
+                    setAmount("");
+                    return;
+                  }
+                  const num = Number(val);
+                  if (Number.isFinite(num) && num >= 0) {
+                    setAmount(val);
+                  }
+                }}
                 min={MIN_AMOUNT}
+                inputMode="numeric"
               />
             </div>
 
-            {/* Manual UPI account details loaded through Redux */}
+            {/* Manual UPI account details */}
             {activeTab === "UPI Manual" && (
               <div className="mt-3 rounded-lg border border-[#525167] p-3">
                 <p className="text-sm gray-text">Pay to this UPI ID</p>
@@ -391,13 +441,17 @@ export default function Recharge() {
                     </span>
                     <button
                       type="button"
-                      className="rounded border border-[#21D9CC] px-3 py-1 text-sm"
+                      className="rounded border border-[#21D9CC] px-3 py-1 text-sm shrink-0"
                       onClick={async () => {
                         try {
-                          await navigator.clipboard.writeText(manualUpiDetailsData.upi_id);
+                          await navigator.clipboard.writeText(
+                            manualUpiDetailsData.upi_id
+                          );
                           showAlert("UPI ID copied", true);
                         } catch {
-                          showAlert("Unable to copy UPI ID. Please copy it manually.");
+                          showAlert(
+                            "Unable to copy UPI ID. Please copy it manually."
+                          );
                         }
                       }}
                     >
@@ -405,15 +459,31 @@ export default function Recharge() {
                     </button>
                   </div>
                 ) : (
-                  <p className="mt-1 text-sm text-amber-300">
-                    {manualUpiDetailsData?.message || "UPI details unavailable. Please try again."}
-                  </p>
+                  <div className="mt-1">
+                    <p className="text-sm text-amber-300">
+                      {manualUpiDetailsData?.message ||
+                        "UPI details unavailable. Please try again."}
+                    </p>
+                    <button
+                      type="button"
+                      className="mt-2 rounded border border-[#21D9CC] px-3 py-1 text-sm"
+                      onClick={() =>
+                        dispatch(getManualUPIDetails({ amount: 0 }))
+                      }
+                    >
+                      Retry
+                    </button>
+                  </div>
                 )}
                 {manualUpiDetailsData?.bank_name && (
-                  <p className="mt-1 text-xs gray-text">Bank: {manualUpiDetailsData.bank_name}</p>
+                  <p className="mt-1 text-xs gray-text">
+                    Bank: {manualUpiDetailsData.bank_name}
+                  </p>
                 )}
                 {manualUpiDetailsData?.username && (
-                  <p className="mt-1 text-xs gray-text">Account name: {manualUpiDetailsData.username}</p>
+                  <p className="mt-1 text-xs gray-text">
+                    Account name: {manualUpiDetailsData.username}
+                  </p>
                 )}
               </div>
             )}
@@ -427,21 +497,20 @@ export default function Recharge() {
                   type="text"
                   inputMode="numeric"
                   className="w-full bgs-body p-2 ps-6 flex items-center focus:outline-none placeholder:text-sm placeholder:text-[var(--text_color_L3)]"
-                  placeholder="Enter 12-digit UTR"
+                  placeholder={`Enter ${UTR_LENGTH}-digit UTR`}
                   value={utr}
                   onChange={(e) =>
-                    setUtr(e.target.value.replace(/\D/g, "").slice(0, 12))
+                    setUtr(e.target.value.replace(/\D/g, "").slice(0, UTR_LENGTH))
                   }
-                  maxLength={12}
+                  maxLength={UTR_LENGTH}
                 />
               </div>
             )}
 
-            {/* Manual UPI helper hint */}
             {activeTab === "UPI Manual" && (
               <p className="text-xs gray-text mt-2 px-2">
-                Transfer the exact amount to the UPI ID shown after clicking
-                Deposit, then enter the 12-digit UTR here.
+                Transfer the exact amount to the UPI ID shown above, then enter
+                the {UTR_LENGTH}-digit UTR here and click Deposit.
               </p>
             )}
           </div>
@@ -454,48 +523,25 @@ export default function Recharge() {
             Recharge instructions
           </h3>
           <ul className="border border-[#525167] p-3 rounded-lg">
-            <li className="flex mt-2">
-              <span>
-                <FaSquare className="rotate-45 text-[7px] color-blue mr-2 mt-[2px]" />
-              </span>
-              <p className="text-sm gray-text leading-[18px]">
-                If the transfer time is up, please fill out the deposit from
-                again.
-              </p>
-            </li>
-            <li className="flex mt-2">
-              <span>
-                <FaSquare className="rotate-45 text-[7px] color-blue mr-2 mt-[2px]" />
-              </span>
-              <p className="text-sm gray-text leading-[18px]">
-                The transfer amount must match the order you created, otherwise
-                the money cannot be credited successfully.
-              </p>
-            </li>
-            <li className="flex mt-2">
-              <span>
-                <FaSquare className="rotate-45 text-[7px] color-blue mr-2 mt-[2px]" />
-              </span>
-              <p className="text-sm gray-text leading-[18px]">
-                If you transfer the wrong amount, our company will not be
-                responsible for the lost amount!
-              </p>
-            </li>
-            <li className="flex mt-2">
-              <span>
-                <FaSquare className="rotate-45 text-[7px] color-blue mr-2 mt-[2px]" />
-              </span>
-              <p className="text-sm gray-text leading-[18px]">
-                Note: do not cancel the deposit order after the money has been
-                transferred.
-              </p>
-            </li>
+            {[
+              "If the transfer time is up, please fill out the deposit form again.",
+              "The transfer amount must match the order you created, otherwise the money cannot be credited successfully.",
+              "If you transfer the wrong amount, our company will not be responsible for the lost amount!",
+              "Note: do not cancel the deposit order after the money has been transferred.",
+            ].map((text, i) => (
+              <li key={i} className="flex mt-2">
+                <span>
+                  <FaSquare className="rotate-45 text-[7px] color-blue mr-2 mt-[2px]" />
+                </span>
+                <p className="text-sm gray-text leading-[18px]">{text}</p>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
 
-      {/* Sticky bottom deposit button */}
-      <div className="fixed bottom-0 bg-[#1E2530] left-0 right-0 m-auto w-[24.7rem] items-center justify-center shadow-lg border-t border-gray-700 z-50 p-4">
+      {/* FIX: sticky bottom bar — responsive width, above safe area */}
+      <div className="fixed bottom-0 bg-[#1E2530] left-0 right-0 m-auto w-full sm:max-w-[24.7rem] items-center justify-center shadow-lg border-t border-gray-700 z-50 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="flex justify-between items-center max-w-md mx-auto">
           <div className="flex-1">
             <p className="text-xs text-gray-400">Recharge Method:</p>
@@ -506,16 +552,16 @@ export default function Recharge() {
           <button
             type="button"
             className={`font-bold py-3 px-6 rounded shadow-md hover:opacity-90 transition-opacity p-2 ${
-              amount >= 1 ? "blue-linear text-black" : "bg-gray-500 text-black"
+              !isSubmitDisabled
+                ? "blue-linear text-black"
+                : "bg-gray-500 text-black cursor-not-allowed"
             }`}
             disabled={isSubmitDisabled}
             onClick={handleSubmit}
           >
-            {loader
+            {loader || submitting
               ? "Processing..."
-              : `Deposit ₹${
-                  amount >= 1000 ? `${amount / 1000}k` : amount || ""
-                }`}
+              : `Deposit ₹${formatAmount(amount)}`}
           </button>
         </div>
       </div>

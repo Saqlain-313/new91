@@ -47,7 +47,7 @@
     <link rel="stylesheet" href="/css/admin.css" />
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
     <style>
       /* Custom Dropdown Styles */
       .tier-dropdown-btn {
@@ -63,23 +63,23 @@
         align-items: center;
         transition: all 0.2s ease;
       }
-      
+
       .tier-dropdown-btn:hover {
         background-color: #f8f9fa;
         border-color: #adb5bd;
       }
-      
+
       .tier-dropdown-btn:after {
         content: "▼";
         font-size: 0.6em;
         margin-left: 8px;
         transition: transform 0.2s ease;
       }
-      
+
       .tier-dropdown-btn[aria-expanded="true"]:after {
         transform: rotate(180deg);
       }
-      
+
       .tier-dropdown-menu {
         border: 1px solid #ced4da;
         border-radius: 4px;
@@ -87,23 +87,23 @@
         padding: 0;
         min-width: 120px;
       }
-      
+
       .dropdown-item {
         color: #015956;
         padding: 8px 16px;
         transition: background-color 0.2s ease;
       }
-      
+
       .dropdown-item:hover, .dropdown-item:focus {
         background-color: #f0f7f6;
         color: #015956;
       }
-      
+
       .dropdown-item.active {
         background-color: #015956;
         color: white;
       }
-      
+
       /* Custom Button Styles */
       .btn-primary-custom {
         background-color: #015956;
@@ -113,19 +113,19 @@
         border-radius: 4px;
         transition: all 0.2s ease;
       }
-      
+
       .btn-primary-custom:hover {
         background-color: #014a47;
         color: white;
       }
-      
+
       /* Form Control Styles */
       .form-control-custom {
         border: 1px solid #ced4da;
         border-radius: 4px;
         padding: 8px 12px;
       }
-      
+
       /* Card Styles */
       .metric-card {
         background: #f8f9fa;
@@ -136,30 +136,30 @@
         text-align: center;
         transition: transform 0.2s ease;
       }
-      
+
       .metric-card:hover {
         transform: translateY(-2px);
       }
-      
+
       .metric-card h3 {
         font-weight: 600;
         color: #015956;
         font-size: 14px;
         margin-bottom: 10px;
       }
-      
+
       .metric-card .value {
         font-size: 1.5rem;
         font-weight: bold;
         color: #00807c;
         margin-bottom: 5px;
       }
-      
+
       .metric-card .subtitle {
         color: #5ccfcb;
         font-size: 13px;
       }
-      
+
       /* Deposit Box Styles */
       .deposit-box {
         background: #f8f9fa;
@@ -169,27 +169,27 @@
         display: flex;
         flex-direction: column;
       }
-      
+
       .deposit-box h2 {
         font-size: 1.2rem;
         color: #015956;
         margin-bottom: 15px;
       }
-      
+
       .deposit-box ul {
         list-style: none;
         padding: 0;
         margin: 0;
         flex-grow: 1;
       }
-      
+
       .deposit-box ul li {
         margin-bottom: 10px;
         padding: 10px;
         background: rgba(92, 207, 203, 0.1);
         border-radius: 5px;
       }
-      
+
       .see-more-btn {
         background-color: #015956;
         color: white;
@@ -199,7 +199,7 @@
         align-self: flex-start;
         margin-top: auto;
       }
-      
+
       .see-more-btn:hover {
         background-color: #014a47;
       }
@@ -212,7 +212,7 @@
       <div class="content-wrapper">
         <div class="container p-4">
           <div class="header-section" style="margin-bottom: 20px;">
-            <h1 class="h3 mb-3 mb-md-0">Agent Performance Dashboard</h1>              
+            <h1 class="h3 mb-3 mb-md-0">Agent Performance Dashboard</h1>
 
             <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2">
               <!-- Improved Tier Dropdown -->
@@ -221,15 +221,15 @@
                   <span id="selectedTier">Level 1</span>
                 </button>
                 <ul class="dropdown-menu tier-dropdown-menu" aria-labelledby="tierDropdown">
-                  <li><a class="dropdown-item active" href="#" onclick="selectLevel('Level 1')">Level 1</a></li>
-                  <li><a class="dropdown-item" href="#" onclick="selectLevel('Level 2')">Level 2</a></li>
-                  <li><a class="dropdown-item" href="#" onclick="selectLevel('Level 3')">Level 3</a></li>
-                  <li><a class="dropdown-item" href="#" onclick="selectLevel('Level 4')">Level 4</a></li>
-                  <li><a class="dropdown-item" href="#" onclick="selectLevel('Level 5')">Level 5</a></li>
-                  <li><a class="dropdown-item" href="#" onclick="selectLevel('Level 6')">Level 6</a></li>
+                  <li><a class="dropdown-item active" href="#" onclick="selectLevel('Level 1', event)">Level 1</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="selectLevel('Level 2', event)">Level 2</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="selectLevel('Level 3', event)">Level 3</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="selectLevel('Level 4', event)">Level 4</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="selectLevel('Level 5', event)">Level 5</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="selectLevel('Level 6', event)">Level 6</a></li>
                 </ul>
               </div>
-              
+
               <!-- Label -->
               <label for="userId" class="form-label mb-0 text-muted" style="min-width: 60px;">
                 User ID
@@ -335,60 +335,6 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Level 1</td>
-                  <td>2</td>
-                  <td>₹9,300,600</td>
-                  <td>₹1,000</td>
-                  <td>₹108,555.58</td>
-                  <td>₹196,846.72</td>
-                  <td><span class="text-danger">₹-88,291.14</span></td>
-                </tr>
-                <tr>
-                  <td>Level 2</td>
-                  <td>0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td><span>₹0</span></td>
-                </tr>
-                <tr>
-                  <td>Level 3</td>
-                  <td>0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td><span>₹0</span></td>
-                </tr>
-                <tr>
-                  <td>Level 4</td>
-                  <td>0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td><span>₹0</span></td>
-                </tr>
-                <tr>
-                  <td>Level 5</td>
-                  <td>0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td><span>₹0</span></td>
-                </tr>
-                <tr>
-                  <td>Level 6</td>
-                  <td>0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td>₹0</td>
-                  <td><span>₹0</span></td>
-                </tr>
               </tbody>
             </table>
           </div>
@@ -422,7 +368,7 @@
                 <h3>Wallet Balance</h3>
                 <div class="value" id="agentBalance">₹ 50,746.20</div>
               </div>
-            </div> 
+            </div>
 
             <div class="col-md-4 col-sm-6 mb-3">
               <div class="metric-card">
@@ -568,77 +514,89 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <script src="/plugins/jquery/jquery.min.js"></script>
     <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/dist/js/adminlte.min.js"></script>
-    <script src="/dist/js/adminlte.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 
- <script>
+    <script>
       // Global variables
       let agentData = null;
       let currentLevel = 1;
       let performanceChart = null;
 
       // Level selection function
-      function selectLevel(level) {
+      function selectLevel(level, evt) {
+        if (evt) evt.preventDefault();
         currentLevel = parseInt(level.split(' ')[1]);
         document.getElementById('selectedTier').textContent = level;
         document.getElementById('currentLevelTitle').textContent = level;
-        
+
         // Update active class in dropdown
         document.querySelectorAll('.tier-dropdown-menu .dropdown-item').forEach(item => {
           item.classList.remove('active');
         });
-        event.target.classList.add('active');
-        
+        if (evt && evt.target) {
+          evt.target.classList.add('active');
+        } else {
+          // fallback: find item by text
+          document.querySelectorAll('.tier-dropdown-menu .dropdown-item').forEach(item => {
+            if (item.textContent.trim() === level) item.classList.add('active');
+          });
+        }
+
         // Update the display for the selected level
-        if (agentData) {
+        if (agentData && Array.isArray(agentData.levelDetails)) {
           updateLevelData(currentLevel);
         }
       }
-      
+
       // Function to update deposit lists for the current level
       function updateLevelData(levelNum) {
         const levelIndex = levelNum - 1;
-        if (!agentData || !agentData.levelDetails[levelIndex]) return;
-        
+        if (!agentData || !Array.isArray(agentData.levelDetails) || !agentData.levelDetails[levelIndex]) {
+          // No level data -> clear lists
+          updateDepositList('first', []);
+          updateDepositList('second', []);
+          updateDepositList('third', []);
+          return;
+        }
+
         const levelData = agentData.levelDetails[levelIndex];
-        
-        // Update deposit lists
-        updateDepositList('first', levelData.firstDeposits);
-        updateDepositList('second', levelData.secondDeposits);
-        updateDepositList('third', levelData.thirdDeposits);
-        
+
+        updateDepositList('first', levelData.firstDeposits || []);
+        updateDepositList('second', levelData.secondDeposits || []);
+        updateDepositList('third', levelData.thirdDeposits || []);
+
         // Update shared table if it's open
         const sharedTableContainer = document.getElementById('sharedDepositTableContainer');
         if (sharedTableContainer.style.display === 'block') {
           const activeBtn = document.querySelector('.see-more-btn.active');
           if (activeBtn) {
             const depositType = activeBtn.dataset.depositType;
-            document.getElementById('sharedTableTitle').textContent = 
+            document.getElementById('sharedTableTitle').textContent =
               `All ${depositType.charAt(0).toUpperCase() + depositType.slice(1)} Deposits - Level ${levelNum}`;
-            updateSharedTable(depositType, levelData[`${depositType}Deposits`]);
+            updateSharedTable(depositType, levelData[`${depositType}Deposits`] || []);
           }
         }
       }
-      
+
       // Function to update a deposit list
       function updateDepositList(type, deposits) {
         const listElement = document.getElementById(`${type}DepositList`);
         const noDataElement = document.getElementById(`${type}DepositNoData`);
         const seeMoreBtn = document.querySelector(`.see-more-btn[data-deposit-type="${type}"]`);
-        
+
         listElement.innerHTML = '';
         noDataElement.style.display = 'none';
-        
+
         if (!deposits || deposits.length === 0) {
           listElement.innerHTML = '<li class="text-muted">No data</li>';
           if (seeMoreBtn) seeMoreBtn.style.display = 'none';
           return;
         }
-        
+
         // Show first 5 items
         const displayCount = Math.min(deposits.length, 5);
         for (let i = 0; i < displayCount; i++) {
@@ -651,7 +609,7 @@
           `;
           listElement.appendChild(listItem);
         }
-        
+
         // Show "See More" button if there are more than 5 items
         if (seeMoreBtn) {
           if (deposits.length > 5) {
@@ -663,20 +621,20 @@
           }
         }
       }
-      
+
       // Function to update the shared table
       function updateSharedTable(type, deposits) {
         const tableBody = document.getElementById('sharedDepositTableBody');
         const noDataElement = document.getElementById('sharedDepositTableNoData');
-        
+
         tableBody.innerHTML = '';
         noDataElement.style.display = 'none';
-        
+
         if (!deposits || deposits.length === 0) {
           noDataElement.style.display = 'block';
           return;
         }
-        
+
         deposits.forEach(deposit => {
           const row = document.createElement('tr');
           row.className = 'table-light';
@@ -687,87 +645,178 @@
           tableBody.appendChild(row);
         });
       }
-      
+
       // Handle "See More" button clicks
       function handleSeeMoreClick(type, clickedButton) {
         const sharedTableContainer = document.getElementById('sharedDepositTableContainer');
         const sharedTableTitle = document.getElementById('sharedTableTitle');
-        const levelData = agentData.levelDetails[currentLevel - 1];
-        
-        // Reset all buttons
+        if (!agentData || !Array.isArray(agentData.levelDetails)) return;
+
+        const levelData = agentData.levelDetails[currentLevel - 1] || {};
+
+        // Reset all other buttons
         document.querySelectorAll('.see-more-btn').forEach(btn => {
           if (btn !== clickedButton) {
             btn.innerHTML = `See More <i class="fas fa-chevron-down ms-2"></i>`;
             btn.classList.remove('active');
           }
         });
-        
+
         if (clickedButton.classList.contains('active')) {
           // Hide table if already showing this type
           sharedTableContainer.style.display = 'none';
           clickedButton.classList.remove('active');
+          clickedButton.innerHTML = `See More <i class="fas fa-chevron-down ms-2"></i>`;
         } else {
           // Show table with selected deposit type
           sharedTableContainer.style.display = 'block';
           sharedTableTitle.textContent = `All ${type.charAt(0).toUpperCase() + type.slice(1)} Deposits - Level ${currentLevel}`;
-          updateSharedTable(type, levelData[`${type}Deposits`]);
-          
+          updateSharedTable(type, levelData[`${type}Deposits`] || []);
+
           // Update button state
           clickedButton.innerHTML = `Hide <i class="fas fa-chevron-up ms-2"></i>`;
           clickedButton.classList.add('active');
         }
       }
-      
+
+      // Clears all dashboard fields when no agent data is available
+      function clearDashboard() {
+        // Metric cards
+        document.getElementById('networkSize').textContent = '-';
+        document.getElementById('networkLevels').textContent = '-';
+        document.getElementById('netDeposits').textContent = '-';
+        document.getElementById('netWithdrawal').textContent = '-';
+        document.getElementById('netProfit').textContent = '-';
+        document.getElementById('retentionRate').textContent = '-';
+        document.getElementById('winRate').textContent = '-';
+        document.getElementById('withdrawalRate').textContent = '-';
+        document.getElementById('commissionEarned').textContent = '-';
+        document.getElementById('commissionRate').textContent = '-';
+
+        // Agent info
+        document.getElementById('agentId').textContent = '-';
+        document.getElementById('agentUsername').textContent = '-';
+        document.getElementById('agentMobile').textContent = '-';
+        document.getElementById('agentBalance').textContent = '-';
+        document.getElementById('agentAccountType').textContent = '-';
+        document.getElementById('agentCreatedAt').textContent = '-';
+
+        // Table
+        const tableBody = document.querySelector('#performanceTable tbody');
+        tableBody.innerHTML = `
+          <tr><td colspan="7" class="text-center text-muted py-4">No data found</td></tr>
+        `;
+
+        // Chart
+        if (performanceChart) {
+          performanceChart.destroy();
+          performanceChart = null;
+        }
+        const canvas = document.getElementById('performanceChart');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Deposit lists
+        ['first', 'second', 'third'].forEach(type => {
+          const listElement = document.getElementById(`${type}DepositList`);
+          const seeMoreBtn = document.querySelector(`.see-more-btn[data-deposit-type="${type}"]`);
+          listElement.innerHTML = '<li class="text-muted">No data</li>';
+          if (seeMoreBtn) {
+            seeMoreBtn.style.display = 'none';
+            seeMoreBtn.classList.remove('active');
+            seeMoreBtn.innerHTML = `See More <i class="fas fa-chevron-down ms-2"></i>`;
+          }
+        });
+
+        // Hide shared table
+        document.getElementById('sharedDepositTableContainer').style.display = 'none';
+      }
+
       // Function to load agent data from API
       async function loadAgentData(userId) {
+        // Show loading indicator
+        Swal.fire({
+          title: 'Loading Data',
+          html: 'Please wait while we fetch agent performance data...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
         try {
-          // Show loading indicator
-          const swalInstance = Swal.fire({
-            title: 'Loading Data',
-            html: 'Please wait while we fetch agent performance data...',
-            allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            }
-          });
-          
-          // Make API call
-          const response = await fetch(`/api/agent-downline-dashboard?userId=${userId}`);
-          
+          const response = await fetch(`/api/agent-downline-dashboard?userId=${encodeURIComponent(userId)}`);
+
+          // 404 -> No agent found
+          if (response.status === 404) {
+            Swal.close();
+            agentData = null;
+            clearDashboard();
+            Swal.fire({
+              title: 'No Data Found',
+              html: `No performance data available for User ID <strong>${userId}</strong>.`,
+              icon: 'info',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#015956'
+            });
+            return;
+          }
+
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
-          
-          agentData = await response.json();
-          
-          // Validate the response data
-          if (!agentData || !agentData.levelDetails) {
-            throw new Error('Invalid data format from API');
+
+          const data = await response.json();
+
+          // Treat empty/null/missing levelDetails as "no data"
+          if (
+            !data ||
+            !Array.isArray(data.levelDetails) ||
+            data.levelDetails.length === 0 ||
+            (!data.agentInfo && !data.networkSize && !data.networkLevels)
+          ) {
+            Swal.close();
+            agentData = null;
+            clearDashboard();
+            Swal.fire({
+              title: 'No Data Found',
+              html: `No performance data available for User ID <strong>${userId}</strong>.`,
+              icon: 'info',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#015956'
+            });
+            return;
           }
-          
+
+          agentData = data;
+
           // Update the UI with the loaded data
           updateUIWithAgentData();
-          
-          // Close loading indicator
-          await swalInstance.close();
+
+          // Close loading
+          Swal.close();
         } catch (error) {
           console.error('Error loading agent data:', error);
+          Swal.close();
+          agentData = null;
+          clearDashboard();
           Swal.fire({
-            title: 'Error!',
-            text: 'Failed to load agent data. Please try again.',
-            icon: 'error',
-            confirmButtonText: 'OK'
+            title: 'No Data Found',
+            html: `We couldn't find performance data for User ID <strong>${userId}</strong>.<br><small class="text-muted">Please check the ID and try again.</small>`,
+            icon: 'info',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#015956'
           });
         }
       }
-      
+
       // Function to update the UI with the loaded agent data
       function updateUIWithAgentData() {
         if (!agentData) return;
-        
+
         // Update top metrics
-        document.getElementById('networkSize').textContent = agentData.networkSize || 0;
-        document.getElementById('networkLevels').textContent = agentData.networkLevels || 0;
+        document.getElementById('networkSize').textContent = agentData.networkSize ?? 0;
+        document.getElementById('networkLevels').textContent = agentData.networkLevels ?? 0;
 
         // Calculate totals
         const totalDeposits = agentData.levelDetails.reduce((sum, level) => sum + Number(level.deposits || 0), 0);
@@ -780,16 +829,16 @@
         document.getElementById('netDeposits').textContent = `₹${totalDeposits.toLocaleString()}`;
         document.getElementById('netWithdrawal').textContent = `₹${totalWithdrawals.toLocaleString()}`;
         document.getElementById('netProfit').textContent = `₹${totalProfit.toLocaleString()}`;
-        
+
         // Calculate and display rates
         const retentionRate = totalDeposits > 0 ? ((totalDeposits - totalWithdrawals) / totalDeposits * 100).toFixed(1) : 0;
         const winRate = totalBetAmount > 0 ? (totalWinAmount / totalBetAmount * 100).toFixed(1) : 0;
         const withdrawalRate = totalDeposits > 0 ? (totalWithdrawals / totalDeposits * 100).toFixed(1) : 0;
-        
+
         document.getElementById('retentionRate').textContent = retentionRate;
         document.getElementById('winRate').textContent = winRate;
         document.getElementById('withdrawalRate').textContent = withdrawalRate;
-        document.getElementById('commissionRate').textContent = '0.0'; // Assuming this comes from API
+        document.getElementById('commissionRate').textContent = '0.0';
 
         // Update agent info
         document.getElementById('agentId').textContent = agentData.agentInfo?.id || '';
@@ -799,18 +848,21 @@
         document.getElementById('agentAccountType').textContent = 'Agent';
         if (agentData.agentInfo?.createdAt) {
           const createdAt = new Date(agentData.agentInfo.createdAt);
-          document.getElementById('agentCreatedAt').textContent = createdAt.toLocaleDateString();
+          document.getElementById('agentCreatedAt').textContent =
+            isNaN(createdAt.getTime()) ? agentData.agentInfo.createdAt : createdAt.toLocaleDateString();
+        } else {
+          document.getElementById('agentCreatedAt').textContent = '-';
         }
 
         // Update performance table
         const tableBody = document.querySelector('#performanceTable tbody');
         tableBody.innerHTML = '';
-        
+
         agentData.levelDetails.forEach(level => {
           const row = document.createElement('tr');
           const profitLoss = Number(level.profitLoss) || 0;
           const profitClass = profitLoss >= 0 ? 'text-success' : 'text-danger';
-          
+
           row.innerHTML = `
             <td>${level.level}</td>
             <td>${level.users}</td>
@@ -829,16 +881,18 @@
         // Update deposit lists for current level
         updateLevelData(currentLevel);
       }
-      
+
       // Function to update the chart
       function updateChart() {
-        const ctx = document.getElementById('performanceChart').getContext('2d');
-        
-        // Destroy previous chart if it exists
+        if (!agentData || !Array.isArray(agentData.levelDetails)) return;
+        const canvas = document.getElementById('performanceChart');
+        const ctx = canvas.getContext('2d');
+
         if (performanceChart) {
           performanceChart.destroy();
+          performanceChart = null;
         }
-        
+
         performanceChart = new Chart(ctx, {
           type: 'bar',
           data: {
@@ -891,25 +945,28 @@
             handleSeeMoreClick(type, this);
           });
         });
-        
+
         // Set up analyze button
         document.getElementById('analyzeBtn').addEventListener('click', function() {
           const userId = document.getElementById('userId').value.trim();
+
+          // Empty ID -> friendly "No Data Found" (not red error)
           if (!userId) {
             Swal.fire({
-              title: 'Error!',
-              text: 'Please enter a valid User ID',
-              icon: 'error',
+              title: 'No Data Found',
+              html: 'Please enter a User ID to analyze.',
+              icon: 'info',
               confirmButtonText: 'OK',
+              confirmButtonColor: '#015956'
             });
             return;
           }
-          
+
           loadAgentData(userId);
         });
-        
+
         // Load data for default user ID on page load
-        const defaultUserId = document.getElementById('userId').value;
+        const defaultUserId = document.getElementById('userId').value.trim();
         if (defaultUserId) {
           loadAgentData(defaultUserId);
         }

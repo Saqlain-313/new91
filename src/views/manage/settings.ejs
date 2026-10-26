@@ -560,27 +560,6 @@
     </script>
 
     <script>
-      function attendanceSendMessage() {
-        const phone = document.getElementById("attendance-phone").value;
-        const message = document.getElementById("attendance-message").value;
-        const alertDiv = document.getElementById("attendance-alert");
-
-        // Basic phone number validation (you should implement more robust validation)
-        if (!phone.match(/^\d{10}$/)) {
-          alertDiv.style.display = "block";
-          return;
-        } else {
-          alertDiv.style.display = "none";
-        }
-
-        // Here you would implement the logic to send the message
-        // (e.g., using a third-party API like Twilio, or sending an email)
-        //console.log("Sending message to:", phone);
-        //console.log("Message:", message);
-      }
-    </script>
-
-    <script>
       function MyUsdt() {
         let phoneA = $("#phoneA").val().trim();
         let usdtA = $("#usdtA").val().trim();
@@ -689,77 +668,35 @@
         }, 1000);
       };
 
-      $(".edit-momo").click(async (e) => {
-        try {
-          e.preventDefault();
-          const bank_name = $("#edit-momo-name_bank").val();
-          const username = $("#edit-momo-name").val();
-          const upi_id = $("#edit-momo-info").val();
-          const upi_id2 = $("#edit-momo-info2").val();
-          const upi_id3 = $("#edit-momo-info3").val();
-          const usdt_wallet_address = $("#edit-momo-qr").val();
-
-          const response = await axios.post("/admin/manager/settings/bank", {
-            bank_name,
-            username,
-            upi_id,
-            upi_id2,
-            upi_id3,
-            usdt_wallet_address,
-            typer: "bank",
-          });
-
-          if (response.data.status == true) {
-            Swal.fire(
-              "Good job!",
-              "Your Links Updated Successfully!",
-              "success"
-            );
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Empty or Wrong",
-            });
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      });
-
-      $(".edit-momo").click(function (e) {
+      // Submit manual payment settings only once (avoid duplicate click handlers).
+      $(document).on("click", ".edit-momo", function (e) {
         e.preventDefault();
-        const bank_name = $("#edit-momo-name_bank").val();
-        const username = $("#edit-momo-name").val();
-        const upi_id = $("#edit-momo-info").val();
-        const upi_id2 = $("#edit-momo-info2").val();
-        const upi_id3 = $("#edit-momo-info3").val();
-        const usdt_wallet_address = $("#edit-momo-qr").val();
+
+        const payload = {
+          bank_name: $("#edit-momo-name_bank").val().trim(),
+          username: $("#edit-momo-name").val().trim(),
+          upi_id: $("#edit-momo-info").val().trim(),
+          upi_id2: $("#edit-momo-info2").val().trim(),
+          upi_id3: $("#edit-momo-info3").val().trim(),
+          usdt_wallet_address: $("#edit-momo-qr").val().trim(),
+          typer: "bank",
+        };
+
         $.ajax({
           type: "POST",
           url: "/admin/manager/settings/bank",
-          data: {
-            bank_name,
-            username,
-            upi_id,
-            upi_id2,
-            upi_id3,
-            usdt_wallet_address,
-            typer: "bank",
-          },
+          data: payload,
           dataType: "json",
           success: function (response) {
-            if (response.status == true) {
-              Swal.fire(
-                "Good job!",
-                "Your Links Updated Successfully!",
-                "success"
-              );
+            if (response && response.status === true) {
+              Swal.fire("Updated", "Manual payment settings updated successfully.", "success");
             } else {
-              Swal.fire({
-                icon: "error",
-                title: "Empty or Wrong",
-              });
+              Swal.fire("Error", response?.message || "Unable to update manual payment settings.", "error");
             }
+          },
+          error: function (xhr) {
+            const message = xhr.responseJSON?.message || "Request failed. Please check your connection and try again.";
+            Swal.fire("Error", message, "error");
           },
         });
       });
@@ -902,21 +839,23 @@
         data: "data",
         dataType: "json",
         success: function (response) {
-          let bank = response.datas[0];
-          let momo = response.datas[0];
-          //console.log("FFF", momo);
-          $("#edit-momo-name_bank").val(momo?.name_bank);
-          $("#edit-momo-name").val(momo.name_user);
-          $("#edit-momo-info").val(momo.stk);
-          $("#edit-momo-info2").val(momo.upi2);
-          $("#edit-momo-info3").val(momo.upi3);
-          $("#edit-momo-qr").val(momo.usdt);
+          const momo = response?.datas?.[0] || {};
+          const settings = response?.settings?.[0] || {};
 
-          // $('#edit-momo-qr').val(momo.qr_code_image);
+          $("#edit-momo-name_bank").val(momo.name_bank || "");
+          $("#edit-momo-name").val(momo.name_user || "");
+          $("#edit-momo-info").val(momo.stk || "");
+          $("#edit-momo-info2").val(momo.upi2 || "");
+          $("#edit-momo-info3").val(momo.upi3 || "");
+          $("#edit-momo-qr").val(momo.usdt || momo.qr_code_image || "");
 
-          $("#telegram").val(response.settings[0].telegram);
-          $("#cskh").val(response.settings[0].cskh);
-          $("#myapp_web").val(response.settings[0].app);
+          $("#telegram").val(settings.telegram || "");
+          $("#cskh").val(settings.cskh || "");
+          $("#myapp_web").val(settings.app || "");
+        },
+        error: function (xhr) {
+          console.error("Failed to load admin settings:", xhr.responseText || xhr.statusText);
+          Swal.fire("Error", "Could not load admin settings.", "error");
         },
       });
     </script>

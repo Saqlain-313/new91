@@ -973,7 +973,7 @@ const initWebRouter = (app) => {
 
   // ---- Manual UPI Payment ----
   router.get(
-    "/wallet/paynow/manual_upi",
+    "/api/wallet/paynow/manual_upi",
     middlewareController,
     paymentController.initiateManualUPIPayment,
   );

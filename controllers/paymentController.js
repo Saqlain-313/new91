@@ -17,27 +17,38 @@ const PaymentMethodsMap = {
 // MANUAL UPI PAYMENT
 // ============================================
 const initiateManualUPIPayment = async (req, res) => {
-    const query = req.query;
+  try {
+    const [bank_recharge_momo] = await connection.query(
+      "SELECT * FROM bank_recharge WHERE type = 'momo'"
+    );
 
-    const [bank_recharge_momo] = await connection.query("SELECT * FROM bank_recharge WHERE type = 'momo'");
+    const row = bank_recharge_momo?.[0];
 
-    let bank_recharge_momo_data;
-    if (bank_recharge_momo.length) {
-        bank_recharge_momo_data = bank_recharge_momo[0];
+    console.log(row)
+
+    if (!row) {
+      return res.status(404).json({
+        status: false,
+        message: "UPI details not configured. Please contact support.",
+        upi_id: null,
+      });
     }
 
-    const momo = {
-        bank_name: bank_recharge_momo_data?.name_bank || "",
-        username: bank_recharge_momo_data?.name_user || "",
-        upi_id: bank_recharge_momo_data?.stk || "",
-        usdt_wallet_address: bank_recharge_momo_data?.qr_code_image || "",
-    }
-
-    return res.render("wallet/manual_payment.ejs", {
-        Amount: query?.am,
-        UpiId: momo.upi_id,
+    return res.status(200).json({
+      status: true,
+      upi_id: row.stk || "",
+      bank_name: row.name_bank || "",
+      username: row.name_user || "",
+      usdt_wallet_address: row.qr_code_image || "",
     });
-}
+  } catch (err) {
+    console.error("initiateManualUPIPayment error:", err);
+    return res.status(500).json({
+      status: false,
+      message: "Server error while fetching UPI details",
+    });
+  }
+};
 
 const addManualUPIPaymentRequest = async (req, res) => {
     try {
