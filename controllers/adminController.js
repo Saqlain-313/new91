@@ -4447,52 +4447,51 @@ const todayrechargeexport = async (req, res) => {
     } else if (purpose == "totalbetting") {
       query = "SELECT * FROM minutes_1";
     }
+
+    if (!query) {
+      return res.status(400).json({ message: "Invalid purpose" });
+    }
+
     const [rows] = await connection.query(query, allparameter);
-    if (!rows || rows[0].length <= 0) {
+    if (!rows || rows.length === 0) {
       return res.status(404).json({ message: "No data found" });
     }
+
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Data");
 
-    // Add column headers
     const columns = Object.keys(rows[0]);
     worksheet.addRow(columns);
 
-    // Add rows from the database result
     rows.forEach((row) => {
-      worksheet.addRow(Object.values(row));
+      worksheet.addRow(
+        Object.values(row).map((v) => (typeof v === "bigint" ? v.toString() : v))
+      );
     });
 
-    // Generate a unique file name
     const fileName = `data_${Date.now()}.xlsx`;
-    const filePath = `./exports/${fileName}`; // Update with your desired file path
+    const filePath = `./exports/${fileName}`;
 
-    // Create the 'exports' directory if it doesn't exist
     if (!fs.existsSync("./exports")) {
-      fs.mkdirSync("./exports");
+      fs.mkdirSync("./exports", { recursive: true });
     }
 
-    // Write the workbook to a file
     await workbook.xlsx.writeFile(filePath);
 
-    // Set the response headers for file download
     res.setHeader("Content-Disposition", `attachment; filename=${fileName}`);
     res.setHeader(
       "Content-Type",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
 
-    // Stream the file to the client
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
 
-    // Delete the file after it's downloaded
     fileStream.on("end", () => {
-      fs.unlinkSync(filePath);
-      //console.log("File downloaded and deleted successfully");
+      fs.unlink(filePath, () => {});
     });
   } catch (error) {
-    //console.log("Error exporting to Excel: " + error);
+    console.error("Error exporting to Excel:", error);  // ← uncomment this!
     res.status(500).json({ message: "Error exporting to Excel" });
   }
 };

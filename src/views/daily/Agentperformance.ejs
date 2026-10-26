@@ -26,7 +26,7 @@
     />
     <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
 
-     <link
+    <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
     />
@@ -46,8 +46,8 @@
 
     <link rel="stylesheet" href="/dist/css/adminlte.min.css" />
     <link rel="stylesheet" href="/css/admin.css" />
-     <!-- jQuery -->
-     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
       :root {
@@ -64,7 +64,6 @@
         background-color: var(--light-bg);
         color: var(--text-dark);
       }
-
 
       .header-section {
         background-color: var(--card-bg);
@@ -103,7 +102,6 @@
         margin-bottom: 5px;
       }
 
-
       .card-subtitle {
         font-size: 0.9rem;
         color: var(--text-light);
@@ -118,7 +116,6 @@
         font-weight: 500;
         transition: all 0.2s ease-in-out;
       }
-      
 
       .btn-primary-custom:hover {
         opacity: 0.9;
@@ -205,22 +202,21 @@
         background: #015956;
       }
 
-      /* Styles for Deposit Overview section - Bootstrap classes */
       .deposit-box {
-        background-color: var(--card-bg); /* Using existing card background */
+        background-color: var(--card-bg);
         border-radius: 15px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        padding: 1.5rem; /* Equivalent to p-6 */
+        padding: 1.5rem;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        color: var(--secondary-color); /* Using the defined secondary color */
+        color: var(--secondary-color);
       }
 
       .deposit-box h2 {
-        font-size: 1.75rem; /* Equivalent to text-3xl */
-        font-weight: 600; /* Equivalent to font-semibold */
-        margin-bottom: 1.5rem; /* Equivalent to mb-6 */
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
       }
 
       .deposit-box ul {
@@ -233,10 +229,10 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: rgba(0, 128, 124, 0.1); 
-        padding: 0.75rem; /* Equivalent to p-3 */
-        border-radius: 0.375rem; /* Equivalent to rounded-md */
-        margin-bottom: 0.75rem; /* space-y-3 equivalent for list items */
+        background-color: rgba(0, 128, 124, 0.1);
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+        margin-bottom: 0.75rem;
       }
 
       .deposit-box ul li:last-child {
@@ -244,18 +240,18 @@
       }
 
       .deposit-box ul li span strong {
-        font-weight: 500; /* Equivalent to font-medium */
+        font-weight: 500;
       }
 
       .deposit-box .see-more-btn {
         width: 100%;
-        padding: 0.75rem 1.5rem; /* py-3 px-6 */
+        padding: 0.75rem 1.5rem;
         background-color: var(--secondary-color);
         color: white;
-        font-weight: 600; /* font-semibold */
-        border-radius: 0.5rem; /* rounded-lg */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* shadow-md */
-        transition: background-color 0.3s ease-in-out; /* transition-colors duration-300 */
+        font-weight: 600;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease-in-out;
         border: none;
       }
 
@@ -264,21 +260,20 @@
       }
 
       .deposit-box .see-more-btn i {
-        margin-left: 0.5rem; /* ml-2 */
+        margin-left: 0.5rem;
       }
 
-      /* Global Search Section */
       .global-search-section {
-        background-color: #e6f7f7; /* A light teal for the search bar background */
-        border-radius: 0.75rem; /* rounded-lg */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* shadow-sm */
-        padding: 1.5rem; /* p-6 */
-        margin-bottom: 2rem; /* mb-8 */
+        background-color: #e6f7f7;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        gap: 1rem; /* gap-4 */
+        gap: 1rem;
       }
 
       @media (min-width: 768px) {
@@ -288,8 +283,8 @@
       }
 
       .global-search-section .form-label {
-        color: #006666; /* A darker teal for label */
-        font-weight: 500; /* font-medium */
+        color: #006666;
+        font-weight: 500;
       }
 
       .global-search-section .input-group-text {
@@ -298,49 +293,48 @@
       }
 
       .global-search-section .form-control {
-        padding-left: 2.5rem; /* pl-10 */
-        padding-right: 1rem; /* pr-4 */
-        padding-top: 0.75rem; /* py-3 */
-        padding-bottom: 0.75rem; /* py-3 */
-        border-radius: 0.5rem; /* rounded-lg */
-        border: 1px solid #ced4da; /* border border-gray-300 */
-        color: #495057; /* text-gray-700 */
+        padding-left: 2.5rem;
+        padding-right: 1rem;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid #ced4da;
+        color: #495057;
       }
 
       .global-search-section .form-control:focus {
         outline: none;
-        box-shadow: 0 0 0 0.25rem rgba(0, 128, 124, 0.25); /* focus:ring-2 focus:ring-blue-500 */
-        border-color: transparent; /* focus:border-transparent */
+        box-shadow: 0 0 0 0.25rem rgba(0, 128, 124, 0.25);
+        border-color: transparent;
       }
 
       .global-search-section .btn-danger-custom {
-        background-color: #dc3545; /* Red-500 */
+        background-color: #dc3545;
         color: white;
-        padding: 0.75rem 1.5rem; /* px-6 py-3 */
-        border-radius: 0.5rem; /* rounded-lg */
-        transition: background-color 0.3s ease-in-out; /* transition-colors duration-300 */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* shadow-md */
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.3s ease-in-out;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         border: none;
       }
 
       .global-search-section .btn-danger-custom:hover {
-        background-color: #bd2130; /* Red-600 */
+        background-color: #bd2130;
       }
 
-      /* Shared Table Container */
       #sharedDepositTableContainer {
         background-color: var(--card-bg);
         border-radius: 15px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        padding: 1.5rem; /* p-6 */
-        margin-top: 2rem; /* mt-8 */
+        padding: 1.5rem;
+        margin-top: 2rem;
       }
 
       #sharedDepositTableContainer h2 {
-        font-size: 1.5rem; /* text-2xl */
-        font-weight: 600; /* font-semibold */
-        color: var(--text-dark); /* text-gray-800 */
-        margin-bottom: 1rem; /* mb-4 */
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
       }
 
       .table-container {
@@ -349,48 +343,47 @@
       }
 
       .shared-table-custom {
-        min-width: 100%; /* min-w-full */
+        min-width: 100%;
         background-color: var(--card-bg);
-        border-radius: 0.75rem; /* rounded-lg */
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05); /* shadow-inner */
+        border-radius: 0.75rem;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
         color: var(--text-dark);
         width: 100%;
       }
 
       .shared-table-custom thead {
-        background-color: #f8f9fa; /* bg-gray-100 */
+        background-color: #f8f9fa;
       }
 
       .shared-table-custom th {
-        padding: 0.75rem 1rem; /* py-3 px-4 */
+        padding: 0.75rem 1rem;
         text-align: left;
-        font-size: 0.875rem; /* text-sm */
-        font-weight: 500; /* font-medium */
-        text-transform: uppercase; /* uppercase */
-        letter-spacing: 0.05em; /* tracking-wider */
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
 
       .shared-table-custom tbody tr {
-        border-top: 1px solid #e2e8f0; /* divide-y divide-gray-200 */
+        border-top: 1px solid #e2e8f0;
       }
 
       .shared-table-custom tbody tr:hover {
-        background-color: #f8f9fa; /* hover:bg-gray-50 */
-        transition: background-color 0.2s ease-in-out; /* transition-colors duration-200 */
+        background-color: #f8f9fa;
+        transition: background-color 0.2s ease-in-out;
       }
 
       .shared-table-custom td {
-        padding: 0.75rem 1rem; /* py-3 px-4 */
-        white-space: nowrap; /* whitespace-nowrap */
+        padding: 0.75rem 1rem;
+        white-space: nowrap;
       }
-      
-      /* Dropdown styles for tier levels */
+
       .tier-dropdown {
         position: relative;
         display: inline-block;
         margin-right: 10px;
       }
-      
+
       .tier-dropdown-btn {
         background-color: #f8f9fa;
         color: #015956;
@@ -404,7 +397,7 @@
         justify-content: space-between;
         align-items: center;
       }
-      
+
       .tier-dropdown-content {
         display: none;
         position: absolute;
@@ -415,33 +408,32 @@
         border-radius: 8px;
         overflow: hidden;
       }
-      
+
       .tier-dropdown-content a {
         color: #015956;
         padding: 12px 16px;
         text-decoration: none;
         display: block;
       }
-      
+
       .tier-dropdown-content a:hover {
         background-color: #e6f7f7;
       }
-      
+
       .tier-dropdown:hover .tier-dropdown-content {
         display: block;
       }
-      
+
       .tier-dropdown:hover .tier-dropdown-btn {
         background-color: #e6f7f7;
       }
-      
-      /* Responsive adjustments */
+
       @media (max-width: 768px) {
         .tier-dropdown {
           width: 100%;
           margin-bottom: 10px;
         }
-        
+
         .tier-dropdown-btn {
           width: 100%;
         }
@@ -455,12 +447,9 @@
       <div class="content-wrapper">
         <div class="container mt-4">
           <div class="header-section" style="margin-bottom: 20px;">
-            <h1 class="h3 mb-3 mb-md-0">Agent Performance Dashboard</h1>              
+            <h1 class="h3 mb-3 mb-md-0">Agent Performance Dashboard</h1>
 
             <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2">
-              <!-- Tier Dropdown -->
-
-              
               <div class="tier-dropdown">
                 <button class="tier-dropdown-btn">
                   <span id="selectedTier">All Tiers</span>
@@ -475,13 +464,11 @@
                   <a href="#" onclick="selectTier('Tier 5')">Tier 5</a>
                 </div>
               </div>
-              
-              <!-- Label -->
+
               <label for="userId" class="form-label mb-0 text-muted" style="min-width: 60px;">
                 User ID
               </label>
 
-              <!-- Input -->
               <input
                 type="text"
                 class="form-control form-control-custom"
@@ -490,7 +477,6 @@
                 style="width: 120px; min-width: 100px;"
               />
 
-              <!-- Button -->
               <button
                 class="btn btn-primary-custom"
                 id="analyzeBtn"
@@ -535,13 +521,13 @@
               </div>
             </div>
 
-            <!-- net withdrwal   -->
+            <!-- Net Withdrawal -->
             <div class="col-md-4 col-sm-6 mb-3" style="padding: 0 10px;">
               <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; height: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;">
                 <div style="font-weight: 600; color: #015956; font-size: 14px;">Net Withdrawal</div>
-                <div style="font-size: 1.5rem; font-weight: bold; color: #00807c;" id="commissionEarned">₹0</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: #00807c;" id="netWithdrawal">₹0</div>
                 <div style="color: #5ccfcb; font-size: 13px;" class="card-subtitle">
-                  <span id="commissionRate">0.0</span>% of total bets
+                  <span id="withdrawalRate">0.0</span>% of total bets
                 </div>
               </div>
             </div>
@@ -581,14 +567,12 @@
                 </tr>
               </thead>
               <tbody>
-                </tbody>
+              </tbody>
             </table>
           </div>
 
           <h2 class="h4 mt-4 mb-3" style="font-weight: bold; color: #015956;">Agent Information</h2>
           <div class="row">
-
-            <!-- Card Template -->
             <div class="col-md-4 col-sm-6 mb-3">
               <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; height: 100%;">
                 <div style="font-weight: 600; color: #015956; font-size: 14px;">User ID</div>
@@ -615,7 +599,7 @@
                 <div style="font-weight: 600; color: #015956; font-size: 14px;">Wallet Balance</div>
                 <div style="font-size: 1.5rem; color: #00807c;" id="agentBalance">₹ 4,500.00</div>
               </div>
-            </div> 
+            </div>
 
             <div class="col-md-4 col-sm-6 mb-3">
               <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; height: 100%;">
@@ -633,9 +617,9 @@
           </div>
         </div>
 
-        <div class=" ">
-          <div class="   p-3">
-            <h1 class="text-start mb-4  fs-4 fw-bold">
+        <div class="">
+          <div class="p-3">
+            <h1 class="text-start mb-4 fs-4 fw-bold">
               Deposit Overview
             </h1>
             <div
@@ -660,7 +644,7 @@
                 id="clearSearchBtn"
                 class="btn btn-danger-custom mt-3 mt-md-0"
               >
-                <!-- <i class="fas fa-times "></i> --> Clear
+                Clear
               </button>
             </div>
 
@@ -670,7 +654,7 @@
                   <div>
                     <h2>First Deposit</h2>
                     <ul id="firstDepositList">
-                      </ul>
+                    </ul>
                     <p
                       id="firstDepositNoData"
                       class="text-center mt-3 text-muted"
@@ -693,7 +677,7 @@
                   <div>
                     <h2>Second Deposit</h2>
                     <ul id="secondDepositList">
-                      </ul>
+                    </ul>
                     <p
                       id="secondDepositNoData"
                       class="text-center mt-3 text-muted"
@@ -716,7 +700,7 @@
                   <div>
                     <h2>Third Deposit</h2>
                     <ul id="thirdDepositList">
-                      </ul>
+                    </ul>
                     <p
                       id="thirdDepositNoData"
                       class="text-center mt-3 text-muted"
@@ -752,7 +736,7 @@
                     </tr>
                   </thead>
                   <tbody id="sharedDepositTableBody">
-                    </tbody>
+                  </tbody>
                 </table>
                 <p
                   id="sharedDepositTableNoData"
@@ -778,14 +762,9 @@
       // Tier selection function
       function selectTier(tier) {
         document.getElementById('selectedTier').textContent = tier;
-        // Here you would typically filter your data based on the selected tier
-        // For now, we'll just log the selection
         console.log('Selected tier:', tier);
-        
-        // You would call your data loading function here with the tier filter
-        // loadAgentData($('#userId').val().trim(), tier);
       }
-      
+
       // Sample Data for Deposits
       const allDeposits = {
         first: [
@@ -822,14 +801,8 @@
         ],
       };
 
-      let currentActiveDepositType = null; // To keep track of which deposit type's table is currently shown
+      let currentActiveDepositType = null;
 
-      /**
-       * Renders the initial 5 deposits or all deposits if fewer than 5,
-       * and manages the visibility of the "See More" button and "No Data" messages.
-       * @param {string} type - The deposit type ('first', 'second', 'third').
-       * @param {Array<Object>} data - The array of deposit objects to display.
-       */
       function renderInitialDeposits(type, data) {
         const listElement = document.getElementById(`${type}DepositList`);
         const noDataElement = document.getElementById(`${type}DepositNoData`);
@@ -837,15 +810,15 @@
           `.see-more-btn[data-deposit-type="${type}"]`
         );
 
-        listElement.innerHTML = ''; // Clear previous list items
-        noDataElement.style.display = 'none'; // Hide no data message by default
-        seeMoreBtn.style.display = 'block'; // Show button by default
+        listElement.innerHTML = '';
+        noDataElement.style.display = 'none';
+        seeMoreBtn.style.display = 'block';
 
-        const displayData = data.slice(0, 5); // Get first 5 items
+        const displayData = data.slice(0, 5);
 
         if (displayData.length === 0) {
           noDataElement.style.display = 'block';
-          seeMoreBtn.style.display = 'none'; // Hide button if no data
+          seeMoreBtn.style.display = 'none';
         } else {
           displayData.forEach((deposit) => {
             const listItem = document.createElement('li');
@@ -859,32 +832,27 @@
             listElement.appendChild(listItem);
           });
 
-          // Hide "See More" button if there are 5 or fewer items
           if (data.length <= 5) {
             seeMoreBtn.style.display = 'none';
           } else {
             seeMoreBtn.innerHTML = `See More <i class="fas fa-chevron-down ms-2"></i>`;
-            seeMoreBtn.classList.remove('active'); // Ensure button is not in 'active' state
+            seeMoreBtn.classList.remove('active');
           }
         }
       }
 
-      /**
-       * Renders all deposits into the shared full table.
-       * @param {Array<Object>} data - The array of deposit objects to display.
-       */
       function renderSharedTable(data) {
         const tableBody = document.getElementById('sharedDepositTableBody');
         const tableNoData = document.getElementById('sharedDepositTableNoData');
-        tableBody.innerHTML = ''; // Clear previous table rows
-        tableNoData.style.display = 'none'; // Hide no data message by default
+        tableBody.innerHTML = '';
+        tableNoData.style.display = 'none';
 
         if (data.length === 0) {
           tableNoData.style.display = 'block';
         } else {
           data.forEach((deposit) => {
             const row = document.createElement('tr');
-            row.className = 'table-light'; // Bootstrap class for light row hover
+            row.className = 'table-light';
             row.innerHTML = `
                         <td class="py-3 px-4 text-nowrap">${deposit.id}</td>
                         <td class="py-3 px-4 text-nowrap">$${deposit.amount.toFixed(
@@ -896,34 +864,24 @@
         }
       }
 
-      /**
-       * Handles the click event for "See More" buttons.
-       * Manages visibility of the shared table and updates button states.
-       * @param {string} type - The deposit type ('first', 'second', 'third').
-       * @param {HTMLElement} clickedButton - The button that was clicked.
-       */
       function handleSeeMoreClick(type, clickedButton) {
         const sharedTableContainer = document.getElementById(
           'sharedDepositTableContainer'
         );
         const sharedTableTitle = document.getElementById('sharedTableTitle');
 
-        // Reset all "See More" buttons to default state
         document.querySelectorAll('.see-more-btn').forEach((btn) => {
           btn.innerHTML = `See More <i class="fas fa-chevron-down ms-2"></i>`;
           btn.classList.remove('active');
         });
 
         if (currentActiveDepositType === type) {
-          // If the same button is clicked again, hide the shared table
           sharedTableContainer.style.display = 'none';
           currentActiveDepositType = null;
         } else {
-          // Show the shared table and populate it with the selected data
           sharedTableContainer.style.display = 'block';
           currentActiveDepositType = type;
 
-          // Update the title of the shared table
           const titleMap = {
             first: 'All First Deposits',
             second: 'All Second Deposits',
@@ -931,7 +889,6 @@
           };
           sharedTableTitle.textContent = titleMap[type];
 
-          // Render the shared table with filtered data
           const searchTerm = document
             .getElementById('searchId')
             .value.toLowerCase();
@@ -942,21 +899,16 @@
             : allDeposits[type];
           renderSharedTable(filteredData);
 
-          // Update the clicked button's text to "Hide"
           clickedButton.innerHTML = `Hide <i class="fas fa-chevron-up ms-2"></i>`;
           clickedButton.classList.add('active');
         }
       }
 
-      /**
-       * Filters the deposit data based on the search term and re-renders the lists/tables.
-       */
       function filterDeposits() {
         const searchTerm = document
           .getElementById('searchId')
           .value.toLowerCase();
 
-        // Always update the initial 5 lists in the boxes
         ['first', 'second', 'third'].forEach((type) => {
           const filteredData = allDeposits[type].filter((deposit) =>
             deposit.id.toLowerCase().includes(searchTerm)
@@ -964,7 +916,6 @@
           renderInitialDeposits(type, filteredData);
         });
 
-        // If the shared table is currently visible, update its content based on the active type
         if (currentActiveDepositType) {
           const filteredSharedData = allDeposits[
             currentActiveDepositType
@@ -973,14 +924,46 @@
         }
       }
 
+      /**
+       * Clears all dashboard fields when no agent data is available.
+       */
+      function clearAgentDashboard() {
+        $('#networkSize').text('-');
+        $('#networkLevels').text('-');
+        $('#netDeposits').text('-');
+        $('#retentionRate').text('-');
+        $('#netProfit').text('-');
+        $('#winRate').text('-');
+        $('#netWithdrawal').text('-');
+        $('#withdrawalRate').text('-');
+        $('#commissionEarned').text('-');
+        $('#commissionRate').text('-');
+
+        $('#agentId').text('-');
+        $('#agentUsername').text('-');
+        $('#agentMobile').text('-');
+        $('#agentBalance').text('-');
+        $('#agentAccountType').text('-');
+        $('#agentCreatedAt').text('-');
+
+        $('#performanceTable tbody').html(
+          '<tr><td colspan="7" class="text-center text-muted py-4">No data found</td></tr>'
+        );
+
+        if (window.performanceChart) {
+          window.performanceChart.data.labels = [];
+          window.performanceChart.data.datasets[0].data = [];
+          window.performanceChart.data.datasets[1].data = [];
+          window.performanceChart.update();
+        }
+      }
+
       // Event Listeners
       document.addEventListener('DOMContentLoaded', () => {
-        // Initial render of all deposit types
         renderInitialDeposits('first', allDeposits.first);
         renderInitialDeposits('second', allDeposits.second);
         renderInitialDeposits('third', allDeposits.third);
 
-        // Attach event listeners to "See More" buttons
         document.querySelectorAll('.see-more-btn').forEach((button) => {
           button.addEventListener('click', (event) => {
             const type = event.target.dataset.depositType;
@@ -988,20 +971,18 @@
           });
         });
 
-        // Attach event listener for global search input
         document.getElementById('searchId').addEventListener('keyup', filterDeposits);
 
-        // Attach event listener for clear search button
         document.getElementById('clearSearchBtn').addEventListener('click', () => {
-          document.getElementById('searchId').value = ''; // Clear input
-          filterDeposits(); // Re-run filter to show all data
+          document.getElementById('searchId').value = '';
+          filterDeposits();
         });
       });
 
       $(document).ready(function () {
-        // Initialize Chart
+        // Initialize Chart (store globally so clearAgentDashboard can access)
         const ctx = document.getElementById('performanceChart').getContext('2d');
-        const performanceChart = new Chart(ctx, {
+        window.performanceChart = new Chart(ctx, {
           type: 'bar',
           data: {
             labels: ['Level 1'],
@@ -1036,16 +1017,6 @@
         $('#analyzeBtn').click(function () {
           const userId = $('#userId').val().trim();
 
-          if (!userId) {
-            Swal.fire({
-              title: 'Error!',
-              text: 'Please enter a valid User ID',
-              icon: 'error',
-              confirmButtonText: 'OK',
-            });
-            return;
-          }
-
           Swal.fire({
             title: 'Loading Data',
             html: 'Please wait while we fetch agent performance data...',
@@ -1058,12 +1029,48 @@
           // Simulate API call (replace with actual API call)
           setTimeout(() => {
             Swal.close();
-            loadAgentData(userId);
-          }, 1500);
+
+            const result = loadAgentData(userId);
+
+            // If no data found, show friendly "No Data Found" message (info, not error)
+            if (!result || !result.found) {
+              Swal.fire({
+                title: 'No Data Found',
+                html: `No performance data available for User ID <strong>${userId || '(empty)'}</strong>.`,
+                icon: 'info',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#00807c',
+              });
+              clearAgentDashboard();
+            }
+          }, 1200);
         });
 
+        /**
+         * Loads agent data. Returns { found: true } if data was rendered,
+         * or { found: false } if no agent exists for the given ID.
+         */
         function loadAgentData(userId = '10003') {
-          // Sample data - replace with actual API call
+          // ---- Replace with real API call when backend is ready ----
+          // Example:
+          // try {
+          //   const res = await fetch(`/api/agent/performance/${encodeURIComponent(userId)}`);
+          //   if (res.status === 404) return { found: false };
+          //   const sampleData = await res.json();
+          //   if (!sampleData || sampleData.notFound) return { found: false };
+          //   // ...render below...
+          // } catch (err) {
+          //   return { found: false };
+          // }
+          // -----------------------------------------------------------
+
+          const DEMO_ID = '10003';
+
+          // Simulate "agent not found" case
+          if (!userId || userId !== DEMO_ID) {
+            return { found: false };
+          }
+
           const sampleData = {
             networkSize: 1,
             networkLevels: 1,
@@ -1071,12 +1078,17 @@
             retentionRate: '90.0',
             netProfit: '₹93',
             winRate: '95.8',
+            netWithdrawal: '₹0',
+            withdrawalRate: '0.0',
             commissionEarned: '₹0',
             commissionRate: '0.0',
             agentInfo: {
               id: userId,
               username: 'MEMBER7876DFJ',
               mobile: '7029934287',
+              balance: '₹ 4,500.00',
+              accountType: 'Agent',
+              createdAt: '2024-03-25',
             },
             levelDetails: [
               {
@@ -1098,6 +1110,8 @@
           $('#retentionRate').text(sampleData.retentionRate);
           $('#netProfit').text(sampleData.netProfit);
           $('#winRate').text(sampleData.winRate);
+          $('#netWithdrawal').text(sampleData.netWithdrawal);
+          $('#withdrawalRate').text(sampleData.withdrawalRate);
           $('#commissionEarned').text(sampleData.commissionEarned);
           $('#commissionRate').text(sampleData.commissionRate);
 
@@ -1105,6 +1119,9 @@
           $('#agentId').text(sampleData.agentInfo.id);
           $('#agentUsername').text(sampleData.agentInfo.username);
           $('#agentMobile').text(sampleData.agentInfo.mobile);
+          $('#agentBalance').text(sampleData.agentInfo.balance);
+          $('#agentAccountType').text(sampleData.agentInfo.accountType);
+          $('#agentCreatedAt').text(sampleData.agentInfo.createdAt);
 
           // Update table
           const tableBody = $('#performanceTable tbody');
@@ -1125,16 +1142,18 @@
           });
 
           // Update chart
-          performanceChart.data.labels = sampleData.levelDetails.map(
+          window.performanceChart.data.labels = sampleData.levelDetails.map(
             (level) => level.level
           );
-          performanceChart.data.datasets[0].data = sampleData.levelDetails.map(
+          window.performanceChart.data.datasets[0].data = sampleData.levelDetails.map(
             (level) => parseInt(level.deposits.replace(/[^0-9]/g, ''))
           );
-          performanceChart.data.datasets[1].data = sampleData.levelDetails.map(
+          window.performanceChart.data.datasets[1].data = sampleData.levelDetails.map(
             (level) => parseInt(level.withdrawals.replace(/[^0-9]/g, ''))
           );
-          performanceChart.update();
+          window.performanceChart.update();
+
+          return { found: true };
         }
       });
     </script>
