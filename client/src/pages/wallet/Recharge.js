@@ -1,7 +1,8 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { FaSquare } from "react-icons/fa";
 import { GiSwipeCard, GiWhiteBook } from "react-icons/gi";
-import { IoMdWallet } from "react-icons/io";
+import { IoMdWallet, IoMdClose } from "react-icons/io";
+import { QRCodeSVG } from "qrcode.react";
 import UpiIcon from "../../assets/mp1.png";
 import RefereshImg from "../../assets/refresh.png";
 import EWalletIcon from "../../assets/upi1.png";
@@ -38,10 +39,14 @@ export default function Recharge() {
   const [alertsuccess, setAlertsuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [utr, setUtr] = useState("");
-  const [submitting, setSubmitting] = useState(false); // FIX: local submitting state
+  const [submitting, setSubmitting] = useState(false);
+  // NEW: QR popup state
+  const [qrPopup, setQrPopup] = useState(false);
+  // NEW: amount that was locked in when the QR popup was opened
+  const [qrAmount, setQrAmount] = useState(0);
 
   const alertTimerRef = useRef(null);
-  const copyTimerRef = useRef(null); // FIX: track copy timer for cleanup
+  const copyTimerRef = useRef(null);
 
   const tabs = [
     { label: "KwikPay", Icons: EWalletIcon, g: false },
@@ -125,7 +130,7 @@ export default function Recharge() {
       return;
     }
 
-    setSubmitting(true); // FIX: prevent double-submit
+    setSubmitting(true);
     try {
       const res = await dispatch(kwikpayRecharge({ money: amt }));
       if (res.meta.requestStatus === "fulfilled" && res.payload?.payment_url) {
@@ -135,7 +140,6 @@ export default function Recharge() {
         showAlert(res.payload?.message || "Payment failed");
       }
     } catch (err) {
-      // FIX: catch unexpected errors so button doesn't hang
       showAlert("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
@@ -173,6 +177,8 @@ export default function Recharge() {
         );
         setAmount("");
         setUtr("");
+        setQrPopup(false);
+        setQrAmount(0);
       } else {
         showAlert(res.payload?.message || "Request failed");
       }
@@ -187,7 +193,7 @@ export default function Recharge() {
   // Generic submit
   // ============================================
   const handleSubmit = () => {
-    if (submitting) return; // FIX: guard against double-click
+    if (submitting) return;
     if (activeTab === "KwikPay") {
       handleSubmitKwikPay();
     } else if (activeTab === "UPI Manual") {
@@ -196,12 +202,28 @@ export default function Recharge() {
   };
 
   // ============================================
+  // Open QR popup (Manual UPI only) after amount is valid
+  // ============================================
+  const handleGenerateQR = () => {
+    if (!manualUpiDetailsData?.upi_id) {
+      showAlert("UPI details not loaded. Please retry.");
+      return;
+    }
+    const amt = Number(amount);
+    if (!amt || amt < MIN_AMOUNT) {
+      showAlert(`Enter an amount of at least ₹${MIN_AMOUNT}`);
+      return;
+    }
+    setQrAmount(amt);
+    setQrPopup(true);
+  };
+
+  // ============================================
   // Refresh balance
   // ============================================
   const handleRefesh = () => {
     setCopyPopup(true);
     dispatch(userDetail());
-    // FIX: clear previous timer before scheduling new one
     clearTimeout(copyTimerRef.current);
     copyTimerRef.current = setTimeout(() => setCopyPopup(false), 1500);
   };
@@ -216,7 +238,7 @@ export default function Recharge() {
 
     return () => {
       clearTimeout(alertTimerRef.current);
-      clearTimeout(copyTimerRef.current); // FIX: cleanup copy timer
+      clearTimeout(copyTimerRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -226,7 +248,6 @@ export default function Recharge() {
   // ============================================
   useEffect(() => {
     if (activeTab === "UPI Manual" && !manualUpiDetailsData?.upi_id) {
-      // FIX: only fetch if not already loaded (avoid refetch on re-render)
       dispatch(getManualUPIDetails({ amount: 0 }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -236,11 +257,13 @@ export default function Recharge() {
   // Tab switch handler
   // ============================================
   const handleTabChange = (tabLabel) => {
-    if (tabLabel === activeTab) return; // FIX: avoid resetting on same tab click
+    if (tabLabel === activeTab) return;
     setActiveTab(tabLabel);
     setActiveIndex(0);
     setAmount("");
     setUtr("");
+    setQrPopup(false);
+    setQrAmount(0);
 
     const firstChannel = chennals.find((c) => c.label === tabLabel);
     if (firstChannel && firstChannel.chennalItem.length > 0) {
@@ -259,7 +282,7 @@ export default function Recharge() {
     activeTab !== "UPI Manual" || !!manualUpiDetailsData?.upi_id;
   const isSubmitDisabled =
     loader ||
-    submitting || // FIX: disable while submitting
+    submitting ||
     !isAmountValid ||
     !isManualUtrValid ||
     !isManualUpiReady;
@@ -271,6 +294,18 @@ export default function Recharge() {
     return num >= 1000 ? `${num / 1000}k` : `${num}`;
   };
 
+  // ============================================
+  // UPI deep link for the QR (uses locked qrAmount)
+  // ============================================
+  const upiUri =
+    manualUpiDetailsData?.upi_id && qrAmount >= MIN_AMOUNT
+      ? `upi://pay?pa=${encodeURIComponent(
+          manualUpiDetailsData.upi_id
+        )}&pn=${encodeURIComponent(
+          manualUpiDetailsData.username || "Payment"
+        )}&am=${qrAmount}&cu=INR`
+      : "";
+
   return (
     <>
       <CustomeNavbar
@@ -280,8 +315,6 @@ export default function Recharge() {
       />
 
       <div className="container-section mt-5 text-white pb-32">
-        {/* FIX: added pb-32 so sticky footer doesn't cover content */}
-
         {/* Balance card */}
         <div className="total-img rounded p-4">
           <div className="flex items-center">
@@ -381,7 +414,7 @@ export default function Recharge() {
                                   ? "blue-linear color-orange"
                                   : "border color-blue sky-border"
                               }`}
-                              onClick={() => setAmount(String(data.am))} // FIX: store as string consistently
+                              onClick={() => setAmount(String(data.am))}
                             >
                               <span
                                 className={`mx-2 ${
@@ -412,7 +445,6 @@ export default function Recharge() {
                 placeholder="Enter amount"
                 value={amount}
                 onChange={(e) => {
-                  // FIX: clamp to MIN_AMOUNT
                   const val = e.target.value;
                   if (val === "") {
                     setAmount("");
@@ -428,36 +460,58 @@ export default function Recharge() {
               />
             </div>
 
-            {/* Manual UPI account details */}
+            {/* Manual UPI: Generate QR button (only after valid amount) */}
             {activeTab === "UPI Manual" && (
               <div className="mt-3 rounded-lg border border-[#525167] p-3">
-                <p className="text-sm gray-text">Pay to this UPI ID</p>
+                <p className="text-sm gray-text">
+                  Pay to this UPI ID or generate a QR for the exact amount
+                </p>
+
                 {manualUpiDetailsLoading ? (
                   <p className="mt-1 text-sm">Loading UPI details...</p>
                 ) : manualUpiDetailsData?.upi_id ? (
-                  <div className="mt-1 flex items-center justify-between gap-2">
-                    <span className="break-all font-semibold text-white">
-                      {manualUpiDetailsData.upi_id}
-                    </span>
+                  <>
+                    {/* UPI ID + copy */}
+                    <div className="mt-2 flex items-center justify-between gap-2">
+                      <span className="break-all font-semibold text-white">
+                        {manualUpiDetailsData.upi_id}
+                      </span>
+                      <button
+                        type="button"
+                        className="rounded border border-[#21D9CC] px-3 py-1 text-sm shrink-0"
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(
+                              manualUpiDetailsData.upi_id
+                            );
+                            showAlert("UPI ID copied", true);
+                          } catch {
+                            showAlert(
+                              "Unable to copy UPI ID. Please copy it manually."
+                            );
+                          }
+                        }}
+                      >
+                        Copy
+                      </button>
+                    </div>
+
+                    {/* Generate QR button — enabled only when amount is valid */}
                     <button
                       type="button"
-                      className="rounded border border-[#21D9CC] px-3 py-1 text-sm shrink-0"
-                      onClick={async () => {
-                        try {
-                          await navigator.clipboard.writeText(
-                            manualUpiDetailsData.upi_id
-                          );
-                          showAlert("UPI ID copied", true);
-                        } catch {
-                          showAlert(
-                            "Unable to copy UPI ID. Please copy it manually."
-                          );
-                        }
-                      }}
+                      disabled={!isAmountValid}
+                      onClick={handleGenerateQR}
+                      className={`mt-3 w-full py-2 rounded font-semibold ${
+                        isAmountValid
+                          ? "blue-linear text-black"
+                          : "bg-gray-500 text-black cursor-not-allowed"
+                      }`}
                     >
-                      Copy
+                      {isAmountValid
+                        ? `Generate QR for ₹${amountNumber}`
+                        : "Enter amount to generate QR"}
                     </button>
-                  </div>
+                  </>
                 ) : (
                   <div className="mt-1">
                     <p className="text-sm text-amber-300">
@@ -475,6 +529,7 @@ export default function Recharge() {
                     </button>
                   </div>
                 )}
+
                 {manualUpiDetailsData?.bank_name && (
                   <p className="mt-1 text-xs gray-text">
                     Bank: {manualUpiDetailsData.bank_name}
@@ -540,7 +595,7 @@ export default function Recharge() {
         </div>
       </div>
 
-      {/* FIX: sticky bottom bar — responsive width, above safe area */}
+      {/* Sticky bottom bar */}
       <div className="fixed bottom-0 bg-[#1E2530] left-0 right-0 m-auto w-full sm:max-w-[24.7rem] items-center justify-center shadow-lg border-t border-gray-700 z-50 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="flex justify-between items-center max-w-md mx-auto">
           <div className="flex-1">
@@ -569,6 +624,93 @@ export default function Recharge() {
       <div>
         <DepositHistoryLite />
       </div>
+
+      {/* ============================================ */}
+      {/* QR POPUP — appears only after user generates QR */}
+      {/* ============================================ */}
+      {qrPopup && upiUri && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/70 flex items-center justify-center p-4"
+          onClick={() => setQrPopup(false)}
+        >
+          <div
+            className="bg-[#1E2530] rounded-xl p-5 w-full max-w-sm text-white relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close */}
+            <button
+              type="button"
+              className="absolute top-3 right-3 text-2xl text-gray-400 hover:text-white"
+              onClick={() => setQrPopup(false)}
+              aria-label="Close"
+            >
+              <IoMdClose />
+            </button>
+
+            <h3 className="text-lg font-semibold mb-1">Scan & Pay</h3>
+            <p className="text-xs gray-text mb-3">
+              Scan with any UPI app. Amount is pre-filled.
+            </p>
+
+            {/* QR */}
+            <div className="flex justify-center">
+              <div className="bg-white p-3 rounded-lg">
+                <QRCodeSVG
+                  value={upiUri}
+                  size={220}
+                  level="M"
+                  includeMargin
+                />
+              </div>
+            </div>
+
+            {/* Amount */}
+            <div className="mt-3 text-center">
+              <p className="text-xs gray-text">Amount</p>
+              <p className="text-2xl font-bold color-blue">
+                ₹{qrAmount.toLocaleString("en-IN")}
+              </p>
+            </div>
+
+            {/* UPI ID + copy */}
+            <div className="mt-3 flex items-center justify-between gap-2 bg-[#2A3341] rounded-lg px-3 py-2">
+              <span className="break-all text-sm font-semibold">
+                {manualUpiDetailsData?.upi_id}
+              </span>
+              <button
+                type="button"
+                className="rounded border border-[#21D9CC] px-3 py-1 text-xs shrink-0"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(
+                      manualUpiDetailsData.upi_id
+                    );
+                    showAlert("UPI ID copied", true);
+                  } catch {
+                    showAlert("Unable to copy UPI ID.");
+                  }
+                }}
+              >
+                Copy
+              </button>
+            </div>
+
+            {/* Warning */}
+            <p className="mt-3 text-xs text-amber-300 text-center">
+              Pay exactly ₹{qrAmount.toLocaleString("en-IN")}. Then enter the
+              UTR below and click Deposit.
+            </p>
+
+            <button
+              type="button"
+              className="mt-4 w-full py-2 rounded font-semibold blue-linear text-black"
+              onClick={() => setQrPopup(false)}
+            >
+              I've Paid — Enter UTR
+            </button>
+          </div>
+        </div>
+      )}
 
       <CopyCopmponent copyPopup={copyPopup} message="Refresh successfully" />
 

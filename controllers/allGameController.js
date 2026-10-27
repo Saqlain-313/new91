@@ -36,10 +36,16 @@ const setBalanceSettleMs = Math.max(
   0
 );
 
-// How many times to retry the Setbalance + verify loop.
+// Max Setbalance + verify attempts.
 const setBalanceMaxAttempts = Math.max(
-  Number(process.env.GAME_SETBALANCE_MAX_ATTEMPTS) || 3,
+  Number(process.env.GAME_SETBALANCE_MAX_ATTEMPTS) || 4,
   1
+);
+
+// Residual fallback for providers that reject 0.
+const resetResidual = Math.max(
+  Number(process.env.GAME_RESET_RESIDUAL ?? 0.01) || 0,
+  0
 );
 
 const DEFAULT_HISTORY_UID = "e333695bcff28acdbecc641ae6ee2b23";
@@ -110,19 +116,7 @@ const needKey = (res) =>
     status: false,
   });
 
-function readBalance(data) {
-  const value =
-    data?.Balance ??
-    data?.balance ??
-    data?.data?.Balance ??
-    data?.data?.balance ??
-    data?.money ??
-    null;
-
-  if (value === null || value === undefined || value === "") return null;
-  const number = Number(value);
-  return Number.isFinite(number) ? number : null;
-}
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const round2 = (number) => {
   const n = Number(number);
@@ -133,39 +127,55 @@ const round2 = (number) => {
 const makeTransferRef = () =>
   `tr_${Date.now()}_${crypto.randomBytes(6).toString("hex")}`;
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+/* =========================
+   BALANCE UNIT NORMALIZATION
+   Converts a raw provider balance into a decimal amount (₹ / USD),
+   respecting balanceUnit. Also converts a decimal amount into the
+   wire format the provider expects.
+========================= */
+
+function fromProviderBalance(rawValue) {
+  if (rawValue === null || rawValue === undefined || rawValue === "") return null;
+  const n = Number(rawValue);
+  if (!Number.isFinite(n)) return null;
+  // Provider returns cents: 50000 means 500.00
+  if (balanceUnit === "cents") return n / 100;
+  return n;
+}
+
+function toProviderBalance(decimalAmount) {
+  const n = Number(decimalAmount);
+  if (!Number.isFinite(n)) throw new Error("Invalid balance amount");
+  if (balanceUnit === "cents") return Math.round(n * 100);
+  return n;
+}
+
+function readBalance(data) {
+  const value =
+    data?.Balance ??
+    data?.balance ??
+    data?.data?.Balance ??
+    data?.data?.balance ??
+    data?.money ??
+    null;
+
+  return fromProviderBalance(value);
+}
 
 const isTrueStatus = (data) =>
   data?.status === true ||
   data?.status === 1 ||
   String(data?.status).toLowerCase() === "true";
 
-// Only treat the response as rejected when the provider EXPLICITLY says so.
-// Some providers don't return `status` on Setbalance at all; the real proof
-// is the Userbalance verify step that follows.
 const isExplicitFail = (data) =>
   data?.status === false ||
   data?.status === 0 ||
   String(data?.status).toLowerCase() === "false";
 
-/**
- * Convert a decimal amount to whatever wire format the provider expects.
- * decimal -> number (1.23)
- * cents   -> integer (123)
- */
-function toWireBalance(amount) {
-  const n = Number(amount);
-  if (!Number.isFinite(n)) throw new Error("Invalid balance amount");
-  if (balanceUnit === "cents") return Math.round(n * 100);
-  return n;
-}
+/* =========================
+   SETBALANCE PLAN
+========================= */
 
-/**
- * Providers often validate with `!opening_balance`, which treats the number 0
- * as "missing". So for Setbalance we try different representations of the
- * value, one per attempt:
- *   0 -> "0"  ->  "0.00"  ->  0
- */
 function formatOpeningBalance(wireBalance, formatIndex) {
   const variants = [
     String(wireBalance),
@@ -173,6 +183,15 @@ function formatOpeningBalance(wireBalance, formatIndex) {
     wireBalance,
   ];
   return variants[formatIndex % variants.length];
+}
+
+function buildResetPlan() {
+  // Every attempt must target an actual zero balance.
+  return [
+    { targetDecimal: 0, formatIndex: 0 },
+    { targetDecimal: 0, formatIndex: 1 },
+    { targetDecimal: 0, formatIndex: 2 },
+  ].slice(0, setBalanceMaxAttempts);
 }
 
 /* =========================
@@ -192,8 +211,6 @@ async function findUserByIdentifier(db, identifier, lock = false) {
 
 /* =========================
    TRANSFER LOG (separate connection)
-   These writes use their own connection so they are NOT undone when the main
-   wallet transaction rolls back. This is what makes reconciliation possible.
 ========================= */
 
 async function writeTransferLog(sql, params) {
@@ -231,6 +248,13 @@ const markTransferFailed = (transferRef, amount, providerBalance) =>
     [amount ?? 0, providerBalance ?? null, transferRef]
   );
 
+const updateTransferProgress = (transferRef, amount, providerBalance) =>
+  writeTransferLog(
+    `UPDATE game_transfers SET amount = ?, provider_balance_after = ?
+       WHERE transfer_ref = ?`,
+    [amount ?? 0, providerBalance ?? null, transferRef]
+  );
+
 /* =========================
    PROVIDER BALANCE API
 ========================= */
@@ -265,21 +289,17 @@ async function fetchUserBalance(playerid) {
   return response;
 }
 
-/**
- * Send a Setbalance request. Sends key, playerid and opening_balance in BOTH
- * query params and JSON body. opening_balance is sent in a different format
- * per attempt (see formatOpeningBalance) so a provider that rejects the
- * number 0 as "missing" still gets a valid value.
- */
-async function setProviderBalance(playerid, openingBalance, formatIndex = 0) {
+async function setProviderBalance(playerid, openingBalanceDecimal, formatIndex = 0) {
   if (!key) throw new Error("GAME_API_KEY is missing");
 
-  const numericBalance = Number(openingBalance);
-  if (!Number.isFinite(numericBalance) || numericBalance < 0) {
-    throw new Error("opening_balance must be a non-negative number");
+  // Negative opening_balance is intentionally supported for provider balance
+  // deduction/reset: e.g. live balance 10781.02 -> send -10781.02.
+  const numericBalance = Number(openingBalanceDecimal);
+  if (!Number.isFinite(numericBalance)) {
+    throw new Error("opening_balance must be a finite number");
   }
 
-  const wireBalance = toWireBalance(numericBalance);
+  const wireBalance = toProviderBalance(numericBalance);
   const sendValue = formatOpeningBalance(wireBalance, formatIndex);
 
   const payload = {
@@ -297,7 +317,6 @@ async function setProviderBalance(playerid, openingBalance, formatIndex = 0) {
     timeout: 15000,
   });
 
-  // Never log the API key.
   console.log(
     `[Setbalance] playerid=${String(playerid)} opening_balance=${JSON.stringify(sendValue)} (type=${typeof sendValue}) unit=${balanceUnit} status=${response.status} response=${JSON.stringify(response.data)}`
   );
@@ -313,150 +332,94 @@ async function setProviderBalance(playerid, openingBalance, formatIndex = 0) {
   return response;
 }
 
-/**
- * Set the provider balance and verify the result, retrying the whole loop.
- * targetBalance is ALWAYS a decimal amount (e.g. 0 or 12.5).
- * Returns { ok, reason?, providerBalance, attempts, lastResponse }.
- */
-async function setProviderBalanceAndVerify(playerid, targetBalance) {
+async function setProviderBalanceAndVerify(playerid) {
   let lastResponse = null;
   let lastProviderBalance = null;
   let lastReason = "exhausted";
 
   for (let attempt = 1; attempt <= setBalanceMaxAttempts; attempt++) {
-    const isLast = attempt === setBalanceMaxAttempts;
-
-    // --- 1. Setbalance (different value format on each attempt) ---
+    // 1) Always fetch the current provider balance before sending a deduction.
+    let liveResponse;
+    let liveData;
     try {
-      lastResponse = await setProviderBalance(
-        playerid,
-        targetBalance,
-        attempt - 1
-      );
+      liveResponse = await fetchUserBalance(playerid);
+      liveData = liveResponse?.data;
     } catch (err) {
-      console.error(
-        `[setProviderBalanceAndVerify] attempt ${attempt} Setbalance threw:`,
-        extractApiError(err)
-      );
-      lastReason = "provider_rejected";
-      if (isLast) {
-        return {
-          ok: false,
-          reason: lastReason,
-          providerBalance: lastProviderBalance,
-          attempts: attempt,
-          lastResponse,
-        };
-      }
-      await sleep(setBalanceSettleMs);
+      console.error(`[setProviderBalanceAndVerify] attempt ${attempt} Userbalance failed:`, extractApiError(err));
+      lastReason = "balance_fetch_failed";
+      if (attempt < setBalanceMaxAttempts) await sleep(setBalanceSettleMs);
       continue;
     }
 
-    // Reject only on an explicit failure. Missing/odd `status` is fine, the
-    // Userbalance verify below is the real source of truth.
-    if (isExplicitFail(lastResponse?.data)) {
-      console.warn(
-        `[setProviderBalanceAndVerify] attempt ${attempt} provider rejected:`,
-        JSON.stringify(lastResponse?.data ?? null)
-      );
-      lastReason = "provider_rejected";
-      if (isLast) {
-        return {
-          ok: false,
-          reason: lastReason,
-          providerBalance: lastProviderBalance,
-          attempts: attempt,
-          lastResponse,
-        };
-      }
-      await sleep(setBalanceSettleMs);
-      continue;
-    }
-
-    // Provider APIs may update asynchronously. Use a growing delay per attempt.
-    await sleep(setBalanceSettleMs * attempt);
-
-    // --- 2. Verify with Userbalance ---
-    let verifyData;
-    try {
-      const verify = await fetchUserBalance(playerid);
-      verifyData = verify?.data;
-    } catch (err) {
-      console.error(
-        `[setProviderBalanceAndVerify] attempt ${attempt} Userbalance threw:`,
-        extractApiError(err)
-      );
-      lastReason = "verify_failed";
-      if (isLast) {
-        return {
-          ok: false,
-          reason: lastReason,
-          providerBalance: lastProviderBalance,
-          attempts: attempt,
-          lastResponse,
-        };
-      }
-      await sleep(setBalanceSettleMs);
-      continue;
-    }
-
-    if (!isTrueStatus(verifyData)) {
-      console.warn(
-        `[setProviderBalanceAndVerify] attempt ${attempt} Userbalance status false:`,
-        JSON.stringify(verifyData ?? null)
-      );
+    if (!isTrueStatus(liveData)) {
+      console.warn(`[setProviderBalanceAndVerify] attempt ${attempt} Userbalance status false:`, JSON.stringify(liveData ?? null));
       lastReason = "verify_status_false";
-      if (isLast) {
-        return {
-          ok: false,
-          reason: lastReason,
-          providerBalance: lastProviderBalance,
-          attempts: attempt,
-          lastResponse,
-        };
-      }
-      await sleep(setBalanceSettleMs);
+      if (attempt < setBalanceMaxAttempts) await sleep(setBalanceSettleMs);
       continue;
     }
 
-    const providerBalance = readBalance(verifyData);
-    lastProviderBalance = providerBalance;
-
-    // targetBalance is already decimal (no cents conversion needed here).
-    if (
-      providerBalance !== null &&
-      Math.abs(providerBalance - targetBalance) <= 0.01
-    ) {
-      return {
-        ok: true,
-        providerBalance,
-        attempts: attempt,
-        lastResponse,
-      };
+    const currentBalance = readBalance(liveData);
+    if (currentBalance === null || !Number.isFinite(currentBalance)) {
+      lastReason = "invalid_provider_balance";
+      if (attempt < setBalanceMaxAttempts) await sleep(setBalanceSettleMs);
+      continue;
     }
 
-    console.warn(
-      `[setProviderBalanceAndVerify] attempt ${attempt} mismatch: expected≈${targetBalance}, got ${providerBalance}`
-    );
-    lastReason = "balance_not_zero";
+    lastProviderBalance = currentBalance;
 
-    if (isLast) {
-      return {
-        ok: false,
-        reason: lastReason,
-        providerBalance,
-        attempts: attempt,
-        lastResponse,
-      };
+    // Provider is already at zero; do not send a needless adjustment.
+    if (Math.abs(currentBalance) <= 0.01) {
+      return { ok: true, providerBalance: currentBalance, targetUsed: 0, attempts: attempt, lastResponse };
     }
 
-    await sleep(setBalanceSettleMs);
+    // 2) Deduct the exact current balance using a negative opening_balance.
+    // Example: Balance=10781.02 -> opening_balance=-10781.02.
+    const negativeBalance = round2(-currentBalance);
+    try {
+      lastResponse = await setProviderBalance(playerid, negativeBalance, (attempt - 1) % 3);
+    } catch (err) {
+      console.error(`[setProviderBalanceAndVerify] attempt ${attempt} Setbalance failed:`, extractApiError(err));
+      lastReason = "provider_rejected";
+      if (attempt < setBalanceMaxAttempts) await sleep(setBalanceSettleMs * attempt);
+      continue;
+    }
+
+    if (isExplicitFail(lastResponse?.data)) {
+      console.warn(`[setProviderBalanceAndVerify] attempt ${attempt} provider rejected:`, JSON.stringify(lastResponse?.data ?? null));
+      lastReason = "provider_rejected";
+      if (attempt < setBalanceMaxAttempts) await sleep(setBalanceSettleMs * attempt);
+      continue;
+    }
+
+    // 3) Wait for provider processing, then verify using Userbalance.
+    await sleep(setBalanceSettleMs * attempt);
+    try {
+      const verifyResponse = await fetchUserBalance(playerid);
+      const verifyData = verifyResponse?.data;
+      if (!isTrueStatus(verifyData)) {
+        lastReason = "verify_status_false";
+      } else {
+        const verifiedBalance = readBalance(verifyData);
+        lastProviderBalance = verifiedBalance;
+        if (verifiedBalance !== null && Math.abs(verifiedBalance) <= 0.01) {
+          return { ok: true, providerBalance: verifiedBalance, targetUsed: 0, attempts: attempt, lastResponse };
+        }
+        lastReason = "balance_not_zero";
+        console.warn(`[setProviderBalanceAndVerify] attempt ${attempt} balance still not zero: ${verifiedBalance}`);
+      }
+    } catch (err) {
+      lastReason = "verify_failed";
+      console.error(`[setProviderBalanceAndVerify] attempt ${attempt} verify failed:`, extractApiError(err));
+    }
+
+    if (attempt < setBalanceMaxAttempts) await sleep(setBalanceSettleMs);
   }
 
   return {
     ok: false,
     reason: lastReason,
     providerBalance: lastProviderBalance,
+    targetUsed: lastProviderBalance === null ? null : round2(-lastProviderBalance),
     attempts: setBalanceMaxAttempts,
     lastResponse,
   };
@@ -515,254 +478,204 @@ const transferBalance = async (req, res) => {
   let playerid;
   let transferRef;
   let gameBalance = 0;
-  let providerResetSucceeded = false;
-  let pendingLogged = false;
+  let userPhone;
+  let walletCredited = false;
 
   try {
     playerid = req.body?.playerid;
     transferRef = req.body?.transferRef || makeTransferRef();
 
     if (!playerid) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Undefined token" });
+      return res.status(400).json({ status: false, message: "Undefined token" });
     }
     if (!key) return needKey(res);
 
-    // 1. Open DB + lock the user row first.
+    // Create/lock the transfer record first to prevent duplicate wallet credits.
     conn = await connection.getConnection();
     await conn.beginTransaction();
     transactionStarted = true;
 
     const user = await findUserByIdentifier(conn, playerid, true);
     if (!user) {
-      await conn.rollback();
-      transactionStarted = false;
+      await conn.rollback(); transactionStarted = false;
       return res.status(404).json({ status: false, message: "User not found" });
     }
-
-    const userPhone = user.phone;
-    const userMoneyBefore = Number(user.money);
-
+    userPhone = user.phone;
+    const userMoneyBefore = round2(Number(user.money));
     if (!Number.isFinite(userMoneyBefore) || userMoneyBefore < 0) {
-      await conn.rollback();
-      transactionStarted = false;
-      return res
-        .status(500)
-        .json({ status: false, message: "Invalid user wallet balance" });
+      await conn.rollback(); transactionStarted = false;
+      return res.status(500).json({ status: false, message: "Invalid user wallet balance" });
     }
 
-    // 2. Idempotency check.
     const [existing] = await conn.query(
       `SELECT status, amount, provider_balance_after, user_money_before, user_money_after
-       FROM game_transfers WHERE transfer_ref = ? LIMIT 1`,
+       FROM game_transfers WHERE transfer_ref = ? LIMIT 1 FOR UPDATE`,
       [transferRef]
     );
-
     if (existing.length) {
       const row = existing[0];
       if (row.status === "completed") {
-        await conn.commit();
-        transactionStarted = false;
+        await conn.commit(); transactionStarted = false;
         return res.status(200).json({
-          status: true,
-          message: "Transfer already completed",
-          data: {
-            playerid,
-            transferRef,
-            transferredAmount: Number(row.amount),
-            providerBalanceAfter: row.provider_balance_after,
-            userPhone,
+          status: true, message: "Transfer already completed",
+          data: { playerid, transferRef, transferredAmount: Number(row.amount),
+            providerBalanceAfter: row.provider_balance_after, userPhone,
             userMoneyBefore: Number(row.user_money_before),
-            userMoneyAfter: Number(row.user_money_after),
-            idempotent: true,
-          },
+            userMoneyAfter: Number(row.user_money_after), idempotent: true }
         });
       }
       if (row.status === "pending") {
-        await conn.rollback();
-        transactionStarted = false;
-        return res.status(409).json({
-          status: false,
-          message:
-            "Previous transfer for this reference is still pending reconciliation. Do not retry until it is resolved.",
-          transferRef,
-        });
+        await conn.rollback(); transactionStarted = false;
+        return res.status(409).json({ status: false,
+          message: "This transfer is pending. Run reconcileTransfer with the same transferRef; do not create a new reference.", transferRef });
       }
-      // 'failed' -> allow retry
+      // Failed reference may be retried; reset its persisted progress.
+      await conn.query(`UPDATE game_transfers SET status='pending', amount=0,
+        provider_balance_after=NULL, user_money_before=NULL, user_money_after=NULL
+        WHERE transfer_ref=?`, [transferRef]);
+    } else {
+      await conn.query(`INSERT INTO game_transfers
+        (transfer_ref, phone, playerid, status, amount, created_at)
+        VALUES (?, ?, ?, 'pending', 0, ?)`,
+        [transferRef, userPhone, String(playerid), timerJoin2(Date.now())]);
     }
 
-    // Mark pending on a SEPARATE connection (committed immediately) BEFORE the
-    // provider call. If the wallet transaction rolls back, this row survives,
-    // so failures are always visible for reconciliation.
-    pendingLogged = await markTransferPending(transferRef, userPhone, playerid);
-
-    // 3. Read provider balance.
+    // 1) Read the provider balance first.
     const balanceResponse = await fetchUserBalance(playerid);
     const balanceData = balanceResponse?.data;
-
     if (!isTrueStatus(balanceData)) {
-      await conn.rollback();
-      transactionStarted = false;
-      await markTransferFailed(transferRef, 0, null);
-      return res.status(502).json({
-        status: false,
-        message: "Unable to fetch provider balance",
-        data: balanceData ?? null,
-      });
+      await conn.query(`UPDATE game_transfers SET status='failed' WHERE transfer_ref=?`, [transferRef]);
+      await conn.commit(); transactionStarted = false;
+      return res.status(502).json({ status: false, message: "Unable to fetch provider balance", data: balanceData ?? null, transferRef });
     }
 
     gameBalance = round2(readBalance(balanceData));
-
     if (!Number.isFinite(gameBalance) || gameBalance <= 0) {
-      await conn.rollback();
-      transactionStarted = false;
-      await markTransferFailed(transferRef, 0, null);
-      return res
-        .status(400)
-        .json({ status: false, message: "Insufficient balance" });
+      await conn.query(`UPDATE game_transfers SET status='failed', amount=0 WHERE transfer_ref=?`, [transferRef]);
+      await conn.commit(); transactionStarted = false;
+      return res.status(400).json({ status: false, message: "Insufficient provider balance", providerBalance: gameBalance, transferRef });
     }
 
-    // 4. Request provider balance reset to zero and verify using Userbalance.
-    // Wallet credit is forbidden unless the provider reports zero.
-    const reset = await setProviderBalanceAndVerify(playerid, 0);
+    // 2) Credit wallet FIRST and persist the credit marker atomically.
+    const userMoneyAfter = round2(userMoneyBefore + gameBalance);
+    const [updateResult] = await conn.query("UPDATE users SET money = ? WHERE phone = ?", [userMoneyAfter, userPhone]);
+    if (updateResult.affectedRows !== 1) throw new Error("User wallet update failed");
 
+    await conn.query(`INSERT INTO transaction_history
+      SET phone = ?, detail = ?, balance = ?, \`time\` = ?`,
+      [userPhone, "Game moved out (pending provider reset)", gameBalance, timerJoin2(Date.now())]);
+
+    await conn.query(`UPDATE game_transfers SET status='pending', amount=?,
+      provider_balance_after=NULL, user_money_before=?, user_money_after=?
+      WHERE transfer_ref=?`, [gameBalance, userMoneyBefore, userMoneyAfter, transferRef]);
+
+    await conn.commit(); transactionStarted = false;
+    walletCredited = true;
+
+    // 3) Only after wallet credit is committed, reset provider to zero and verify.
+    const reset = await setProviderBalanceAndVerify(playerid);
     if (!reset.ok) {
-      await conn.rollback();
-      transactionStarted = false;
-
-      // Row now definitely exists (committed earlier), so this update works.
-      await markTransferFailed(transferRef, gameBalance, reset.providerBalance);
-
-      const reason = reset.reason;
-      const providerBalance = reset.providerBalance;
-
-      console.error(
-        `[transferBalance] Setbalance failed reason=${reason} playerid=${playerid} providerBalance=${providerBalance} attempts=${reset.attempts}`
-      );
-
+      console.error(`[transferBalance] wallet credited; provider reset pending playerid=${playerid} transferRef=${transferRef} providerBalance=${reset.providerBalance}`);
+      await updateTransferProgress(transferRef, gameBalance, reset.providerBalance);
       return res.status(409).json({
         status: false,
-        message:
-          reason === "balance_not_zero"
-            ? "Provider balance is still not zero. Wallet was not credited."
-            : reason === "provider_rejected"
-            ? "Provider rejected balance reset."
-            : reason === "verify_failed" || reason === "verify_status_false"
-            ? "Reset was requested but provider balance could not be verified. Reconciliation required."
-            : "Unable to reset provider balance after retries.",
-        providerBalance,
-        transferRef,
-        reason,
-        attempts: reset.attempts,
+        message: "Wallet credited, but provider balance is not verified as zero. Transfer remains pending; call reconcileTransfer using this transferRef. Do not retry with a new reference.",
+        transferRef, transferredAmount: gameBalance,
+        providerBalance: reset.providerBalance, reason: reset.reason, attempts: reset.attempts,
+        walletCredited: true, userMoneyBefore, userMoneyAfter
       });
     }
 
-    providerResetSucceeded = true;
-    const providerBalanceAfter = reset.providerBalance;
+    await writeTransferLog(`UPDATE game_transfers SET status='completed', amount=?,
+      provider_balance_after=?, user_money_before=?, user_money_after=? WHERE transfer_ref=?`,
+      [gameBalance, reset.providerBalance, userMoneyBefore, userMoneyAfter, transferRef]);
 
-    // 5. Credit wallet only after zero is confirmed.
-    const userMoneyAfter = round2(userMoneyBefore + gameBalance);
-
-    const [updateResult] = await conn.query(
-      "UPDATE users SET money = ? WHERE phone = ?",
-      [userMoneyAfter, userPhone]
-    );
-
-    if (updateResult.affectedRows !== 1) {
-      await conn.rollback();
-      transactionStarted = false;
-      // Provider is already zero but wallet not credited: keep it 'pending'
-      // with the amount so it can be fixed manually.
-      await writeTransferLog(
-        `UPDATE game_transfers SET amount = ?, provider_balance_after = ?
-          WHERE transfer_ref = ?`,
-        [gameBalance, providerBalanceAfter, transferRef]
-      );
-      return res.status(500).json({
-        status: false,
-        message:
-          "Provider balance is zero but wallet update failed. Reconciliation required.",
-        transferRef,
-      });
-    }
-
-    // 6. Transaction history.
-    await conn.query(
-      `INSERT INTO transaction_history
-         SET phone = ?, detail = ?, balance = ?, \`time\` = ?`,
-      [userPhone, "Game moved out", gameBalance, timerJoin2(Date.now())]
-    );
-
-    // 7. Mark transfer completed.
-    await conn.query(
-      `UPDATE game_transfers
-         SET status = 'completed', amount = ?, provider_balance_after = ?,
-             user_money_before = ?, user_money_after = ?
-       WHERE transfer_ref = ?`,
-      [
-        gameBalance,
-        providerBalanceAfter,
-        round2(userMoneyBefore),
-        userMoneyAfter,
-        transferRef,
-      ]
-    );
-
-    await conn.commit();
-    transactionStarted = false;
-
-    return res.status(200).json({
-      status: true,
-      message: "Transfer completed successfully",
-      data: {
-        playerid,
-        transferRef,
-        transferredAmount: gameBalance,
-        providerBalanceAfter,
-        userPhone,
-        userMoneyBefore: round2(userMoneyBefore),
-        userMoneyAfter,
-      },
-    });
+    return res.status(200).json({ status: true, message: "Provider balance transferred to wallet and provider reset verified",
+      data: { playerid, transferRef, transferredAmount: gameBalance,
+        providerBalanceBefore: gameBalance, providerBalanceAfter: reset.providerBalance,
+        userPhone, userMoneyBefore, userMoneyAfter, walletCredited: true, attempts: reset.attempts } });
   } catch (error) {
     if (conn && transactionStarted) {
-      try {
-        await conn.rollback();
-      } catch (rollbackError) {
-        console.error(
-          "[transferBalance] Rollback failed:",
-          rollbackError.message
-        );
-      }
+      try { await conn.rollback(); } catch (e) { console.error("[transferBalance] Rollback failed:", e.message); }
     }
-
     console.error("[transferBalance]", extractApiError(error));
-
-    if (providerResetSucceeded) {
-      // Provider is zero but wallet may not be credited. Leave row 'pending'.
-      console.error(
-        "[transferBalance] Provider may already be zero. Reconcile before retrying.",
-        { playerid, transferRef, gameBalance }
-      );
-      await writeTransferLog(
-        `UPDATE game_transfers SET amount = ? WHERE transfer_ref = ?`,
-        [gameBalance, transferRef]
-      );
-    } else if (pendingLogged && transferRef) {
-      // Provider was never reset, safe to allow retry.
+    // Never mark failed after a wallet credit: reconciliation must not credit again.
+    if (!walletCredited && transferRef) {
       await markTransferFailed(transferRef, gameBalance, null);
     }
-
     return fail(res, "transferBalance", error);
   } finally {
-    if (conn) {
-      try {
-        conn.release();
-      } catch (error) {
-        console.error("[transferBalance] Release failed:", error.message);
-      }
+    if (conn) { try { conn.release(); } catch (e) { console.error("[transferBalance] Release failed:", e.message); } }
+  }
+};
+
+/* =========================
+   RECONCILE PENDING TRANSFER
+   Fixes rows stuck in 'pending'. Safe to call repeatedly.
+========================= */
+
+const reconcileTransfer = async (req, res) => {
+  const transferRef = req.body?.transferRef || req.params?.transferRef;
+  if (!transferRef) return res.status(400).json({ status: false, message: "transferRef required" });
+  if (!key) return needKey(res);
+
+  let conn;
+  try {
+    conn = await connection.getConnection();
+    await conn.beginTransaction();
+    const [rows] = await conn.query(`SELECT transfer_ref, phone, playerid, status, amount,
+      provider_balance_after, user_money_before, user_money_after
+      FROM game_transfers WHERE transfer_ref=? LIMIT 1 FOR UPDATE`, [transferRef]);
+    if (!rows.length) {
+      await conn.rollback();
+      return res.status(404).json({ status: false, message: "Transfer not found" });
     }
+    const row = rows[0];
+    if (row.status === "completed") {
+      await conn.rollback();
+      return res.status(200).json({ status: true, message: "Already completed", data: row });
+    }
+
+    // A persisted user_money_after means the wallet credit was committed already.
+    // Never credit the wallet a second time during reconciliation.
+    const walletAlreadyCredited = row.user_money_after !== null && row.user_money_after !== undefined && Number(row.amount) > 0;
+    if (!walletAlreadyCredited) {
+      await conn.rollback();
+      return res.status(409).json({ status: false,
+        message: "No confirmed wallet-credit marker exists for this transfer. Automatic credit is blocked to prevent double credit; manual review required.", transferRef });
+    }
+    await conn.commit();
+
+    // Reset/verify provider balance; do not change wallet here.
+    let liveProviderBalance = null;
+    try {
+      const live = await fetchUserBalance(row.playerid);
+      if (isTrueStatus(live?.data)) liveProviderBalance = readBalance(live.data);
+    } catch (e) {
+      console.error("[reconcileTransfer] Userbalance failed:", e.message);
+    }
+
+    if (liveProviderBalance === null || Math.abs(liveProviderBalance) > 0.01) {
+      const reset = await setProviderBalanceAndVerify(row.playerid);
+      if (!reset.ok) {
+        await updateTransferProgress(transferRef, Number(row.amount), reset.providerBalance ?? liveProviderBalance);
+        return res.status(409).json({ status: false,
+          message: "Wallet was already credited; provider reset still not verified. No second wallet credit was made.",
+          transferRef, walletCredited: true, providerBalance: reset.providerBalance ?? liveProviderBalance,
+          reason: reset.reason, attempts: reset.attempts });
+      }
+      liveProviderBalance = reset.providerBalance;
+    }
+
+    await writeTransferLog(`UPDATE game_transfers SET status='completed', provider_balance_after=?, amount=? WHERE transfer_ref=?`,
+      [liveProviderBalance, Number(row.amount), transferRef]);
+    return res.status(200).json({ status: true, message: "Reconciled: provider is zero; existing wallet credit retained",
+      data: { transferRef, creditedAmount: Number(row.amount), liveProviderBalance, walletCredited: true } });
+  } catch (e) {
+    if (conn) { try { await conn.rollback(); } catch (_) {} }
+    return fail(res, "reconcileTransfer", e);
+  } finally {
+    if (conn) { try { conn.release(); } catch (_) {} }
   }
 };
 
@@ -792,7 +705,7 @@ const launchGame = async (req, res) => {
     }
     if (!key) return needKey(res);
 
-    // 1. Lock wallet, zero it, commit BEFORE calling the provider.
+    // 1. Lock wallet, zero it, commit BEFORE provider call.
     conn = await connection.getConnection();
     await conn.beginTransaction();
     transactionStarted = true;
@@ -832,10 +745,10 @@ const launchGame = async (req, res) => {
     await conn.commit();
     transactionStarted = false;
 
-    // 2. Call provider after wallet is zeroed.
+    // 2. Call provider.
     let response;
     try {
-      const wireBalance = toWireBalance(openingBalance);
+      const wireBalance = toProviderBalance(openingBalance);
       response = await axios.post(
         launchUrl,
         {
@@ -875,7 +788,7 @@ const launchGame = async (req, res) => {
       });
     }
 
-    // 3. Record transaction history (non-fatal).
+    // 3. History (non-fatal).
     if (openingBalance > 0) {
       const c2 = await connection.getConnection();
       try {
@@ -1158,6 +1071,7 @@ const gameHistory = async (req, res) => {
 module.exports = {
   checkBalance,
   transferBalance,
+  reconcileTransfer,   // NEW
   launchGame,
   getgamedetails,
   gameProvider,
