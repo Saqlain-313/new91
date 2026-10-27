@@ -1,8 +1,8 @@
+import { QRCodeSVG } from "qrcode.react";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { FaSquare } from "react-icons/fa";
 import { GiSwipeCard, GiWhiteBook } from "react-icons/gi";
-import { IoMdWallet, IoMdClose } from "react-icons/io";
-import { QRCodeSVG } from "qrcode.react";
+import { IoMdClose, IoMdWallet } from "react-icons/io";
 import UpiIcon from "../../assets/mp1.png";
 import RefereshImg from "../../assets/refresh.png";
 import EWalletIcon from "../../assets/upi1.png";
@@ -18,14 +18,13 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import AlertCopmponent from "../../components/AlertComponent";
 import CustomeNavbar from "../../components/CustomeNavbar";
-import DepositHistoryLite from "./DepositHistoryLite";
 
 const MIN_AMOUNT = 1;
 const UTR_LENGTH = 12;
 
 export default function Recharge() {
   const { manualUpiDetailsData, manualUpiDetailsLoading } = useSelector(
-    (state) => state.user
+    (state) => state.user,
   );
   const { userInfo, loader } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -40,9 +39,9 @@ export default function Recharge() {
   const [successMessage, setSuccessMessage] = useState("");
   const [utr, setUtr] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  // NEW: QR popup state
+  // QR popup state
   const [qrPopup, setQrPopup] = useState(false);
-  // NEW: amount that was locked in when the QR popup was opened
+  // amount that was locked in when the QR popup was opened
   const [qrAmount, setQrAmount] = useState(0);
 
   const alertTimerRef = useRef(null);
@@ -93,11 +92,11 @@ export default function Recharge() {
   ];
 
   const selectedchennalGroup = chennals.find(
-    (chennal) => chennal.label === activeTab
+    (chennal) => chennal.label === activeTab,
   );
 
   const selectedchennalItem = selectedchennalGroup?.chennalItem.find(
-    (item) => item.label === activeTab2
+    (item) => item.label === activeTab2,
   );
 
   // ============================================
@@ -147,10 +146,11 @@ export default function Recharge() {
   };
 
   // ============================================
-  // Manual UPI Submit
+  // Manual UPI Submit (called from QR popup)
   // ============================================
   const handleSubmitManualUPI = async () => {
-    const amt = Number(amount);
+    // popup open hai to QR me lock kiya hua amount use karo
+    const amt = qrPopup ? Number(qrAmount) : Number(amount);
     if (!amt || amt < MIN_AMOUNT) {
       showAlert(`Minimum deposit is ₹${MIN_AMOUNT}`);
       return;
@@ -167,13 +167,13 @@ export default function Recharge() {
     setSubmitting(true);
     try {
       const res = await dispatch(
-        manualUPIRecharge({ money: amt, utr: String(utr).trim() })
+        manualUPIRecharge({ money: amt, utr: String(utr).trim() }),
       );
       if (res.meta.requestStatus === "fulfilled" && res.payload?.status) {
         showAlert(
           res.payload.message ||
             "Payment request submitted! Balance will update shortly.",
-          true
+          true,
         );
         setAmount("");
         setUtr("");
@@ -186,18 +186,6 @@ export default function Recharge() {
       showAlert("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  // ============================================
-  // Generic submit
-  // ============================================
-  const handleSubmit = () => {
-    if (submitting) return;
-    if (activeTab === "KwikPay") {
-      handleSubmitKwikPay();
-    } else if (activeTab === "UPI Manual") {
-      handleSubmitManualUPI();
     }
   };
 
@@ -216,6 +204,20 @@ export default function Recharge() {
     }
     setQrAmount(amt);
     setQrPopup(true);
+  };
+
+  // ============================================
+  // Generic submit (sticky bar)
+  // KwikPay -> direct submit
+  // UPI Manual -> QR popup open (UTR popup ke andar hai)
+  // ============================================
+  const handleSubmit = () => {
+    if (submitting) return;
+    if (activeTab === "KwikPay") {
+      handleSubmitKwikPay();
+    } else if (activeTab === "UPI Manual") {
+      handleGenerateQR();
+    }
   };
 
   // ============================================
@@ -276,18 +278,18 @@ export default function Recharge() {
   // ============================================
   const amountNumber = Number(amount);
   const isAmountValid = !!amountNumber && amountNumber >= MIN_AMOUNT;
-  const isManualUtrValid =
-    activeTab !== "UPI Manual" || utr.length === UTR_LENGTH;
   const isManualUpiReady =
     activeTab !== "UPI Manual" || !!manualUpiDetailsData?.upi_id;
-  const isSubmitDisabled =
-    loader ||
-    submitting ||
-    !isAmountValid ||
-    !isManualUtrValid ||
-    !isManualUpiReady;
 
-  // FIX: display helper for preset button + deposit button
+  // Sticky bar button
+  const isSubmitDisabled =
+    loader || submitting || !isAmountValid || !isManualUpiReady;
+
+  // QR popup ka Submit button (UTR valid hona chahiye)
+  const isPopupSubmitDisabled =
+    loader || submitting || utr.length !== UTR_LENGTH;
+
+  // display helper for preset button + deposit button
   const formatAmount = (val) => {
     const num = Number(val);
     if (!num) return "";
@@ -300,9 +302,9 @@ export default function Recharge() {
   const upiUri =
     manualUpiDetailsData?.upi_id && qrAmount >= MIN_AMOUNT
       ? `upi://pay?pa=${encodeURIComponent(
-          manualUpiDetailsData.upi_id
+          manualUpiDetailsData.upi_id,
         )}&pn=${encodeURIComponent(
-          manualUpiDetailsData.username || "Payment"
+          manualUpiDetailsData.username || "Payment",
         )}&am=${qrAmount}&cu=INR`
       : "";
 
@@ -314,7 +316,7 @@ export default function Recharge() {
         link="/wallet/RechargeHistory"
       />
 
-      <div className="container-section mt-5 text-white pb-32">
+      <div className="container-section mt-5 text-white pb-3">
         {/* Balance card */}
         <div className="total-img rounded p-4">
           <div className="flex items-center">
@@ -388,7 +390,7 @@ export default function Recharge() {
                         </div>
                       ))}
                     </Fragment>
-                  )
+                  ),
               )}
             </div>
           </div>
@@ -429,7 +431,7 @@ export default function Recharge() {
                             </button>
                           ))}
                         </Fragment>
-                      )
+                      ),
                   )}
                 </Fragment>
               ))}
@@ -460,112 +462,11 @@ export default function Recharge() {
               />
             </div>
 
-            {/* Manual UPI: Generate QR button (only after valid amount) */}
-            {activeTab === "UPI Manual" && (
-              <div className="mt-3 rounded-lg border border-[#525167] p-3">
-                <p className="text-sm gray-text">
-                  Pay to this UPI ID or generate a QR for the exact amount
-                </p>
-
-                {manualUpiDetailsLoading ? (
-                  <p className="mt-1 text-sm">Loading UPI details...</p>
-                ) : manualUpiDetailsData?.upi_id ? (
-                  <>
-                    {/* UPI ID + copy */}
-                    <div className="mt-2 flex items-center justify-between gap-2">
-                      <span className="break-all font-semibold text-white">
-                        {manualUpiDetailsData.upi_id}
-                      </span>
-                      <button
-                        type="button"
-                        className="rounded border border-[#21D9CC] px-3 py-1 text-sm shrink-0"
-                        onClick={async () => {
-                          try {
-                            await navigator.clipboard.writeText(
-                              manualUpiDetailsData.upi_id
-                            );
-                            showAlert("UPI ID copied", true);
-                          } catch {
-                            showAlert(
-                              "Unable to copy UPI ID. Please copy it manually."
-                            );
-                          }
-                        }}
-                      >
-                        Copy
-                      </button>
-                    </div>
-
-                    {/* Generate QR button — enabled only when amount is valid */}
-                    <button
-                      type="button"
-                      disabled={!isAmountValid}
-                      onClick={handleGenerateQR}
-                      className={`mt-3 w-full py-2 rounded font-semibold ${
-                        isAmountValid
-                          ? "blue-linear text-black"
-                          : "bg-gray-500 text-black cursor-not-allowed"
-                      }`}
-                    >
-                      {isAmountValid
-                        ? `Generate QR for ₹${amountNumber}`
-                        : "Enter amount to generate QR"}
-                    </button>
-                  </>
-                ) : (
-                  <div className="mt-1">
-                    <p className="text-sm text-amber-300">
-                      {manualUpiDetailsData?.message ||
-                        "UPI details unavailable. Please try again."}
-                    </p>
-                    <button
-                      type="button"
-                      className="mt-2 rounded border border-[#21D9CC] px-3 py-1 text-sm"
-                      onClick={() =>
-                        dispatch(getManualUPIDetails({ amount: 0 }))
-                      }
-                    >
-                      Retry
-                    </button>
-                  </div>
-                )}
-
-                {manualUpiDetailsData?.bank_name && (
-                  <p className="mt-1 text-xs gray-text">
-                    Bank: {manualUpiDetailsData.bank_name}
-                  </p>
-                )}
-                {manualUpiDetailsData?.username && (
-                  <p className="mt-1 text-xs gray-text">
-                    Account name: {manualUpiDetailsData.username}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* UTR input — only for Manual UPI */}
-            {activeTab === "UPI Manual" && (
-              <div className="bgs-body flex items-center mt-3 px-5 py-1 rounded-full">
-                <span className="color-blue text-sm font-bold">UTR</span>{" "}
-                <span className="border-r border-[#bdbdbd] ml-2 w-2 h-4"></span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  className="w-full bgs-body p-2 ps-6 flex items-center focus:outline-none placeholder:text-sm placeholder:text-[var(--text_color_L3)]"
-                  placeholder={`Enter ${UTR_LENGTH}-digit UTR`}
-                  value={utr}
-                  onChange={(e) =>
-                    setUtr(e.target.value.replace(/\D/g, "").slice(0, UTR_LENGTH))
-                  }
-                  maxLength={UTR_LENGTH}
-                />
-              </div>
-            )}
-
             {activeTab === "UPI Manual" && (
               <p className="text-xs gray-text mt-2 px-2">
-                Transfer the exact amount to the UPI ID shown above, then enter
-                the {UTR_LENGTH}-digit UTR here and click Deposit.
+                Transfer the exact amount to the UPI ID shown above (or scan the
+                QR), then enter the {UTR_LENGTH}-digit UTR in the QR popup and
+                submit.
               </p>
             )}
           </div>
@@ -616,17 +517,19 @@ export default function Recharge() {
           >
             {loader || submitting
               ? "Processing..."
-              : `Deposit ₹${formatAmount(amount)}`}
+              : activeTab === "UPI Manual"
+                ? `Pay ₹${formatAmount(amount)}`
+                : `Deposit ₹${formatAmount(amount)}`}
           </button>
         </div>
       </div>
 
-      <div>
+      {/* <div>
         <DepositHistoryLite />
-      </div>
+      </div> */}
 
       {/* ============================================ */}
-      {/* QR POPUP — appears only after user generates QR */}
+      {/* QR POPUP — QR + UTR + Submit                 */}
       {/* ============================================ */}
       {qrPopup && upiUri && (
         <div
@@ -634,7 +537,7 @@ export default function Recharge() {
           onClick={() => setQrPopup(false)}
         >
           <div
-            className="bg-[#1E2530] rounded-xl p-5 w-full max-w-sm text-white relative"
+            className="bg-[#1E2530] rounded-xl p-5 w-full max-w-sm text-white relative max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close */}
@@ -655,12 +558,7 @@ export default function Recharge() {
             {/* QR */}
             <div className="flex justify-center">
               <div className="bg-white p-3 rounded-lg">
-                <QRCodeSVG
-                  value={upiUri}
-                  size={220}
-                  level="M"
-                  includeMargin
-                />
+                <QRCodeSVG value={upiUri} size={220} level="M" includeMargin />
               </div>
             </div>
 
@@ -683,7 +581,7 @@ export default function Recharge() {
                 onClick={async () => {
                   try {
                     await navigator.clipboard.writeText(
-                      manualUpiDetailsData.upi_id
+                      manualUpiDetailsData.upi_id,
                     );
                     showAlert("UPI ID copied", true);
                   } catch {
@@ -698,15 +596,41 @@ export default function Recharge() {
             {/* Warning */}
             <p className="mt-3 text-xs text-amber-300 text-center">
               Pay exactly ₹{qrAmount.toLocaleString("en-IN")}. Then enter the
-              UTR below and click Deposit.
+              UTR below and submit.
             </p>
 
+            {/* UTR input — QR ke just niche */}
+            <div className="bgs-body flex items-center mt-3 px-5 py-1 rounded-full">
+              <span className="color-blue text-sm font-bold">UTR</span>{" "}
+              <span className="border-r border-[#bdbdbd] ml-2 w-2 h-4"></span>
+              <input
+                type="text"
+                inputMode="numeric"
+                className="w-full bgs-body p-2 ps-6 flex items-center focus:outline-none placeholder:text-sm placeholder:text-[var(--text_color_L3)]"
+                placeholder={`Enter ${UTR_LENGTH}-digit UTR`}
+                value={utr}
+                onChange={(e) =>
+                  setUtr(e.target.value.replace(/\D/g, "").slice(0, UTR_LENGTH))
+                }
+                maxLength={UTR_LENGTH}
+              />
+            </div>
+            <p className="text-xs gray-text mt-1 px-2 text-right">
+              {utr.length}/{UTR_LENGTH}
+            </p>
+
+            {/* Submit */}
             <button
               type="button"
-              className="mt-4 w-full py-2 rounded font-semibold blue-linear text-black"
-              onClick={() => setQrPopup(false)}
+              disabled={isPopupSubmitDisabled}
+              className={`mt-3 w-full py-2 rounded font-semibold ${
+                !isPopupSubmitDisabled
+                  ? "blue-linear text-black"
+                  : "bg-gray-500 text-black cursor-not-allowed"
+              }`}
+              onClick={handleSubmitManualUPI}
             >
-              I've Paid — Enter UTR
+              {loader || submitting ? "Processing..." : "Submit Deposit"}
             </button>
           </div>
         </div>

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { TbLockFilled } from "react-icons/tb";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { TbLockFilled } from "react-icons/tb";
 
 import { RiArrowRightSLine } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
-import { changePassword } from "../../store/reducer/authReducer";
 import CustomeNavbar from "../../components/CustomeNavbar";
+import { changePassword } from "../../store/reducer/authReducer";
 const ChangePassword = () => {
   const { userInfo, successMessage } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -57,9 +57,9 @@ const ChangePassword = () => {
           <div className="mt-5">
             <div className="flex items-center">
               <span>
-                <TbLockFilled className="text-[#fb5b5b] text-2xl" />
+                <TbLockFilled className="color-l text-2xl" />
               </span>
-              <label htmlFor="" className="ms-1 text-whites">
+              <label htmlFor="" className="font-medium ms-1 text-whites">
                 Login Password
               </label>
             </div>
@@ -69,7 +69,7 @@ const ChangePassword = () => {
                 name="password"
                 onChange={inputHandle}
                 value={state.password}
-                className="w-full bg-body border border-[--bgbody] focus:[var(--grey-100)] rounded-lg p-2 py-3  ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-[var(--grey-200)] placeholder:font-medium"
+                className="w-full nav-bg border border-[--bgbody] focus:[var(--grey-100)] rounded-lg p-2 py-3  ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-[var(--grey-200)] placeholder:font-medium"
                 placeholder="Login password"
               />
               <span
@@ -87,9 +87,9 @@ const ChangePassword = () => {
           <div className="mt-5">
             <div className="flex items-center">
               <span>
-                <TbLockFilled className="text-[#fb5b5b] text-2xl" />
+                <TbLockFilled className="color-l text-2xl" />
               </span>
-              <label htmlFor="" className="ms-1 text-whites">
+              <label htmlFor="" className="font-medium ms-1 text-whites">
                 New login password
               </label>
             </div>
@@ -99,7 +99,7 @@ const ChangePassword = () => {
                 name="newPassWord"
                 onChange={inputHandle}
                 value={state.newPassWord}
-                className="w-full bg-body border border-[--bgbody] focus:[var(--grey-100)] rounded-lg p-2 py-3 ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-[var(--grey-200)] placeholder:font-medium"
+                className="w-full nav-bg border border-[--bgbody] focus:[var(--grey-100)] rounded-lg p-2 py-3 ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-[var(--grey-200)] placeholder:font-medium"
                 placeholder="New login password"
               />
               <span
@@ -117,9 +117,9 @@ const ChangePassword = () => {
           <div className="mt-5">
             <div className="flex items-center">
               <span>
-                <TbLockFilled className="text-[#fb5b5b] text-2xl" />
+                <TbLockFilled className="color-l text-2xl" />
               </span>
-              <label htmlFor="" className="ms-1 text-whites">
+              <label htmlFor="" className="font-medium ms-1 text-whites">
                 Confirm new password
               </label>
             </div>
@@ -129,7 +129,7 @@ const ChangePassword = () => {
                 name="cPassWord"
                 onChange={inputHandle}
                 value={state.cPassWord}
-                className="w-full  bg-body border border-[--bgbody] focus:[var(--grey-100)] rounded-lg p-2 py-3 ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-[var(--grey-200)] placeholder:font-medium"
+                className="w-full  nav-bg border border-[--bgbody] focus:[var(--grey-100)] rounded-lg p-2 py-3 ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-[var(--grey-200)] placeholder:font-medium"
                 placeholder="Please new password"
               />
               <span
@@ -145,13 +145,13 @@ const ChangePassword = () => {
             </div>
           </div>
 
-          <p className="gray-text fs-sm flex items-center float-right mt-3">
+          <p className="text-whites fs-sm flex items-center float-right mt-3">
             <Link to={"/main/CustomerService"}>Contact customer service</Link>{" "}
             <RiArrowRightSLine className="text-sm mt-[3px]" />
           </p>
         </form>
         <button
-          className="blue-linear flex justify-center  text-xl  w-80   m-auto font-bold text-center  rounded-full p-2 mt-20 tracking-[3px] text-white"
+          className="blue-linear flex justify-center  text-xl  w-80   m-auto font-bold text-center  rounded-full p-2 mt-20 tracking-[3px] text-white "
           onClick={handleUpdate}
         >
           Save changes
