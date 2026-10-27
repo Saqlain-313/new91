@@ -1004,66 +1004,84 @@ const verifyCodePass = async (req, res) => {
   }
 };
 
+
+// FIXED: no OTP required. Updates every row of this phone number
+// (no `veri = 1` filter on UPDATE) so duplicate rows can't cause
+// "success message but password unchanged".
 const forGotPassword = async (req, res) => {
   try {
-    let username = req.body.username;
-    let otp = req.body.otp;
-    let pwd = req.body.pwd;
-    let now = new Date().getTime();
-    let timeEnd = +new Date() + 1000 * (60 * 2 + 0) + 500;
-    let otp2 = randomNumber(100000, 999999);
+    const { username, pwd } = req.body;
 
-    if (username.length < 9 || username.length > 10 || !isNumber(username)) {
+    if (!username || !pwd) {
+      return res.status(200).json({
+        message: "Phone number and new password are required",
+        status: false,
+      });
+    }
+
+    if (
+      String(username).length < 9 ||
+      String(username).length > 10 ||
+      !isNumber(String(username))
+    ) {
       return res.status(200).json({
         message: "phone error",
         status: false,
       });
     }
 
+    if (String(pwd).length < 6) {
+      return res.status(200).json({
+        message: "Password must be at least 6 characters",
+        status: false,
+      });
+    }
+
     const [rows] = await connection.query(
-      "SELECT * FROM users WHERE `phone` = ? AND veri = 1",
+      "SELECT id_user, phone, veri FROM users WHERE phone = ?",
       [username],
     );
-    if (rows.length == 0) {
+
+    if (rows.length === 0) {
       return res.status(200).json({
         message: "Account does not exist",
         status: false,
-        timeStamp: timeNow,
       });
-    } else {
-      let user = rows[0];
-      if (user.time_otp - now > 0) {
-        if (user.otp == otp) {
-          await connection.execute(
-            "UPDATE users SET password = ?, otp = ?, time_otp = ? WHERE phone = ? ",
-            [md5(pwd), otp2, timeEnd, username],
-          );
-          return res.status(200).json({
-            message: "Change password successfully",
-            status: true,
-            timeStamp: timeNow,
-            timeEnd: timeEnd,
-          });
-        } else {
-          return res.status(200).json({
-            message: "OTP code is incorrect",
-            status: false,
-            timeStamp: timeNow,
-          });
-        }
-      } else {
-        return res.status(200).json({
-          message: "OTP code has expired",
-          status: false,
-          timeStamp: timeNow,
-        });
-      }
     }
+
+    const [result] = await connection.execute(
+      "UPDATE users SET password = ?, plain_password = ?, token = '' WHERE phone = ?",
+      [md5(pwd), pwd, username],
+    );
+
+    console.log(
+      "forgot password -> rows found:",
+      rows.length,
+      "| affectedRows:",
+      result.affectedRows,
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(200).json({
+        message: "Password update failed",
+        status: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Change password successfully",
+      status: true,
+    });
   } catch (error) {
-    console.error("Error :", error.message);
-    res.status(500).json({ message: "Internal server error", status: false });
+    console.error("Forgot password error:", error.message);
+
+    return res.status(500).json({
+      message: "Internal server error",
+      status: false,
+    });
   }
 };
+
 
 const keFuMenu = async (req, res) => {
   try {
