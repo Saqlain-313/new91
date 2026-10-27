@@ -17,6 +17,7 @@
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
     "lucide-react": "^0.462.0",
+    "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-fast-marquee": "^1.6.5",
