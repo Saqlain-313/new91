@@ -1,4 +1,3 @@
-import React from "react";
 import { useSelector } from "react-redux";
 
 import CustomeNavbar from "../../../components/CustomeNavbar";
@@ -8,42 +7,41 @@ const ConfidentialityAgreement = () => {
 
   return (
     <>
-    
-       <CustomeNavbar name="Confidentiality Agreement"/>
+      <CustomeNavbar name="Confidentiality Agreement" />
 
       <div className="container-section mt-5 p-3">
-        <p className="mb-3 text-sm text-black">
+        <p className="mb-3 text-sm text-gray-200">
           This Privacy Policy describes Our policies and procedures on the
           collection, use and disclosure of Your information when You use the
           Service and tells You about your privacy rights and the law protects
-          You.  
+          You.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm text-gray-200">
           Interpretation and Definitions <br />
           Interpretation
         </p>
-        <p className="text-sm text-black">
+        <p className="text-sm text-gray-200">
           The words of which the initial letter is capitalized have meanings
           defined under the following conditions.
         </p>
-        <p className="text-sm text-black">
+        <p className="text-sm text-gray-200">
           The following definitions shall have the same meaning regardless of
           whether they appear in singular or in plural.
         </p>
-        <p className="text-sm text-black">
+        <p className="text-sm text-gray-200">
           Definitions <br />
           For the purposes of this Privacy Policy:
         </p>
-        <p className="text-sm text-black">
+        <p className="text-sm text-gray-200">
           You means the individual accessing or using the Service, or the
           company, or other legal entity on behalf of which such individual is
           accessing or using the Service, as applicable.
         </p>
-        <p className="text-sm text-black">
+        <p className="text-sm text-gray-200">
           <b>Company</b>(referred to as either "the Company", "We","Us" or "our"
           in this Agreement) refers to {bannergetData?.gameall?.name}.
         </p>
-        <p className="text-sm text-black">
+        <p className="text-sm text-gray-200">
           <b>Affiliate</b> means an entity that controls, is controlled by or is
           under common control with a party where "control" means owenrship of
           50% or more of the shres, equity interest or other securities entitled
@@ -52,9 +50,9 @@ const ConfidentialityAgreement = () => {
           <b>Account</b> means a unique account created for you to access our
           Service or parts of our Service. <br />
           <b>Website</b> refers to{" "}
-          <span className="text-blue-700">{bannergetData?.gameall?.name}</span>{" "}
+          <span className="color-blue">{bannergetData?.gameall?.name}</span>{" "}
           accessible from{" "}
-          <span className="text-blue-700">{bannergetData?.gameall?.name}</span>{" "}
+          <span className="color-blue">{bannergetData?.gameall?.name}</span>{" "}
           <br />
           <b>Service</b> refers to the Website. <br />
           <b>Country</b> refers to; Dhaka, Bangaladesh <br />

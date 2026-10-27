@@ -1,95 +1,95 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { HashRouter as Router, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
 
 import Home from "./pages/home/Home";
 
-import DailyTasks from "./pages/activity/DailyTasks";
+import Forgot from "./pages/account/Forgot";
+import Login from "./pages/account/Login";
+import Register from "./pages/account/Register";
 import Activity from "./pages/activity/Activity";
-import Record from "./pages/activity/Record";
-import InvitaionBonus from "./pages/main/InvitaionBonus";
-import Rule from "./pages/main/Rule";
-import Navbar from "./layout/Navbar";
-import Laundry from "./pages/activity/Laundry";
-import Superjackpot from "./pages/activity/SuperJackpot";
+import DailySignIn from "./pages/activity/DailySignIn";
+import DailyTasks from "./pages/activity/DailyTasks";
 import JackpotRule from "./pages/activity/JackpotRule";
 import JackpotStar from "./pages/activity/JackpotStar";
+import Laundry from "./pages/activity/Laundry";
 import MemberPackage from "./pages/activity/MemberPackage";
+import Record from "./pages/activity/Record";
 import RedeemGift from "./pages/activity/RedeemGift";
-import DailySignIn from "./pages/activity/DailySignIn";
-import Promotion from "./pages/promotion/Promotion";
-import TeamReport from "./pages/promotion/TeamReport";
-import PromotionRule from "./pages/promotion/PromotionRule";
-import Server from "./pages/promotion/Server";
-import RebateRatio from "./pages/promotion/RebateRatio";
-import Wallet from "./pages/wallet/Wallet";
-import Recharge from "./pages/wallet/Recharge";
-import Withdraw from "./pages/wallet/Withdraw";
-import AddBankCard from "./pages/wallet/AddBankCard";
-import Main from "./pages/main/Main";
-import Register from "./pages/account/Register";
-import Login from "./pages/account/Login";
-import Forgot from "./pages/account/Forgot";
-import CustomerService from "./pages/main/CustomerService";
-import StrongBox from "./pages/main/StrongBox";
+import Superjackpot from "./pages/activity/SuperJackpot";
 import Notification from "./pages/home/Notification";
+import CustomerService from "./pages/main/CustomerService";
 import GameStatistics from "./pages/main/GameStatistics";
+import InvitaionBonus from "./pages/main/InvitaionBonus";
 import Language from "./pages/main/Language";
-import WheelSpin from "./pages/WheelSpin/WheelSpin";
+import Main from "./pages/main/Main";
+import Rule from "./pages/main/Rule";
+import StrongBox from "./pages/main/StrongBox";
+import Promotion from "./pages/promotion/Promotion";
+import PromotionRule from "./pages/promotion/PromotionRule";
+import RebateRatio from "./pages/promotion/RebateRatio";
+import Server from "./pages/promotion/Server";
+import TeamReport from "./pages/promotion/TeamReport";
+import AddBankCard from "./pages/wallet/AddBankCard";
+import Recharge from "./pages/wallet/Recharge";
+import Wallet from "./pages/wallet/Wallet";
+import Withdraw from "./pages/wallet/Withdraw";
 import EventDetail from "./pages/WheelSpin/EventDetail";
+import WheelSpin from "./pages/WheelSpin/WheelSpin";
 // import Invite from './pages/promotion/Invite';
 import ActivityRules from "./pages/WheelSpin/ActivityRules";
 import EventDescription from "./pages/WheelSpin/EventDescription";
 
-import SettingCenter from "./pages/main/SettingCenter";
-import Feedback from "./pages/main/Feedback";
-import Notifications from "./pages/main/Notifications";
+import FiveD from "./pages/5D/FiveD";
+import BindEmail from "./pages/account/BindEmail";
+import ChangePassword from "./pages/account/ChangePassword";
+import K3 from "./pages/k3/K3";
 import About from "./pages/main/about/About";
 import ConfidentialityAgreement from "./pages/main/about/ConfidentialityAgreement";
 import RiskDisclosureAgreement from "./pages/main/about/RiskDisclosureAgreement";
-import ChangePassword from "./pages/account/ChangePassword";
-import BindEmail from "./pages/account/BindEmail";
+import Feedback from "./pages/main/Feedback";
+import Notifications from "./pages/main/Notifications";
+import SettingCenter from "./pages/main/SettingCenter";
 import Subordinate from "./pages/promotion/Subordinate";
-import Wingo from "./pages/wingo/Wingo";
-import K3 from "./pages/k3/K3";
-import FiveD from "./pages/5D/FiveD";
 import Trx from "./pages/wingo/Trx";
+import Wingo from "./pages/wingo/Wingo";
 
-import CommissionDetails from "./pages/promotion/CommissionDetails";
 import BetRecords from "./pages/main/BetRecords";
-import TransAction from "./pages/wallet/TransAction";
-import RechargeHistory from "./pages/wallet/RechargeHistory";
-import WithdrawHistory from "./pages/wallet/WithdrawHistory";
+import CommissionDetails from "./pages/promotion/CommissionDetails";
 import Vip from "./pages/vip/Vip";
 import PaymentPage from "./pages/wallet/PaymentPage";
+import RechargeHistory from "./pages/wallet/RechargeHistory";
+import TransAction from "./pages/wallet/TransAction";
+import WithdrawHistory from "./pages/wallet/WithdrawHistory";
 
+import AttendanceHistory from "./pages/activity/AttendanceHistory";
 import Avatar from "./pages/main/Avatar";
 import InvitaionRecord from "./pages/main/InvitaionRecord";
-import AttendanceHistory from "./pages/activity/AttendanceHistory";
 
 import PrivateRoute from "./layout/PrivateRoute";
 
 import ActivityDetail from "./pages/activity/ActivityDetail";
 import GameRules from "./pages/activity/GameRules";
+import ServiceCollection from "./pages/main/ServiceCollection";
+import WithdrawlProblem from "./pages/main/WithdrawlProblem";
 import PaymentPage2 from "./pages/wallet/PaymentPage2";
 import PaymentPage3 from "./pages/wallet/PaymentPage3";
 import PaymentPageUsdt from "./pages/wallet/PaymentPageUsdt";
-import ServiceCollection from "./pages/main/ServiceCollection";
-import WithdrawlProblem from "./pages/main/WithdrawlProblem";
 
 import AllOnlineGames from "./pages/home/AllOnlineGames";
 import ActivityAward from "./pages/main/ActivityAward";
 import Invite from "./pages/promotion/Invite";
 
 import DepositBouns from "./pages/activity/DepositBouns";
-import PartnerRewards from "./pages/promotion/PartnerRewards";
-import AddUSDT from "./pages/wallet/AddUSDT";
-import Beginner from "./pages/main/Beginner";
-import PaymentPageUsdt2 from "./pages/wallet/PaymentPageUsdt2";
-import BankAccount from "./pages/wallet/BankAccount";
-import AddUPI from "./pages/wallet/AddUPI";
-import Upi from "./pages/wallet/Upi";
 import CasinoSection from "./pages/home/newgame/CasinoSection";
+import Beginner from "./pages/main/Beginner";
+import PartnerRewards from "./pages/promotion/PartnerRewards";
+import SearchSubordinate from "./pages/promotion/SearchSubordinate";
+import AddUPI from "./pages/wallet/AddUPI";
+import AddUSDT from "./pages/wallet/AddUSDT";
+import BankAccount from "./pages/wallet/BankAccount";
+import PaymentPageUsdt2 from "./pages/wallet/PaymentPageUsdt2";
+import Upi from "./pages/wallet/Upi";
 
 function AppComponent() {
   // zoom app
@@ -232,6 +232,11 @@ function AppComponent() {
               <Route path="promotion/Server" element={<Server />} />
               <Route path="promotion/RebateRatio" element={<RebateRatio />} />
               <Route path="promotion/Subordinate" element={<Subordinate />} />
+              <Route
+                path="promotion/searchsubordinate"
+                element={<SearchSubordinate />}
+              />
+
               <Route
                 path="promotion/PartnerReward"
                 element={<PartnerRewards />}

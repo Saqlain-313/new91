@@ -5,55 +5,55 @@ const RiskDisclosureAgreement = () => {
     <>
       <CustomeNavbar name="Risk Disclosure Agreement" />
       <div className="container-section mt-5 mb-4 p-3">
-        <p className="mb-3 text-sm text-black">
+        <p className="mb-3 text-sm gray-text">
           This Privacy Policy describes Our policies and procedures on the
           collection, use and disclosure of Your information when You use the
           Service and tells You about Your privacy rights and how the law
           protects You.
         </p>
-        <h3 className="heading-h2 text-center text-black">
+        <h3 className="heading-h2 text-center gray-text">
           Interpretation and Definitions
         </h3>
-        <h3 className="heading-h3 text-center text-black">Interpretation</h3>
-        <p className="fs-sm text-black">
+        <h3 className="heading-h3 text-center gray-text">Interpretation</h3>
+        <p className="fs-sm gray-text">
           Interpretation and Definitions <br />
           Interpretation
         </p>
       </div>
 
       <div className="container-section mt-5 p-3">
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           This Privacy Policy describes Our policies and procedures on the
           collection, use and disclosure of Your information when You use the
           Service and tells You about Your privacy rights and how the law
           protects You.
         </p>
-        <h2 className="heading-h2 text-center text-black">
+        <h2 className="heading-h2 text-center gray-text">
           Interpretation and Definitions
         </h2>
-        <h3 className="heading-h3 text-center text-black">Interpretation</h3>
-        <p className="fs-sm text-black">
+        <h3 className="heading-h3 text-center gray-text">Interpretation</h3>
+        <p className="fs-sm gray-text">
           The words of which the initial letter is capitalized have meanings
           defined under the following conditions.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           The following definitions shall have the same meaning regardless of
           whether they appear in singular or inplural.
         </p>
-        <h3 className="heading-h3 text-center text-black">Definitions</h3>
-        <p className="fs-sm text-black">
+        <h3 className="heading-h3 text-center gray-text">Definitions</h3>
+        <p className="fs-sm gray-text">
           For the purposes of this Privacy Policy:
         </p>
-        <ul className="text-sm gray-100">
+        <ul>
           <li>
-            <p className="fs-sm text-black">
+            <p className="fs-sm gray-text">
               <strong>You</strong> means the individual accessing or using the
               Service, or the company, or other legal entity on behalf of which
               such individual is accessing or using the Service, as applicable.
             </p>
           </li>
           <li>
-            <p className="fs-sm text-black">
+            <p className="fs-sm gray-text">
               <strong>Company</strong> (referred to as either "the Company",
               "We", "Us" or "Our" in this Agreement) refers to
               <text className="color-blue-500"></text>.
@@ -73,7 +73,7 @@ const RiskDisclosureAgreement = () => {
           <li>
             <strong>Website</strong> refers to
             <text className="color-blue-500"></text>, accessible from
-            <text className="color-blue-500">http://Chennai91.icu</text>
+            <text className="color-blue-500">http://bdg-club.com</text>
           </li>
           <li>
             <strong>Service</strong> refers to the Website.
@@ -82,7 +82,7 @@ const RiskDisclosureAgreement = () => {
             <strong>Country</strong> refers to: India
           </li>
           <li>
-            <p className="fs-sm text-black">
+            <p className="fs-sm gray-text">
               <strong>Service Provider</strong> means any natural or legal
               person who processes the data on behalf of the Company. It refers
               to third-party companies or individuals employed by the Company to
@@ -97,7 +97,7 @@ const RiskDisclosureAgreement = () => {
             in or create an account to use the Service.
           </li>
           <li>
-            <p className="fs-sm text-black">
+            <p className="fs-sm gray-text">
               <strong>Personal Data</strong> is any information that relates to
               an identified or identifiable individual.
             </p>
@@ -118,38 +118,38 @@ const RiskDisclosureAgreement = () => {
             infrastructure itself (for example, the duration of a page visit).
           </li>
         </ul>
-        <h2 className="heading-h2 text-center text-black">
+        <h2 className="heading-h2 text-center gray-text">
           Collecting and Using Your Personal Data
         </h2>
-        <h3 className="heading-h3 text-center text-black">
+        <h3 className="heading-h3 text-center gray-text">
           Types of Data Collected
         </h3>
-        <h3 className="heading-h3 text-center text-black">Personal Data</h3>
-        <p className="fs-sm text-black">
+        <h3 className="heading-h3 text-center gray-text">Personal Data</h3>
+        <p className="fs-sm gray-text">
           While using Our Service, We may ask You to provide Us with certain
           personally identifiable information that can be used to contact or
           identify You. Personally identifiable information may include, but is
           not limited to:
         </p>
-        <ul className="text-sm gray-100">
+        <ul>
           <li>Email address</li>
           <li>First name and last name</li>
           <li>Phone number</li>
           <li>Address, State, Province, ZIP/Postal code, City</li>
           <li>Usage Data</li>
         </ul>
-        <h3 className="heading-h3 text-center text-black">Usage Data</h3>
-        <p className="fs-sm text-black">
+        <h3 className="heading-h3 text-center gray-text">Usage Data</h3>
+        <p className="fs-sm gray-text">
           Usage Data is collected automatically when using the Service.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           Usage Data may include information such as Your Device's Internet
           Protocol address (e.g. IP address), browser type, browser version, the
           pages of our Service that You visit, the time and date of Your visit,
           the time spent on those pages, unique device identifiers and other
           diagnostic data.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           When You access the Service by or through a mobile device, We may
           collect certain information automatically, including, but not limited
           to, the type of mobile device You use, Your mobile device unique ID,
@@ -157,43 +157,43 @@ const RiskDisclosureAgreement = () => {
           the type of mobile Internet browser You use, unique device identifiers
           and other diagnostic data.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           We may also collect information that Your browser sends whenever You
           visit our Service or when You access the Service by or through a
           mobile device.
         </p>
-        <h3 className="heading-h3 text-center text-black">
+        <h3 className="heading-h3 text-center gray-text">
           Tracking Technologies and Cookies
         </h3>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           We use Cookies and similar tracking technologies to track the activity
           on Our Service and store certain information. Tracking technologies
           used are beacons, tags, and scripts to collect and track information
           and to improve and analyze Our Service.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           You can instruct Your browser to refuse all Cookies or to indicate
           when a Cookie is being sent. However, if You do not accept Cookies,
           You may not be able to use some parts of our Service.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           Cookies can be "Persistent" or "Session" Cookies. Persistent Cookies
           remain on your personal computer or mobile device when You go offline,
           while Session Cookies are deleted as soon as You close your web
           browser.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           We use both session and persistent Cookies for the purposes set out
           below:
         </p>
-        <ul className="fs-sm gray-100">
+        <ul>
           <li>
-            <p className="fs-sm text-black">
+            <p className="fs-sm gray-text">
               <strong>Necessary / Essential Cookies</strong>
             </p>
-            <p className="fs-sm text-black">Type: Session Cookies</p>
-            <p className="fs-sm text-black">Administered by: Us</p>
-            <p className="fs-sm text-black">
+            <p className="fs-sm gray-text">Type: Session Cookies</p>
+            <p className="fs-sm gray-text">Administered by: Us</p>
+            <p className="fs-sm gray-text">
               Purpose: These Cookies are essential to provide You with services
               available through the Website and to enable You to use some of its
               features. They help to authenticate users and prevent fraudulent
@@ -203,23 +203,23 @@ const RiskDisclosureAgreement = () => {
             </p>
           </li>
           <li>
-            <p className="fs-sm text-black">
+            <p className="fs-sm gray-text">
               <strong>Cookies Policy / Notice Acceptance Cookies</strong>
             </p>
-            <p className="fs-sm text-black">Type: Persistent Cookies</p>
-            <p className="fs-sm text-black">Administered by: Us</p>
-            <p className="fs-sm text-black">
+            <p className="fs-sm gray-text">Type: Persistent Cookies</p>
+            <p className="fs-sm gray-text">Administered by: Us</p>
+            <p className="fs-sm gray-text">
               Purpose: These Cookies identify if users have accepted the use of
               cookies on the Website.
             </p>
           </li>
           <li>
-            <p className="fs-sm text-black">
+            <p className="fs-sm gray-text">
               <strong>Functionality Cookies</strong>
             </p>
-            <p className="fs-sm text-black">Type: Persistent Cookies</p>
-            <p className="fs-sm text-black">Administered by: Us</p>
-            <p className="fs-sm text-black">
+            <p className="fs-sm gray-text">Type: Persistent Cookies</p>
+            <p className="fs-sm gray-text">Administered by: Us</p>
+            <p className="fs-sm gray-text">
               Purpose: These Cookies allow us to remember choices You make when
               You use the Website, such as remembering your login details or
               language preference. The purpose of these Cookies is to provide
@@ -228,17 +228,17 @@ const RiskDisclosureAgreement = () => {
             </p>
           </li>
         </ul>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           For more information about the cookies we use and your choices
           regarding cookies, please visit our Cookies Policy.
         </p>
-        <h3 className="heading-h3 text-center text-black">
+        <h3 className="heading-h3 text-center gray-text">
           Use of Your Personal Data
         </h3>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           The Company may use Personal Data for the following purposes:
         </p>
-        <ul className="text-sm gray-100">
+        <ul>
           <li>
             <strong>To provide and maintain our Service</strong>, including to
             monitor the usage of our Service.
@@ -275,10 +275,10 @@ const RiskDisclosureAgreement = () => {
             requests to Us.
           </li>
         </ul>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           We may share your personal information in the following situations:
         </p>
-        <ul className="text-sm gray-100">
+        <ul>
           <li>
             <strong>With Service Providers:</strong> We may share Your personal
             information with Service Providers to monitor and analyze the use of
@@ -314,10 +314,10 @@ const RiskDisclosureAgreement = () => {
             You and view Your profile.
           </li>
         </ul>
-        <h3 className="heading-h3 text-center text-black">
+        <h3 className="heading-h3 text-center gray-text">
           Retention of Your Personal Data
         </h3>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           The Company will retain Your Personal Data only for as long as is
           necessary for the purposes set out in this Privacy Policy. We will
           retain and use Your Personal Data to the extent necessary to comply
@@ -325,17 +325,17 @@ const RiskDisclosureAgreement = () => {
           your data to comply with applicable laws), resolve disputes, and
           enforce our legal agreements and policies.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           The Company will also retain Usage Data for internal analysis
           purposes. Usage Data is generally retained for a shorter period of
           time, except when this data is used to strengthen the security or to
           improve the functionality of Our Service, or We are legally obligated
           to retain this data for longer time periods.
         </p>
-        <h3 className="heading-h3 text-center text-black">
+        <h3 className="heading-h3 text-center gray-text">
           Transfer of Your Personal Data
         </h3>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           Your information, including Personal Data, is processed at the
           Company's operating offices and in any other places where the parties
           involved in the processing are located. It means that this information
@@ -344,43 +344,43 @@ const RiskDisclosureAgreement = () => {
           where the data protection laws may differ than those from Your
           jurisdiction.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           Your consent to this Privacy Policy followed by Your submission of
           such information represents Your agreement to that transfer.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           The Company will take all steps reasonably necessary to ensure that
           Your data is treated securely and in accordance with this Privacy
           Policy and no transfer of Your Personal Data will take place to an
           organization or a country unless there are adequate controls in place
           including the security of Your data and other personal information.
         </p>
-        <h3 className="heading-h3 text-center text-black">
+        <h3 className="heading-h3 text-center gray-text">
           Disclosure of Your Personal Data
         </h3>
-        <h3 className="heading-h3 text-center text-black">
+        <h3 className="heading-h3 text-center gray-text">
           Business Transactions
         </h3>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           If the Company is involved in a merger, acquisition or asset sale,
           Your Personal Data may be transferred. We will provide notice before
           Your Personal Data is transferred and becomes subject to a different
           Privacy Policy.
         </p>
-        <h3 className="heading-h3 text-center text-black">Law enforcement</h3>
-        <p className="fs-sm text-black">
+        <h3 className="heading-h3 text-center gray-text">Law enforcement</h3>
+        <p className="fs-sm gray-text">
           Under certain circumstances, the Company may be required to disclose
           Your Personal Data if required to do so by law or in response to valid
           requests by public authorities (e.g. a court or a government agency).
         </p>
-        <h3 className="heading-h3 text-center text-black">
+        <h3 className="heading-h3 text-center gray-text">
           Other legal requirements
         </h3>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           The Company may disclose Your Personal Data in the good faith belief
           that such action is necessary to:
         </p>
-        <ul className="text-sm gray-100">
+        <ul>
           <li>Comply with a legal obligation</li>
           <li>Protect and defend the rights or property of the Company</li>
           <li>
@@ -392,20 +392,18 @@ const RiskDisclosureAgreement = () => {
           </li>
           <li>Protect against legal liability</li>
         </ul>
-        <h3 className="heading-h3 text-center text-black">
+        <h3 className="heading-h3 text-center gray-text">
           Security of Your Personal Data
         </h3>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           The security of Your Personal Data is important to Us, but remember
           that no method of transmission over the Internet, or method of
           electronic storage is 100% secure. While We strive to use commercially
           acceptable means to protect Your Personal Data, We cannot guarantee
           its absolute security.
         </p>
-        <h2 className="heading-h2 text-center text-black">
-          Children's Privacy
-        </h2>
-        <p className="fs-sm text-black">
+        <h2 className="heading-h2 text-center gray-text">Children's Privacy</h2>
+        <p className="fs-sm gray-text">
           Our Service does not address anyone under the age of 13. We do not
           knowingly collect personally identifiable information from anyone
           under the age of 13. If You are a parent or guardian and You are aware
@@ -414,48 +412,48 @@ const RiskDisclosureAgreement = () => {
           under the age of 13 without verification of parental consent, We take
           steps to remove that information from Our servers.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           If We need to rely on consent as a legal basis for processing Your
           information and Your country requires consent from a parent, We may
           require Your parent's consent before We collect and use that
           information.
         </p>
-        <h2 className="heading-h2 text-center text-black">
+        <h2 className="heading-h2 text-center gray-text">
           Links to Other Websites
         </h2>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           Our Service may contain links to other websites that are not operated
           by Us. If You click on a third party link, You will be directed to
           that third party's site. We strongly advise You to review the Privacy
           Policy of every site You visit.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           We have no control over and assume no responsibility for the content,
           privacy policies or practices of any third party sites or services.
         </p>
-        <h2 className="heading-h2 text-center text-black">
+        <h2 className="heading-h2 text-center gray-text">
           Changes to this Privacy Policy
         </h2>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           We may update our Privacy Policy from time to time. We will notify You
           of any changes by posting the new Privacy Policy on this page.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           We will let You know via email and/or a prominent notice on Our
           Service, prior to the change becoming effective and update the "Last
           updated" date at the top of this Privacy Policy.
         </p>
-        <p className="fs-sm text-black">
+        <p className="fs-sm gray-text">
           You are advised to review this Privacy Policy periodically for any
           changes. Changes to this Privacy Policy are effective when they are
           posted on this page.
         </p>
-        <h2 className="heading-h2 text-center text-black">Contact Us</h2>
-        <p className="fs-sm text-black">
+        <h2 className="heading-h2 text-center gray-text">Contact Us</h2>
+        <p className="fs-sm gray-text">
           If you have any questions about this Privacy Policy, You can contact
           us:
         </p>
-        <ul className="text-black">
+        <ul>
           <li>By visiting this page on our website</li>
         </ul>
       </div>

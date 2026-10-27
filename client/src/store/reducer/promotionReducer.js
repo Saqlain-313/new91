@@ -1,5 +1,5 @@
 // propertySlice.js
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "./api";
 
 // promotion
@@ -14,7 +14,7 @@ export const promotions = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 export const totalCommission = createAsyncThunk(
   "auth/totalcommission",
@@ -27,7 +27,7 @@ export const totalCommission = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 export const myTeamReport = createAsyncThunk(
   "auth/myteam",
@@ -40,7 +40,7 @@ export const myTeamReport = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 
 export const myTeamReportSubordinate = createAsyncThunk(
@@ -50,13 +50,13 @@ export const myTeamReportSubordinate = createAsyncThunk(
       const { data } = await api.post(
         "/webapi/downlinerecharge-data/list-data",
         { date: date },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       return fulfillWithValue(data);
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 export const subordinates = createAsyncThunk(
   "auth/subordinate",
@@ -69,9 +69,8 @@ export const subordinates = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
-
 
 export const newSubordinate = createAsyncThunk(
   "auth/new-subordinate",
@@ -84,9 +83,8 @@ export const newSubordinate = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
-
 
 export const commissiondatas = createAsyncThunk(
   "auth/commissiondatas",
@@ -99,7 +97,7 @@ export const commissiondatas = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 
 export const transactionHistory = createAsyncThunk(
@@ -113,7 +111,7 @@ export const transactionHistory = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 
 export const randompromotion = createAsyncThunk(
@@ -126,32 +124,27 @@ export const randompromotion = createAsyncThunk(
       return fulfillWithValue(data); // Return data directly
     } catch (error) {
       return rejectWithValue(
-        error.response ? error.response.data : "An unknown error occurred"
+        error.response ? error.response.data : "An unknown error occurred",
       );
     }
-  }
+  },
 );
 
-export const getfetchPromotionDataUser = createAsyncThunk(
-  "auth/tchPromotionDataUser",
-  async (date, { rejectWithValue, fulfillWithValue }) => {
+// Define the async thunk for searching users
+export const searchUser = createAsyncThunk(
+  "promotion/searchUser", // Action type prefix
+  async ({ id_user, page }, { rejectWithValue }) => {
     try {
-      const { data } = await api.post(`/webapi/fetchPromotionDataUser`, { date: date }, {
+      const { data } = await api.get("/webapi/searchUser", {
+        params: { id_user, page }, // Pass id_user and page as query parameters
         withCredentials: true,
       });
-      // //console.log("Fetched Data:", data); // Debug API response
-      return fulfillWithValue(data);
+      return data;
     } catch (error) {
-      console.error("Error in spin wheel:", error); // Debug API error
-      return rejectWithValue(
-        error.response ? error.response.data : "An unknown error occurred"
-      );
+      return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
-
-
-
 
 export const promotionReducer = createSlice({
   name: "promotion",
@@ -159,7 +152,10 @@ export const promotionReducer = createSlice({
     loader: false,
     errorMessage: "",
     successMessage: "",
-  
+    searchResults: [], // To store the results from searchUser
+    searchPage: 1,
+    searchTotalResults: 0,
+
     // add userDetail to initialState
   },
   reducers: {
@@ -167,10 +163,18 @@ export const promotionReducer = createSlice({
       state.errorMessage = "";
       state.successMessage = "";
     },
-    
+
+    // ... existing reducers
+    clearSearchState: (state) => {
+      state.searchResults = [];
+      state.searchPage = 1;
+      state.searchTotalResults = 0;
+      state.errorMessage = "";
+      state.successMessage = "";
+    },
   },
   extraReducers: (builder) => {
-    builder         
+    builder
       .addCase(promotions.pending, (state) => {
         state.loader = true;
       })
@@ -256,7 +260,7 @@ export const promotionReducer = createSlice({
         state.loader = false;
         state.transactionHistoryData = transactionHistoryData;
       })
-     
+
       .addCase(commissiondatas.pending, (state) => {
         state.loader = true;
       })
@@ -281,32 +285,40 @@ export const promotionReducer = createSlice({
         state.newSubordinateData = payload.datas || [];
         state.loader = false;
       })
-         .addCase(randompromotion.pending, (state) => {
-              state.loader = true;
-            })
-            .addCase(randompromotion.rejected, (state, { payload }) => {
-              state.errorMessage = payload?.errorMessage || "An error occurred";
-              state.loader = false;
-            })
-            .addCase(randompromotion.fulfilled, (state, { payload }) => {
-              state.successMessage = payload.message || "";
-              state.randompromotionData = payload.data || [];
-              state.loader = false;
-            })
-                 .addCase(getfetchPromotionDataUser.pending, (state) => {
+      .addCase(randompromotion.pending, (state) => {
         state.loader = true;
       })
-      .addCase(getfetchPromotionDataUser.rejected, (state, { payload }) => {
+      .addCase(randompromotion.rejected, (state, { payload }) => {
         state.errorMessage = payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
-      .addCase(getfetchPromotionDataUser.fulfilled, (state, { payload }) => {
+      .addCase(randompromotion.fulfilled, (state, { payload }) => {
         state.successMessage = payload.message || "";
-        state.subordinateData = payload?.data || [];
-        state.levelData = payload?.levelData || [];
-        state.userData = payload?.userData || [];
+        state.randompromotionData = payload.data || [];
         state.loader = false;
       })
+
+      .addCase(searchUser.pending, (state) => {
+        state.loader = true;
+        state.errorMessage = "";
+        state.successMessage = "";
+      })
+      .addCase(searchUser.fulfilled, (state, { payload }) => {
+        state.loader = false;
+        state.successMessage = payload.message;
+        state.searchResults = payload.data; // Assuming 'data' holds the array of users
+        state.searchPage = payload.page;
+        state.searchTotalResults = payload.results; // Assuming 'results' is total count
+        state.errorMessage = "";
+      })
+      .addCase(searchUser.rejected, (state, { payload }) => {
+        state.loader = false;
+        state.errorMessage = payload?.message || "Failed to search users."; // Use payload.message for consistency
+        state.successMessage = "";
+        state.searchResults = [];
+        state.searchPage = 1;
+        state.searchTotalResults = 0;
+      });
   },
 });
 
