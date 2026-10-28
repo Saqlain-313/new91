@@ -1,18 +1,18 @@
-import React, { useState } from "react";
 import { BsFire } from "react-icons/bs";
+import { Link, useNavigate } from "react-router-dom";
 import RefereshImg from "../../assets/refresh.png";
 import Wallet from "../../assets/wallet.png";
-import { Link, useNavigate } from "react-router-dom";
 
-import Slider from "react-slick";
-import { RiVolumeUpFill } from "react-icons/ri";
-import { useSelector } from "react-redux";
+import Cookies from "js-cookie";
 import { IoIosArrowBack } from "react-icons/io";
 import { MdSupportAgent } from "react-icons/md";
-import VoiceImg from "../../assets/voice.png";
+import { RiVolumeUpFill } from "react-icons/ri";
+import { useSelector } from "react-redux";
+import Slider from "react-slick";
 import VoiceOffImg from "../../assets/voice-off.png";
+import VoiceImg from "../../assets/voice.png";
 
-const HeaderInfo = ({ money, handleRefersh,handleVoice,activeVoice }) => {
+const HeaderInfo = ({ money, handleRefersh, handleVoice, activeVoice }) => {
   const { bannergetData } = useSelector((state) => state.user);
 
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const HeaderInfo = ({ money, handleRefersh,handleVoice,activeVoice }) => {
 
   return (
     <>
- <div className="nav-bg   sticky top-0 z-20 py-1">
+      <div className="nav-bg   sticky top-0 z-20 py-1">
         <div className="container-section flex  items-center relative">
           <button className="absolute">
             <Link to={"/"}>
@@ -43,7 +43,12 @@ const HeaderInfo = ({ money, handleRefersh,handleVoice,activeVoice }) => {
             <img src={bannergetData?.gameall?.logo1} alt="" className="w-28" />
           </div>
           <p className="absolute right-1 flex items-center">
-            <Link to={"/main/CustomerService"} className=" gray-50 ">
+            <Link
+              to={`https://h5.workorder.support.max-win.site/?token=${Cookies.get(
+                "gametoken",
+              )}`}
+              className=" gray-50 "
+            >
               <MdSupportAgent className="text-white text-2xl" />
             </Link>
             <Link>
@@ -58,13 +63,13 @@ const HeaderInfo = ({ money, handleRefersh,handleVoice,activeVoice }) => {
         </div>
       </div>
 
-
       <div className="nav-bg pb-24 rounded-b-[60px]">
         <div className="container-section pt-5">
           <div className="wallet-bg-section pb-4 rounded-2xl  flex flex-col justify-center items-center w-full">
             <div className="flex items-center ms-2 mt-4 mb-1">
               <h3 className="heaing-h3 text-lg font-bold text-whites">
-                ₹{money
+                ₹
+                {money
                   ? Number(money).toLocaleString("en-IN", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
@@ -138,10 +143,13 @@ const HeaderInfo = ({ money, handleRefersh,handleVoice,activeVoice }) => {
             </div>
 
             <span className="float-end text-xl  relative mr-2">
-              <Link to={"/main/Notification"} className="flex items-center blue-linear p-1 rounded-full px-3 py-2">
+              <Link
+                to={"/main/Notification"}
+                className="flex items-center blue-linear p-1 rounded-full px-3 py-2"
+              >
                 <BsFire className=" mr-1 fs-sm text-white" />{" "}
                 <span className=" font-medium fs-sm text-white">Details</span>
-              </Link >
+              </Link>
 
               {/* <div className="ponter-event"></div> */}
             </span>
