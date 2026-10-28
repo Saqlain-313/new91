@@ -24,6 +24,18 @@ const WinImg = "https://i.ibb.co/ssJ2HLw/win-popup.png";
 const LoseImg = "https://i.ibb.co/8zTQQmx/loss-popup.png";
 const xData = [1, 5, 10, 20, 50, 100];
 
+// ✅ FIX: websocket + polling fallback (production pe nginx/Cloudflare upgrade
+// block kare to bhi socket polling pe chalega), aur reconnect kabhi band nahi hoga.
+const createSocket = () =>
+  io(host, {
+    transports: ["websocket", "polling"],
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    timeout: 20000,
+  });
+
 const FiveD = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const { d5PeriodListData, d5HistoryData } = useSelector((state) => state.game);
@@ -42,10 +54,10 @@ const FiveD = () => {
   const [pageno, setPage] = useState(1);
   const [pageto, setPageto] = useState(10);
   const [typeid1, setTypeid1] = useState(1);
-  
-  // ✅ Timer state ek object mein combine (3 re-renders → 1 re-render)
+
+  // Timer state ek object mein combine (3 re-renders -> 1 re-render)
   const [timerData, setTimerData] = useState({ minute: 0, sec1: 0, sec2: 0 });
-  
+
   const [changeTime, setChangeTime] = useState(true);
   const [details, setDetails] = useState(null);
   const [copyPopup, setCopyPopup] = useState(false);
@@ -59,8 +71,7 @@ const FiveD = () => {
   const [selectedNumbers, setSelectedNumbers] = useState([]);
 
   const intervalRef = useRef(null);
-  const socketRef = useRef(null);
-  const timeSocketRef = useRef(null);
+  const socketRef = useRef(null); // ✅ ek hi shared socket (game result + timer dono)
   const activeVoiceRef = useRef(activeVoice);
   const typeid1Ref = useRef(typeid1);
   const pagenoRef = useRef(pageno);
@@ -84,7 +95,6 @@ const FiveD = () => {
     return match ? parseInt(match[0], 10) : null;
   };
 
-  // ✅ chartFunction ko useCallback + requestAnimationFrame
   const chartFunction = useCallback(() => {
     requestAnimationFrame(() => {
       const trendList = document.getElementById("trendList");
@@ -268,20 +278,60 @@ const FiveD = () => {
     if (gameHistory === "chart") chartFunction();
   }, [gameHistory, d5PeriodListData, chartFunction]);
 
-  // ✅ SINGLE shared socket for game results
+  // ============================================================
+  // ✅ SOCKET A: connection create/destroy (sirf ek baar, mount pe)
+  // ============================================================
   useEffect(() => {
-    if (!socketRef.current) {
-      socketRef.current = io(host, {
-        transports: ["websocket"],
-        reconnection: true,
-        reconnectionAttempts: 10,
-        reconnectionDelay: 1000,
-      });
-    }
+    const sock = createSocket();
+    socketRef.current = sock;
+    let hasConnectedBefore = false;
+
+    const onConnect = () => {
+      console.log("[5D socket] connected:", sock.id, "transport:", sock.io.engine.transport.name);
+      // Reconnect ke baad (network drop / server restart / tab background) data refresh karo
+      if (hasConnectedBefore) {
+        debouncedDispatch(dispatch, typeid1Ref.current, pagenoRef.current, pagetoRef.current);
+      }
+      hasConnectedBefore = true;
+    };
+    const onConnectError = (err) => {
+      console.warn("[5D socket] connect_error:", err?.message);
+    };
+    const onDisconnect = (reason) => {
+      console.warn("[5D socket] disconnected:", reason);
+      // Server ne khud disconnect kiya to manually reconnect
+      if (reason === "io server disconnect") sock.connect();
+    };
+
+    sock.on("connect", onConnect);
+    sock.on("connect_error", onConnectError);
+    sock.on("disconnect", onDisconnect);
+
+    // Tab wapas visible ho to socket zinda hai ya nahi check karo (mobile browsers background mein kill kar dete hain)
+    const onVisible = () => {
+      if (document.visibilityState === "visible" && !sock.connected) sock.connect();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      sock.off("connect", onConnect);
+      sock.off("connect_error", onConnectError);
+      sock.off("disconnect", onDisconnect);
+      sock.disconnect();
+      if (socketRef.current === sock) socketRef.current = null;
+    };
+  }, [dispatch, debouncedDispatch]);
+
+  // ============================================================
+  // ✅ SOCKET B: game result listener
+  // ============================================================
+  useEffect(() => {
     const sock = socketRef.current;
+    if (!sock) return;
 
     const handler = (msg) => {
-      // ✅ Sirf tab setPage/setPageto jab actually naya result aaye
+      // Sirf tab setPage/setPageto jab actually naya result aaye
       if (msg?.data?.[1]?.period == d5HistoryDataRef.current?.data?.gameslist?.[0]?.stage) {
         setPage(1); setPageto(10);
         setResultPopup(true);
@@ -292,7 +342,6 @@ const FiveD = () => {
       if ((tid == 3 || tid == 5 || tid == 10) && Array.isArray(msg?.data)) {
         debouncedDispatch(dispatch, tid, pagenoRef.current, pagetoRef.current);
         setChangeTime(true);
-        // ✅ chartFunction yahan nahi — useEffect se call hoga
       }
     };
 
@@ -300,17 +349,12 @@ const FiveD = () => {
     return () => sock.off("data-server-5d", handler);
   }, [dispatch, debouncedDispatch, debouncedDispatchResult]);
 
-  // ✅ SINGLE time socket for countdown (1 re-render per tick)
+  // ============================================================
+  // ✅ SOCKET C: countdown timer listener (typeid1 badle to event badlo)
+  // ============================================================
   useEffect(() => {
-    if (!timeSocketRef.current) {
-      timeSocketRef.current = io(host, {
-        transports: ["websocket"],
-        reconnection: true,
-        reconnectionAttempts: 10,
-        reconnectionDelay: 1000,
-      });
-    }
-    const sock = timeSocketRef.current;
+    const sock = socketRef.current;
+    if (!sock) return;
 
     const eventName =
       typeid1 == 1 ? "timeUpdate_11" :
@@ -324,7 +368,6 @@ const FiveD = () => {
       if (!data) return;
       const { minute, secondtime1, secondtime2 } = data;
 
-      // ✅ Single state update
       setTimerData({ minute, sec1: secondtime1, sec2: secondtime2 });
 
       if (minute === 0 && secondtime1 === 0 && secondtime2 <= 5 && secondtime2 >= 1) {
@@ -343,11 +386,10 @@ const FiveD = () => {
     return () => sock.off(eventName, handler);
   }, [typeid1]);
 
+  // Audio / interval cleanup
   useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-      if (socketRef.current) { socketRef.current.disconnect(); socketRef.current = null; }
-      if (timeSocketRef.current) { timeSocketRef.current.disconnect(); timeSocketRef.current = null; }
       if (audio1Ref.current) audio1Ref.current.pause();
       if (audio2Ref.current) audio2Ref.current.pause();
     };
