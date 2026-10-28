@@ -266,6 +266,26 @@ const urls = [
   },
 ];
 
+// ============================================================
+// K3 HELPER  (game: 1, 3, 5, 10)
+// Naya period add + result/payout + frontend ko "data-server-k3" emit
+// ============================================================
+async function runK3(game) {
+  try {
+    await k3Controller.addK3(game);
+    await k3Controller.handlingK3(game);
+
+    // [0] = naya pending period, [1] = abhi khatam hua period
+    const [rows] = await connection.execute(
+      "SELECT * FROM `k3` WHERE `game` = ? ORDER BY `id` DESC LIMIT 2",
+      [game],
+    );
+    io.emit("data-server-k3", { data: rows, game: Number(game) });
+  } catch (error) {
+    console.error(`runK3 error for game ${game}:`, error.message);
+  }
+}
+
 const wait = (ms) => new Promise((res) => setTimeout(res, ms));
 
 const waitForNextPeriod = async (currentPeriod) => {
@@ -299,11 +319,7 @@ const waitForNextPeriod = async (currentPeriod) => {
 
       const results = await Promise.allSettled(calls);
 
-      //console.log("results", results)
-      //console.log("results from server", results);
-
       for (const result of results) {
-        //console.log("results from server", result.value?.data?.data?.issueNumber ," currentPeriod ", currentPeriod);
         if (
           result.status === "fulfilled" &&
           result.value?.data?.data?.issueNumber > currentPeriod
@@ -314,20 +330,17 @@ const waitForNextPeriod = async (currentPeriod) => {
       }
 
       if (foundResponse) {
-        //console.log(`✅ New period from ${foundResponse.name}:`, foundResponse.data.data.issueNumber);
         return foundResponse.data;
       }
     } catch (err) {
       console.error(`⚠️ Attempt ${attempt} failed:`, err.message);
     }
 
-    // console.log(`⏳ Attempt ${attempt}: No new period, retrying...`);
     const elapsed = Date.now() - start;
     const wait = Math.max(retryInterval - elapsed, 0);
     await new Promise((res) => setTimeout(res, wait));
   }
 
-  //console.log("❌ Max attempts reached without detecting new period.");
   return null;
 };
 
@@ -382,10 +395,7 @@ const waitForNextPeriod_1 = async (currentPeriod) => {
 
       const results = await Promise.allSettled(calls);
 
-      //console.log("results", results)
-
       for (const result of results) {
-        //console.log("results from server", result.value?.data?.data?.issueNumber ," currentPeriod ", currentPeriod);
         if (
           result.status === "fulfilled" &&
           result.value?.data?.data?.issueNumber > currentPeriod
@@ -396,20 +406,17 @@ const waitForNextPeriod_1 = async (currentPeriod) => {
       }
 
       if (foundResponse) {
-        //console.log(`✅ New period from ${foundResponse.name}:`, foundResponse.data.data.issueNumber);
         return foundResponse.data;
       }
     } catch (err) {
       console.error(`⚠️ Attempt ${attempt} failed:`, err.message);
     }
 
-    // console.log(`⏳ Attempt ${attempt}: No new period, retrying...`);
     const elapsed = Date.now() - start;
     const wait = Math.max(retryInterval - elapsed, 0);
     await new Promise((res) => setTimeout(res, wait));
   }
 
-  //console.log("❌ Max attempts reached without detecting new period.");
   return null;
 };
 
@@ -451,6 +458,9 @@ const bodyData_trx = {
   timestamp: 1744432487,
 };
 
+// ============================================================
+// 3 MIN & 5 MIN COUNTDOWN (gameId = 3 / 5)
+// ============================================================
 async function startCountdown(gameId, requestData) {
   var response = await axios.post(apiUrl_lottery7_30, requestData, {
     headers_lottery7_30,
@@ -467,9 +477,6 @@ async function startCountdown(gameId, requestData) {
   let endWithOffset = end.getTime() + 2000;
   var countdown = (endWithOffset - service.getTime()) / 1000;
 
-  //   //console.log("endWithOffset",countdown)
-  // let countdown = Math.floor((end.getTime() - Date.now()) / 1000);
-
   let winGoTriggered = false;
   let winGoRunning = false;
 
@@ -479,8 +486,6 @@ async function startCountdown(gameId, requestData) {
     const secondtime2 = countdown % 10;
 
     if (gameId == 10) {
-      // //console.log("times",end,service)
-
       io.emit(`timeUpdate_30`, { minute, secondtime1, secondtime2 });
     } else if (gameId == 1) {
       io.emit(`timeUpdate_11`, { minute, secondtime1, secondtime2 });
@@ -499,6 +504,12 @@ async function startCountdown(gameId, requestData) {
       );
 
       winGoTriggered = true;
+
+      // ✅ K3 for 3 min & 5 min (add period + result + payout + socket emit)
+      if (gameId === 3 || gameId === 5) {
+        runK3(gameId);
+      }
+
       if (!winGoRunning) {
         winGoRunning = true;
         try {
@@ -545,17 +556,8 @@ async function startCountdown(gameId, requestData) {
 
     countdown--;
 
-    // //console.log("countdown" , countdown , "gameId" , gameId)
-    ////console.log("countdown", countdown);
-
-    ////console.log(`countdown_${gameId}`, countdown);
-
     if (countdown == 1) {
-      // //console.log("countdown");
-
       let response, data;
-      //console.log(`Waiting 900ms before making API call for game ${gameId}...`);
-      //await new Promise((resolve) => setTimeout(resolve, 900)); // Fake waiting
 
       try {
         response = await Promise.race([
@@ -573,8 +575,6 @@ async function startCountdown(gameId, requestData) {
           console.error("Invalid date format for GameID", gameId);
           throw new Error("Invalid API response");
         }
-
-        //console.log(`API responded successfully for game ${gameId}`);
       } catch (error) {
         console.error(
           `API delay or error for GameID ${gameId}, using fallback.`,
@@ -599,11 +599,8 @@ async function startCountdown(gameId, requestData) {
       countdown = (endWithOffset - service.getTime()) / 1000;
       winGoTriggered = false;
 
-      //console.log(`New countdown set for game ${gameId}: ${countdown} seconds`);
-
       try {
         if (winGoRunning) {
-          //console.log(`Waiting for winGoRunning to finish for game ${gameId}...`);
           while (winGoRunning) {
             await new Promise((resolve) => setTimeout(resolve, 100));
           }
@@ -614,7 +611,6 @@ async function startCountdown(gameId, requestData) {
           [`wingo${gameId}`],
         );
         io.emit("data-server", { data: winGoData });
-        // console.log(`Emitted winGo data for game ${gameId}`);
       } catch (error) {
         console.error(`Error fetching wingo data for game ${gameId}:`, error);
       }
@@ -665,9 +661,11 @@ const requestData_5 = {
 
 const logFile = path.join(__dirname, "wingo10countdown.log");
 
+// ============================================================
+// 30 SEC COUNTDOWN (wingo 30s)
+// ============================================================
 async function startCountdown_30(requestData) {
   let gameId = 10;
-  ////logToFile(`🔄 Starting countdown for GameID ${gameId}`);
 
   try {
     let response = await axios.post(
@@ -681,8 +679,6 @@ async function startCountdown_30(requestData) {
     let service = new Date(data.serviceTime);
     let period_id = data.issueNumber;
 
-    //console.log("first time api call period_id", period_id);
-
     if (isNaN(end.getTime()) || isNaN(service.getTime())) {
       return restartCountdown(requestData);
     }
@@ -692,8 +688,6 @@ async function startCountdown_30(requestData) {
       (endWithOffset - (service.getTime() + 2000)) / 1000;
     let countdown = (endWithOffset - service.getTime()) / 1000;
 
-    ////logToFile(`⏳ Countdown initialized: ${countdown}s | Service Time: ${service} | End Time: ${end}`);
-
     let winGoTriggered = false;
     let winGoRunning = false;
 
@@ -701,11 +695,8 @@ async function startCountdown_30(requestData) {
       try {
         if (countdown <= 0) {
           clearInterval(countdownInterval);
-          ////logToFile(`🔄 Restarting countdown for GameID ${gameId} as countdown reached 0`);
           return restartCountdown(requestData);
         }
-
-        //////logToFile(`⏱️ Countdown: ${countdown}s | GameID: ${gameId}`);
 
         let minute = Math.floor(countdown_frontend / 60);
         let secondtime1 = Math.floor(countdown_frontend / 10);
@@ -716,8 +707,6 @@ async function startCountdown_30(requestData) {
         if (countdown === 3 && !winGoTriggered) {
           winGoTriggered = true;
           winGoRunning = true;
-
-          //console.log("addwingo function called--------------");
 
           try {
             await connection.execute(
@@ -733,20 +722,12 @@ async function startCountdown_30(requestData) {
               end = new Date(data.endTime);
               service = new Date(data.serviceTime);
               period_id = data.issueNumber;
-
-              //console.log("period_id new in server ", period_id," countdown ", countdown)
-
-              // Now you can safely use period_id in countdown or other logic
             })();
 
             await winGoController.addWinGo_10(period_id);
             await winGoController.handlingWinGo1P(gameId);
-
-            //console.log("time reach 3 seond" , period_id);
-
-            ////logToFile(`🎯 WinGo Process Triggered for GameID ${gameId}`);
           } catch (error) {
-            ////logToFile(`❌ Error in winGo logic: ${error.message}`);
+            // silent
           } finally {
             winGoRunning = false;
           }
@@ -761,46 +742,18 @@ async function startCountdown_30(requestData) {
               'SELECT * FROM `wingo` WHERE `game` = "wingo10" ORDER BY `id` DESC LIMIT 2',
             );
 
-            // //console.log("trought result --------------" , winGo1_10);
             io.emit("data-server", { data: winGo1_10 });
-            ////logToFile(`📡 Emitted latest Wingo data for GameID ${gameId}`);
           } catch (error) {
-            ////logToFile(`❌ Error fetching wingo data: ${error.message}`);
+            // silent
           }
         }
 
-        //  if (countdown === 25) {
-        //   try {
-        //     const [winGo1_10] = await connection.execute(
-        //       'SELECT * FROM `wingo` WHERE `game` = "wingo10" ORDER BY `id` DESC LIMIT 2'
-        //     );
-
-        //     //console.log("trought result --------------" , winGo1_10);
-        //     io.emit('data-server', { data: winGo1_10 });
-        //     ////logToFile(`📡 Emitted latest Wingo data for GameID ${gameId}`);
-        //   } catch (error) {
-        //     ////logToFile(`❌ Error fetching wingo data: ${error.message}`);
-        //   }
-        // }
-
-        // //console.log("countdown: ", countdown);
-        // //console.log("countdown_frontend:", countdown_frontend);
-
         if (countdown === 1) {
-          ////logToFile(`⏳ Waiting 900ms before new API call for GameID ${gameId}`);
-
           try {
-            //console.log("time reach 1 seond" , period_id);
-
-            ////logToFile(`📥 API Response: ${JSON.stringify(data)}`);
-
             if (isNaN(end.getTime()) || isNaN(service.getTime())) {
               throw new Error("Invalid API response");
             }
-
-            ////logToFile(`✅ API responded successfully, new endTime: ${end}, serviceTime: ${service}`);
           } catch (error) {
-            ////logToFile(`⚠️ API delay/error, using fallback time for GameID ${gameId} error: ${error.message}`);
             end = new Date(Date.now() + 30000);
             service = new Date();
           }
@@ -812,8 +765,6 @@ async function startCountdown_30(requestData) {
 
           winGoTriggered = false;
 
-          ////logToFile(`🔄 New Countdown Set: ${countdown}s for GameID ${gameId}`);
-
           try {
             while (winGoRunning) {
               await new Promise((resolve) => setTimeout(resolve, 100));
@@ -824,26 +775,22 @@ async function startCountdown_30(requestData) {
               [`wingo${gameId}`],
             );
             io.emit("data-server", { data: winGoData });
-            ////logToFile(`📡 Emitted updated Wingo data for GameID ${gameId}`);
           } catch (error) {
-            ////logToFile(`❌ Error fetching wingo data: ${error.message}`);
+            // silent
           }
         }
       } catch (error) {
-        ////logToFile(`❌ Error in countdown loop for GameID ${gameId}: ${error.message}`);
         clearInterval(countdownInterval);
         restartCountdown(requestData);
       }
     }, 1000);
   } catch (error) {
-    ////logToFile(`❌ Failed to start countdown for GameID ${gameId}: ${error.message}`);
     restartCountdown(requestData);
   }
 }
 
 // Function to restart the countdown after an error
 async function restartCountdown(requestData) {
-  ////logToFile("🔄 Restarting countdown after failure...");
   await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait before retrying
   startCountdown_30(requestData);
 }
@@ -878,10 +825,7 @@ async function fetchIssueNumber(delay = 500) {
     try {
       const response = await axios.get(apiUrl, { headers });
 
-      //console.log("response json",response);
       const issueNumber = response.data?.current?.issueNumber;
-
-      //console.log("issueNumber json",issueNumber);
 
       if (issueNumber) {
         let indiaTime = new Date().toLocaleString("en-IN", {
@@ -908,18 +852,17 @@ async function fetchIssueNumber(delay = 500) {
   }
 }
 
+// ============================================================
+// 1 MIN COUNTDOWN (wingo 1m + trx + car + 5D + K3 1min)
+// ============================================================
 async function startCountdown_1(requestData) {
   let gameId = 1;
-  //////logToFile_1(`🔄 Starting countdown for GameID ${gameId} with requestData: ${JSON.stringify(requestData)}`);
 
   try {
     let response = await axios.post(apiUrl_lottery7_30, requestData, {
       headers_lottery7_30,
     });
     let data = response.data.data;
-
-    //console.log("data", data);
-    //////logToFile_1(`📥 API Response for GameID ${gameId}: ${JSON.stringify(data)}`);
 
     let end = new Date(data.endTime);
     let service = new Date(data.serviceTime);
@@ -931,11 +874,7 @@ async function startCountdown_1(requestData) {
       headers_trx,
     );
 
-    //////logToFile_1(`📅 Parsed Dates - GameID ${gameId} | EndTime: ${end} | ServiceTime: ${service}`);
-
     if (isNaN(end.getTime()) || isNaN(service.getTime())) {
-      //////logToFile_1(`❌ Invalid date format for GameID ${gameId}, restarting...`);
-      //console.log("restart")
       return restartCountdown_1(requestData);
     }
 
@@ -944,18 +883,13 @@ async function startCountdown_1(requestData) {
       (endWithOffset - (service.getTime() + 2000)) / 1000;
     let countdown = (endWithOffset - service.getTime()) / 1000;
 
-    //////logToFile_1(`⏳ Countdown initialized for GameID ${gameId}: ${countdown}s | EndWithOffset: ${endWithOffset}`);
-
     let winGoTriggered = false;
     let winGoRunning = false;
 
     let countdownInterval = setInterval(async () => {
       try {
-        //////logToFile_1(`⏱️ Countdown Tick - GameID ${gameId}: ${countdown}s remaining`);
-        //console.log("countdown", countdown, "period_id", period_id);
         if (countdown <= 0) {
           clearInterval(countdownInterval);
-          //////logToFile_1(`🔄 Countdown reached 0, restarting for GameID ${gameId}`);
           return restartCountdown_1(requestData);
         }
 
@@ -965,12 +899,9 @@ async function startCountdown_1(requestData) {
 
         io.emit(`timeUpdate_11`, { minute, secondtime1, secondtime2 });
 
-        //////logToFile_1(`📡 Emitting time update for GameID ${gameId}: Minute ${minute}, Sec1: ${secondtime1}, Sec2: ${secondtime2}`);
-        // //console.log("countdown",countdown,!winGoTriggered,countdown === 5 && !winGoTriggered)
         if (countdown === 3 && !winGoTriggered) {
           winGoTriggered = true;
           winGoRunning = true;
-          //////logToFile_1(`🎯 WinGo Triggered for GameID ${gameId}`);
 
           try {
             await connection.execute(
@@ -980,16 +911,11 @@ async function startCountdown_1(requestData) {
 
             (async () => {
               response = await waitForNextPeriod_1(period_id);
-              //console.log("🎯 New period response:", response);
 
               data = response.data;
               end = new Date(data.endTime);
               service = new Date(data.serviceTime);
               period_id = data.issueNumber;
-
-              //console.log("period_id new in server ", period_id," countdown ", countdown)
-
-              // Now you can safely use period_id in countdown or other logic
             })();
 
             await Promise.all([
@@ -1007,12 +933,10 @@ async function startCountdown_1(requestData) {
             await k5Controller.add5D(1);
             await k5Controller.handling5D(1);
 
-            await k3Controller.addK3(1);
-            await k3Controller.handlingK3(1);
-
-            //////logToFile_1(`✅ WinGo Process Completed for GameID ${gameId}`);
+            // ✅ K3 1 min (add + result + payout + socket emit)
+            await runK3(1);
           } catch (error) {
-            //////logToFile_1(`❌ Error in WinGo process for GameID ${gameId}: ${error.message}`);
+            console.error("Error in 1 min process:", error.message);
           } finally {
             winGoRunning = false;
           }
@@ -1038,15 +962,12 @@ async function startCountdown_1(requestData) {
               'SELECT * FROM `cargame` WHERE `game` = "cargame" ORDER BY `id` DESC LIMIT 2',
             );
             io.emit("data-server-bike", { data: bike });
-            //////logToFile_1(`📡 Emitted latest Wingo data for GameID ${gameId}: ${JSON.stringify(winGo1)}`);
           } catch (error) {
-            //////logToFile_1(`❌ Error fetching wingo data for GameID ${gameId}: ${error.message}`);
+            // silent
           }
         }
 
         if (countdown === 1) {
-          //////logToFile_1(`⏳ Waiting 900ms before API call for GameID ${gameId}`);
-
           try {
             issueNumber_trx = await fetchIssueNumber(
               apiUrl_trx,
@@ -1054,15 +975,10 @@ async function startCountdown_1(requestData) {
               headers_trx,
             );
 
-            //////logToFile_1(`📥 New API Response for GameID ${gameId}: ${JSON.stringify(data)}`);
-
             if (isNaN(end.getTime()) || isNaN(service.getTime())) {
               throw new Error("Invalid API response");
             }
-
-            //////logToFile_1(`✅ Valid API Response for GameID ${gameId}, new EndTime: ${end}, ServiceTime: ${service}`);
           } catch (error) {
-            //////logToFile_1(`⚠️ API delay/error for GameID ${gameId}, using fallback time. Error: ${error.message}`);
             end = new Date(Date.now() + 60000);
             service = new Date();
           }
@@ -1072,8 +988,6 @@ async function startCountdown_1(requestData) {
           countdown_frontend =
             (endWithOffset - (service.getTime() + 2000)) / 1000;
           winGoTriggered = false;
-
-          //////logToFile_1(`🔄 New Countdown Set for GameID ${gameId}: ${countdown}s`);
 
           try {
             while (winGoRunning) {
@@ -1085,29 +999,62 @@ async function startCountdown_1(requestData) {
               [`wingo`],
             );
             io.emit("data-server", { data: winGoData });
-
-            //////logToFile_1(`📡 Emitted updated Wingo data for GameID ${gameId}: ${JSON.stringify(winGoData)}`);
           } catch (error) {
-            //////logToFile_1(`❌ Error fetching updated Wingo data for GameID ${gameId}: ${error.message}`);
+            // silent
           }
         }
       } catch (error) {
-        //////logToFile_1(`❌ Countdown loop error for GameID ${gameId}: ${error.message}`);
         clearInterval(countdownInterval);
         restartCountdown_1(requestData);
       }
     }, 1000);
   } catch (error) {
-    //////logToFile_1(`❌ Failed to start countdown for GameID ${gameId}: ${error.message}`);
     restartCountdown_1(requestData);
   }
 }
 
 // Function to restart the countdown after an error
 async function restartCountdown_1(requestData) {
-  //////logToFile_1(`🔄 Restarting countdown after failure for GameID 1...`);
   await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait before retrying
   startCountdown_1(requestData);
+}
+
+// ============================================================
+// 10 MINUTE COUNTDOWN  ->  frontend event: "timeUpdate_10"
+// Wall-clock aligned (xx:00, xx:10, xx:20 ...), no drift.
+// Payload: { minute, secondtime1, secondtime2 }
+// ============================================================
+function startCountdown_10min() {
+  const PERIOD = 600; // seconds
+  let lastTriggeredPeriod = null;
+
+  setInterval(async () => {
+    try {
+      const nowSec = Math.floor(Date.now() / 1000);
+      // 599 -> 0, resets every 10 minutes
+      const remaining = PERIOD - 1 - (nowSec % PERIOD);
+
+      const minute = Math.floor(remaining / 60); // 0-9
+      const secondtime1 = Math.floor((remaining % 60) / 10); // tens digit
+      const secondtime2 = remaining % 10; // units digit
+
+      io.emit("timeUpdate_10", { minute, secondtime1, secondtime2 });
+
+      // Period khatam hone se 4 sec pehle game logic
+      // Double trigger se bachne ke liye period-id guard hai.
+      if (remaining === 4) {
+        const periodKey = Math.floor(nowSec / PERIOD);
+        if (lastTriggeredPeriod !== periodKey) {
+          lastTriggeredPeriod = periodKey;
+
+          // ✅ K3 10 min (add + result + payout + socket emit)
+          runK3(10);
+        }
+      }
+    } catch (error) {
+      console.error("Error in 10 min countdown:", error);
+    }
+  }, 1000);
 }
 
 // Start countdowns for different games
@@ -1115,16 +1062,12 @@ startCountdown_30(requestData_30);
 
 startCountdown_1(requestData_1, requestData_1_trx);
 
-//startCountdown(1, requestData_1);
-
 startCountdown(3, requestData_3);
 
 startCountdown(5, requestData_5);
 
-// issue problem
-//Sentry.setupExpressErrorHandler(app);
-
-//app.use(Sentry.Handlers.requestHandler());
+// 10 minute timer (timeUpdate_10 + K3 10 min)
+startCountdown_10min();
 
 const DEFAULT_PORT = Number(process.env.PORT) || 7805;
 const MAX_PORT_ATTEMPTS = 10;
@@ -1164,18 +1107,14 @@ startServer(DEFAULT_PORT);
 
 // Graceful shutdown on SIGINT (Ctrl+C)
 process.on("SIGINT", () => {
-  //console.log("Received SIGINT. Shutting down server gracefully...");
   server.close(() => {
-    //console.log("Server closed.");
     process.exit(0);
   });
 });
 
 // Graceful shutdown on SIGTERM (e.g., from process managers like PM2, Docker)
 process.on("SIGTERM", () => {
-  //console.log("Received SIGTERM. Shutting down server gracefully...");
   server.close(() => {
-    //console.log("Server closed.");
     process.exit(0);
   });
 });
