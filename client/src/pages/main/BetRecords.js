@@ -51,7 +51,13 @@ const ImgData = [
   NineImg,
 ];
 
+// name = getGameKey() ka output (neeche dekho)
 const allDate = [
+  {
+    img: null,
+    title: "All",
+    name: null,
+  },
   {
     img: WingoImg,
     title: "Win Go",
@@ -59,24 +65,19 @@ const allDate = [
   },
   {
     img: TrxImg,
-    title: "Motar Raceing",
-    name: "cargame",
+    title: "TRX",
+    name: "trx",
   },
   {
     img: FivedImg,
     title: "5D",
-    name: "5D",
+    name: "5d",
   },
   {
     img: k3Img,
     title: "K3",
-    name: "K",
+    name: "k3",
   },
-  // {
-  //   img: carImg,
-  //   title: "Racing",
-  //   name: "Racing",
-  // },
 ];
 
 const imgData = {
@@ -88,14 +89,23 @@ const imgData = {
   6: N6,
 };
 const getImageFromNumber = (number) => {
-  if (number) {
-    return number
-      ?.toString()
-      ?.split("")
-      .map((num) => imgData[num]);
-  } else {
-    throw new Error("Input is not a valid number or string");
-  }
+  if (number === null || number === undefined || number === "") return [];
+  return String(number)
+    .split("")
+    .map((num) => imgData[num])
+    .filter(Boolean);
+};
+
+// "wingo10" -> "wingo", "5D 1" -> "5d", "K3 1" -> "k3", "cargame"/"trx" -> "trx"
+const getGameKey = (game) => {
+  const g = String(game || "")
+    .toLowerCase()
+    .trim();
+  if (g.startsWith("wingo")) return "wingo";
+  if (g.startsWith("trx") || g.startsWith("cargame")) return "trx";
+  if (g.startsWith("5d")) return "5d";
+  if (g.startsWith("k3")) return "k3";
+  return g;
 };
 
 const formatDate = (timestamp) => {
@@ -116,9 +126,23 @@ const toDateStr = (value) => {
   if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}/.test(value)) {
     return value.slice(0, 10);
   }
+  if (/^\d{10,}$/.test(String(value))) {
+    return formatDate(new Date(Number(value)));
+  }
   const d = new Date(value);
   if (isNaN(d.getTime())) return "";
   return formatDate(d);
+};
+
+// Wingo/TRX me `today` hota hai, 5D/K3 me sirf `time`
+const getItemTime = (item) => item?.today || item?.time || "";
+
+const getTimestamp = (item) => {
+  const v = getItemTime(item);
+  if (!v) return 0;
+  if (/^\d{10,}$/.test(String(v))) return Number(v);
+  const t = new Date(String(v).replace(" ", "T")).getTime();
+  return Number.isNaN(t) ? 0 : t;
 };
 
 const BetRecords = () => {
@@ -127,7 +151,7 @@ const BetRecords = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const [openAll, setOpenAll] = useState(false);
 
-  const [isName, setIsName] = useState("wingo");
+  const [isName, setIsName] = useState(null);
 
   const [searchLevel, setSearchLevel] = useState(null);
 
@@ -146,24 +170,30 @@ const BetRecords = () => {
     setSearchLevel(data);
   };
 
-  const filteredData = wingoHistoryData?.gameslist?.filter((item) => {
-    const itemDate = toDateStr(item.today);
-    const matchesDate = selectedDate
-      ? itemDate === toDateStr(selectedDate)
-      : true; // Show all if no date is selected
+  const selectedTitle =
+    allDate.find((item) => item.name === searchLevel)?.title || "All";
 
-    const matchesLevel =
-      searchLevel !== null
-        ? item.game.replace(/\d+$/, "") == searchLevel
-        : true; // Show all if no game type is selected
+  const filteredData = Array.isArray(wingoHistoryData?.gameslist)
+    ? wingoHistoryData.gameslist
+        .filter((item) => {
+          const matchesDate = selectedDate
+            ? toDateStr(getItemTime(item)) === toDateStr(selectedDate)
+            : true; // Show all if no date is selected
 
-    return matchesLevel && matchesDate;
-  });
+          const matchesLevel = searchLevel
+            ? getGameKey(item.game) === searchLevel
+            : true; // Show all if no game type is selected
+
+          return matchesLevel && matchesDate;
+        })
+        // latest bet sabse upar
+        .sort((a, b) => getTimestamp(b) - getTimestamp(a))
+    : [];
 
   const filteredThirdParty = Array.isArray(gameHistoryData)
     ? gameHistoryData.filter((item) => {
         if (!selectedDate) return true;
-        return toDateStr(item.today) === toDateStr(selectedDate);
+        return toDateStr(getItemTime(item)) === toDateStr(selectedDate);
       })
     : [];
 
@@ -199,8 +229,6 @@ const BetRecords = () => {
     { name: "Slots", icon: <PiApplePodcastsLogo /> },
   ];
 
-  console.log(isName, activeIndex, "isName");
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -220,7 +248,7 @@ const BetRecords = () => {
             className="col-span-6 nav-bg flex cursor-pointer justify-between items-center p-2 rounded-md"
             onClick={handleOpenAll}
           >
-            <span className="text-base text-whites">All</span>
+            <span className="text-base text-whites">{selectedTitle}</span>
             <span>
               <IoIosArrowDown className="text-base text-whites" />
             </span>
@@ -236,9 +264,13 @@ const BetRecords = () => {
 
       {activeIndex === 0 ? (
         <div className="container-section mt-5">
-          {Array.isArray(wingoHistoryData?.gameslist) &&
-            filteredData?.map((data, i) => (
-              <div className="nav-bg rounded-xl  mt-3 pb-4 pt-3" key={i}>
+          {filteredData.map((data, i) => {
+            const gameKey = getGameKey(data.game);
+            return (
+              <div
+                className="nav-bg rounded-xl  mt-3 pb-4 pt-3"
+                key={data.id_product || i}
+              >
                 <div className="flex justify-between items-center px-3">
                   <h3 className="heading-h3 font-semibold text-whites">
                     {data.game === "wingo10"
@@ -265,7 +297,7 @@ const BetRecords = () => {
                   </p>
                 </div>
                 <p className="fs-sm px-3 text-whites border-b border-color-slat leading-5">
-                  {data.today}
+                  {getItemTime(data)}
                 </p>
                 <ul className="px-2 mt-2">
                   <li className="flex  justify-between">
@@ -365,9 +397,8 @@ const BetRecords = () => {
                       <div className="flex  flex-col items-center mt-[3px] mr-1">
                         <FaRegDotCircle className="blue-color-300 bg-white rounded-full fs-sm mr-1 border-b" />
                       </div>
-                      {/* wingo  */}
-                      {(data.game.includes("wingo") ||
-                        data.game.includes("trx")) && (
+                      {/* wingo / trx */}
+                      {(gameKey === "wingo" || gameKey === "trx") && (
                         <div className="flex  items-center">
                           <img
                             src={ImgData[data.result]}
@@ -408,19 +439,23 @@ const BetRecords = () => {
                           </span>
                         </div>
                       )}
-                      {data.game.includes("5D") && (
+                      {/* 5D */}
+                      {gameKey === "5d" && (
                         <div className="flex  items-center">
-                          {data?.result?.split("").map((item, idx) => (
-                            <img
-                              src={ImgData[item]}
-                              className="w-8 mr-1"
-                              alt=""
-                              key={idx}
-                            />
-                          ))}
+                          {String(data.result ?? "")
+                            .split("")
+                            .map((item, idx) => (
+                              <img
+                                src={ImgData[item]}
+                                className="w-8 mr-1"
+                                alt=""
+                                key={idx}
+                              />
+                            ))}
                         </div>
                       )}
-                      {data.game.includes("K3") && (
+                      {/* K3 */}
+                      {gameKey === "k3" && (
                         <div className="flex  items-center">
                           {getImageFromNumber(data.result).map((img, idx) => (
                             <img
@@ -469,7 +504,8 @@ const BetRecords = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            );
+          })}
         </div>
       ) : (
         <div className="container-section mt-5">
@@ -497,7 +533,7 @@ const BetRecords = () => {
                 </p>
               </div>
               <p className="fs-sm px-3 text-whites border-b border-color-slat leading-5">
-                {data.today}
+                {getItemTime(data)}
               </p>
               <ul className="px-2 mt-2">
                 <li className="flex  justify-between">
@@ -657,14 +693,18 @@ const BetRecords = () => {
               <div
                 key={i}
                 className={`col-span-6 flex cursor-pointer  items-center p-2 rounded-md
-                        ${isName == item.name ? "bg-color-l2" : "nav-bg"}
+                        ${isName === item.name ? "bg-color-l2" : "nav-bg"}
                         `}
                 onClick={() => {
                   handleClick(item.name);
                   handleOpenAll();
                 }}
               >
-                <img src={item.img} alt="" className="w-10 h-10" />
+                {item.img ? (
+                  <img src={item.img} alt="" className="w-10 h-10" />
+                ) : (
+                  <div className="w-10 h-10" />
+                )}
                 <p className="ms-3 text-whites">{item.title}</p>
               </div>
             ))}

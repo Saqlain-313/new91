@@ -1,5 +1,5 @@
 // propertySlice.js
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 import { api } from "./api";
 
@@ -14,7 +14,7 @@ export const register = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 export const login = createAsyncThunk(
   "auth/login",
@@ -30,17 +30,15 @@ export const login = createAsyncThunk(
       Cookies.set("auth", data.value, {
         expires: expirationDate, // Set expiration date
         secure: true,
-        sameSite: "None"
+        sameSite: "None",
       });
       // localStorage.setItem('token', data.user.token);
       return fulfillWithValue(data);
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
-
-
 
 export const userDetail = createAsyncThunk(
   "auth/user-details",
@@ -55,7 +53,7 @@ export const userDetail = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 export const changeUserName = createAsyncThunk(
   "auth/change-user",
@@ -64,13 +62,13 @@ export const changeUserName = createAsyncThunk(
       const { data } = await api.post(
         "/webapi/change/userInfo",
         { name: name },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       return fulfillWithValue(data);
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 export const changeUserPhoto = createAsyncThunk(
   "auth/change-photo",
@@ -79,13 +77,13 @@ export const changeUserPhoto = createAsyncThunk(
       const { data } = await api.post(
         "/webapi/change/userPhoto",
         { photo: photo },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       return fulfillWithValue(data);
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 export const changePassword = createAsyncThunk(
   "auth/change-password",
@@ -98,7 +96,7 @@ export const changePassword = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  }
+  },
 );
 
 export const emailotp = createAsyncThunk(
@@ -108,15 +106,15 @@ export const emailotp = createAsyncThunk(
       const { data } = await api.post(
         `/webapi/email-otp`,
         { email: email },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       return fulfillWithValue(data); // Return data directly
     } catch (error) {
       return rejectWithValue(
-        error.response ? error.response.data : "An unknown error occurred"
+        error.response ? error.response.data : "An unknown error occurred",
       );
     }
-  }
+  },
 );
 
 export const emailsubmit = createAsyncThunk(
@@ -126,15 +124,15 @@ export const emailsubmit = createAsyncThunk(
       const { data } = await api.post(
         `/webapi/email`,
         { otp: otp, email: email },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       return fulfillWithValue(data); // Return data directly
     } catch (error) {
       return rejectWithValue(
-        error.response ? error.response.data : "An unknown error occurred"
+        error.response ? error.response.data : "An unknown error occurred",
       );
     }
-  }
+  },
 );
 
 export const emailLogin = createAsyncThunk(
@@ -149,41 +147,48 @@ export const emailLogin = createAsyncThunk(
       return fulfillWithValue(data); // Return data directly
     } catch (error) {
       return rejectWithValue(
-        error.response ? error.response.data : "An unknown error occurred"
+        error.response ? error.response.data : "An unknown error occurred",
       );
     }
-  }
+  },
 );
 
-
-
+// ============================================
+// Forgot password (NO OTP) — phone + new password
+// Backend: forGotPassword controller -> { username, pwd }
+// ============================================
 export const forgotPassword = createAsyncThunk(
-  'auth/forgot-password',
-  async (state, { rejectWithValue, fulfillWithValue }) => {
+  "auth/forgot-password",
+  async ({ username, pwd }, { rejectWithValue, fulfillWithValue }) => {
     try {
-      const { data } = await api.post('/resetPasword', state, { withCredentials: true });
+      const { data } = await api.post(
+        "/resetPasword",
+        { username: String(username).trim(), pwd },
+        { withCredentials: true },
+      );
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" },
+      );
     }
-  }
+  },
 );
-
 
 export const otpSend = createAsyncThunk(
   "auth/otpSend",
   async (phone, { rejectWithValue, fulfillWithValue }) => {
     try {
       const { data } = await api.post(`/sent/otp/verify/reset`, {
-        phone: phone,    
+        phone: phone,
       });
       return fulfillWithValue(data); // Return data directly
     } catch (error) {
       return rejectWithValue(
-        error.response ? error.response.data : "An unknown error occurred"
+        error.response ? error.response.data : "An unknown error occurred",
       );
     }
-  }
+  },
 );
 
 export const registerOtp = createAsyncThunk(
@@ -191,17 +196,16 @@ export const registerOtp = createAsyncThunk(
   async (phone, { rejectWithValue, fulfillWithValue }) => {
     try {
       const { data } = await api.post(`/sent/otp/verify`, {
-        phone: phone,    
+        phone: phone,
       });
       return fulfillWithValue(data); // Return data directly
     } catch (error) {
       return rejectWithValue(
-        error.response ? error.response.data : "An unknown error occurred"
+        error.response ? error.response.data : "An unknown error occurred",
       );
     }
-  }
+  },
 );
-
 
 export const authReducer = createSlice({
   name: "auth",
@@ -209,7 +213,7 @@ export const authReducer = createSlice({
     loader: false,
     userInfo: null,
     errorMessage: "",
-    successMessage: "",   
+    successMessage: "",
     // add userDetail to initialState
   },
   reducers: {
@@ -232,7 +236,6 @@ export const authReducer = createSlice({
         state.loader = false;
       })
       .addCase(register.fulfilled, (state, { payload }) => {
-    
         state.successMessage = payload.message;
         state.loader = false;
       })
@@ -250,7 +253,7 @@ export const authReducer = createSlice({
         state.loader = false;
         state.userInfo = userInfo;
       })
-     
+
       .addCase(emailLogin.pending, (state) => {
         state.loader = true;
       })
@@ -346,18 +349,31 @@ export const authReducer = createSlice({
         state.emailotpData = payload.data || [];
         state.loader = false;
       })
-       .addCase(forgotPassword.pending, (state) => {
+
+      // ============================================
+      // forgotPassword (no OTP)
+      // ============================================
+      .addCase(forgotPassword.pending, (state) => {
         state.loader = true;
+        state.errorMessage = "";
+        state.successMessage = "";
       })
       .addCase(forgotPassword.rejected, (state, { payload }) => {
-        state.errorMessage = payload?.errorMessage || 'An error occurred';
+        state.errorMessage =
+          payload?.message || payload?.errorMessage || "An error occurred";
         state.loader = false;
       })
       .addCase(forgotPassword.fulfilled, (state, { payload }) => {
-        state.successMessage = payload.message;
         state.loader = false;
+        // Backend errors par bhi HTTP 200 + status:false bhejta hai
+        if (payload?.status) {
+          state.successMessage =
+            payload?.message || "Change password successfully";
+        } else {
+          state.errorMessage = payload?.message || "Password reset failed";
+        }
       })
-      
+
       .addCase(otpSend.pending, (state) => {
         state.loader = true;
       })
@@ -367,7 +383,7 @@ export const authReducer = createSlice({
       })
       .addCase(otpSend.fulfilled, (state, { payload }) => {
         state.successMessage = payload.message || "";
-         state.loader = false;
+        state.loader = false;
       })
       .addCase(registerOtp.pending, (state) => {
         state.loader = true;
@@ -378,9 +394,8 @@ export const authReducer = createSlice({
       })
       .addCase(registerOtp.fulfilled, (state, { payload }) => {
         state.successMessage = payload.message || "";
-         state.loader = false;
-      })
-
+        state.loader = false;
+      });
   },
 });
 

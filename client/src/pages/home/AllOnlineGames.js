@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { useDispatch } from "react-redux";
-import { gameListByGameTypeAndProvider } from "../../store/reducer/spribeGameReducer";
+import CustomeNavbar from "../../components/CustomeNavbar";
 import JilliPopup from "../../components/JilliPopup";
 import RechargePopup from "../../components/RechargePopup";
+import { gameListByGameTypeAndProvider } from "../../store/reducer/spribeGameReducer";
 import { rechargeList2 } from "../../store/reducer/userReducer";
-import CustomeNavbar from "../../components/CustomeNavbar";
+import LotterSection from "./newgame/LotterSection";
 
 const Container = styled.div`
   width: 100%;
@@ -41,7 +42,9 @@ const Item = styled.div`
   width: 100px; /* Assuming each item has a width of 100px */
   margin: 10px 5px;
   background: ${(props) =>
-    props.active ? "linear-gradient(90deg, #F5CC2C 0%, #F2CA33 100%)" : "#fff"};
+    props.active
+      ? "var(--Gradient-1, linear-gradient(93deg, var(--mediam-blue) 7.38%, var(--bgblue) 94.48%))"
+      : "#201d2b"};
   padding: 11px 12px;
 `;
 
@@ -93,43 +96,43 @@ const AllOnlineGames = () => {
   const items = [
     {
       name: "Lottery",
-      icon: "https://i.ibb.co/5XJY3nYJ/lottery.png",
+      icon: "https://i.ibb.co/mCS1hw9t/L-d9b599f044f44fc10475.png",
       id: "Lottery",
       type: "",
     },
     {
       name: "Slots",
-      icon: "https://i.ibb.co/jkb6GJ9x/slots.png",
+      icon: "	https://i.ibb.co/35SV9gdz/SUPER-JACKPOT.png",
       id: "Slot Game",
       type: "jili",
     },
     {
       name: "Mini games",
-      icon: "https://i.ibb.co/hRFMfxLP/mini.png",
+      icon: "	https://i.ibb.co/wFZqXRnG/MINI-GAME.png",
       id: "CasinoTable",
       type: "spribe",
     },
     {
       name: "Fishing",
-      icon: "https://i.ibb.co/SXj088tV/fishing.png",
+      icon: "https://i.ibb.co/JRnd4dfz/f.png",
       id: "Fish Game",
       type: "jili",
     },
     {
       name: "Casino",
-      icon: "https://i.ibb.co/93SfgzHq/casino.png",
+      icon: "https://i.ibb.co/rR8JY3Ys/Chat-GPT-Image-Aug-14-2026-03-17-05-PM.png",
       id: "CasinoLive",
       type: "evolutionlive",
     },
     {
       name: "PVC",
-      icon: "https://i.ibb.co/HTcWYBdc/pvc.png",
+      icon: "https://i.ibb.co/7Nn3hdyq/Chat-GPT-Image-Aug-14-2026-03-05-38-PM.png",
       id: "Ca",
       type: "ev",
     },
     {
       name: "Sports",
-      icon: "https://i.ibb.co/d0bYjD6C/sport.png",
+      icon: "https://i.ibb.co/C34fRZTP/sports.png",
       id: "Ca",
       type: "ev",
     },
@@ -141,8 +144,8 @@ const AllOnlineGames = () => {
         provider: provider,
         game_type: gameType,
         page: 1,
-        size: 20,
-      })
+        size: 50,
+      }),
     ).then((res) => {
       if (res?.payload?.data?.data) {
         setGameList(res.payload.data.data);
@@ -229,39 +232,8 @@ const AllOnlineGames = () => {
       </Container>
 
       {tab === "Lottery" && (
-        <div className="container-section mt-5">
-          <div className="flex flex-col gap-2 ">
-            {gameData.map((game) => (
-              <div
-                key={game.id}
-                onClick={() => handleWingo(game.link)}
-                className="lotterySlotItem  blue-linear rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
-              >
-                <div className="px-4 py-2 flex flex-row items-start justify-between">
-                  <div className="flex flex-col items-start">
-                    <span className="block text-white font-bold text-lg mt-1">
-                      {game.name}
-                    </span>
-                    <h4 className="mt-1">
-                      <div className="text-gray-100 text-xs font-semibold">
-                        {game.description1}
-                      </div>
-                      <div className="text-gray-100 text-xs font-semibold">
-                        {game.description2}
-                      </div>
-                    </h4>
-                  </div>
-                  <img
-                    src={game.image}
-                    alt={game.name}
-                    className={`w-[90px] rounded ${
-                      game.id >= 1 && game.id <= 5 ? "h-[80px]" : ""
-                    }`}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="p-2">
+          <LotterSection />
         </div>
       )}
 
@@ -340,9 +312,8 @@ const AllOnlineGames = () => {
         {tab === "PVC" && (
           <div className="grid grid-cols-12 gap-3 mt-3">
             {[
-              "https://i.ibb.co/GvvYf3JL/pvc1.png",
-              "https://i.ibb.co/wF6rT0yw/pvc2.png",
-              "https://i.ibb.co/352KZsZT/pvc3.png",
+              "https://i.ibb.co/ZQcyY3X/vendorlogo-20240620145952prhc.png",
+              "https://i.ibb.co/hRpgZ6N9/vendorlogo-20240620145936heyd.png",
             ]?.map((item, index) => (
               <div className="col-span-4" key={index}>
                 <img
@@ -359,9 +330,8 @@ const AllOnlineGames = () => {
         {tab === "Sports" && (
           <div className="grid grid-cols-12 gap-3 mt-3">
             {[
-              "https://i.ibb.co/8gPLBczQ/vendorlogo-20240611171549i8md.png",
-              "https://i.ibb.co/fYm4nYtM/vendorlogo-20240611171621j6wf.png",
-              "https://i.ibb.co/6RH8B9Sp/vendorlogo-20240611171602f8k1.png",
+              "https://i.ibb.co/4gDkSFQh/img1.png",
+              "https://i.ibb.co/pvmfQSRy/img2.png",
             ]?.map((item, index) => (
               <div className="col-span-4" key={index}>
                 <img
@@ -385,7 +355,7 @@ const gameData = [
   {
     id: 1,
     name: "Win Go",
-    image: "https://i.ibb.co/1YpMws1w/lotterycategory-wingo.png",
+    image: "https://i.ibb.co/7xzW3FWt/wingo.png",
     description1: "Guess Number",
     description2: "Green/Red/Violet to win",
     link: "/wingo",
@@ -393,7 +363,7 @@ const gameData = [
   {
     id: 2,
     name: "K3",
-    image: "https://i.ibb.co/8DM9C571/lotterycategory-k3.png",
+    image: "https://i.ibb.co/RksPMscQ/k3.png",
     description1: "Guess Number",
     description2: "Big/Small/Odd/Even",
     link: "/k3",
@@ -401,7 +371,7 @@ const gameData = [
   {
     id: 3,
     name: "5D",
-    image: "https://i.ibb.co/rLDKjgV/lotterycategory-5d.png",
+    image: "https://i.ibb.co/bj9PQtCK/5d.png",
     description1: "Guess Number",
     description2: "Big/Small/Odd/Even",
     link: "/5d",
@@ -409,7 +379,7 @@ const gameData = [
   {
     id: 4,
     name: "Trx Win Go",
-    image: "https://i.ibb.co/MDHJpJL6/trx-ec.png",
+    image: "https://i.ibb.co/Df41Vh4p/4.png",
     description1: "Guess Number",
     description2: "Green/Red/Violet to win",
     link: "/trx",

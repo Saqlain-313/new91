@@ -81,6 +81,7 @@ import ActivityAward from "./pages/main/ActivityAward";
 import Invite from "./pages/promotion/Invite";
 
 import DepositBouns from "./pages/activity/DepositBouns";
+import FristGift from "./pages/activity/FristGift";
 import CasinoSection from "./pages/home/newgame/CasinoSection";
 import Beginner from "./pages/main/Beginner";
 import PartnerRewards from "./pages/promotion/PartnerRewards";
@@ -187,6 +188,7 @@ function AppComponent() {
               <Route path="main/ActivityAward" element={<ActivityAward />} />
               <Route path="main/InvitationBonus/Rule" element={<Rule />} />
               <Route path="main/Laundry" element={<Laundry />} />
+              <Route path="main/firstgift" element={<FristGift />} />
               <Route
                 path="main/CustomerService"
                 element={<CustomerService />}

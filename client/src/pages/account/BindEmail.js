@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { MdVerifiedUser } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 
-import { emailotp, emailsubmit } from "../../store/reducer/authReducer";
 import CustomeNavbar from "../../components/CustomeNavbar";
+import ServiceRotate from "../../components/ServiceRotate";
+import { emailotp, emailsubmit } from "../../store/reducer/authReducer";
 
 const BindEmail = () => {
   const { loader } = useSelector((state) => state.auth);
@@ -56,7 +57,7 @@ const BindEmail = () => {
   return (
     <>
       <CustomeNavbar name="Bind mainbox" />
-
+      <ServiceRotate />
       <div className="container-section">
         <form action="" className="mt-10">
           <div>
@@ -77,7 +78,7 @@ const BindEmail = () => {
             <div className="mt-3 flex justify-between">
               <input
                 type="text"
-                className="w-full  bg-body border border-[--bgbody] focus:[var(--grey-100)] rounded-lg p-2 py-2  ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-[var(--grey-200)] placeholder:font-medium"
+                className="w-full  nav-bg border border-[--bgbody] focus:[var(--grey-100)] rounded-lg p-2 py-2  ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-[var(--grey-200)] placeholder:font-medium"
                 placeholder="Please enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -88,27 +89,27 @@ const BindEmail = () => {
           <div className="mt-4">
             <div className="flex items-center ">
               <span>
-                <MdVerifiedUser className="text-[#fb5b5b] text-2xl" />
+                <MdVerifiedUser className="color-l text-2xl" />
               </span>
-              <label htmlFor="" className="ms-1 text-whites">
+              <label htmlFor="" className="font-medium ms-1 text-whites">
                 Verification Code
               </label>
             </div>
             <div className="mt-3 flex justify-between relative">
               <input
                 type="text"
-                className="w-full  bg-body border border-[--bgbody] focus:[var(--grey-100)] rounded-lg p-2 py-3  ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-[var(--grey-200)] placeholder:font-medium"
-                placeholder="Please enter the confirmation code"
+                className="w-full  nav-bg border border-[--bgbody] focus:[var(--grey-100)] rounded-lg p-2 py-3  ps-6 flex items-center focus:border focus:outline-none  placeholder:text-sm placeholder:text-[var(--grey-200)] placeholder:font-medium"
+                placeholder="Enter the confirmation code"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
               />
               {loader ? (
-                <span className="absolute blue-linear right-3 top-2 text-whites cursor-pointer text-sm px-6 py-2 rounded-full">
+                <span className="absolute blue-linear right-3 top-2 text-white cursor-pointer text-sm px-6 py-2 rounded-full">
                   Wait
                 </span>
               ) : (
                 <span
-                  className="absolute blue-linear right-3 top-2  text-white cursor-pointer text-sm px-8 py-2 rounded-full"
+                  className="absolute blue-linear right-3 top-2  text-white cursor-pointer text-sm px-6 py-2 rounded-full"
                   onClick={handleOtp}
                 >
                   Send
@@ -118,7 +119,7 @@ const BindEmail = () => {
           </div>
         </form>
         <button
-          className="blue-linear flex justify-center  text-xl  w-80  text-white m-auto font-bold text-center  rounded-full p-2 mt-52 tracking-[3px]"
+          className="blue-linear flex justify-center  text-xl  w-full  text-white m-auto font-bold text-center  rounded-full p-2 px-2 mt-52 tracking-[3px]"
           onClick={submit}
         >
           Bind
