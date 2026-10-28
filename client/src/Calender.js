@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 
+const START_YEAR = 2020;
+
 function ScrollPicker({ items, selectedItem, onChange, label }) {
   const containerRef = useRef(null);
   const itemRefs = useRef([]);
@@ -47,7 +49,7 @@ function ScrollPicker({ items, selectedItem, onChange, label }) {
         <div style={{ height: itemHeight * 2 }} />
         {items.map((item, index) => (
           <div
-            key={index}
+            key={item}
             ref={(el) => (itemRefs.current[index] = el)}
             onClick={() => handleItemClick(index)}
             className={`h-10 flex items-center justify-center cursor-pointer ${
@@ -68,52 +70,59 @@ function ScrollPicker({ items, selectedItem, onChange, label }) {
   );
 }
 
-function Calendar({ onDateSelect, onValueChange }) {
-  const now = new Date();
-  const currentYear = now.getUTCFullYear();
-  const currentMonth = now.getUTCMonth() + 1; // Months are 0-based
-  const currentDay = now.getUTCDate();
+const pad = (n) => String(n).padStart(2, "0");
 
-  const [selectedYear, setSelectedYear] = useState(currentYear.toString());
-  const [selectedMonth, setSelectedMonth] = useState(
-    currentMonth.toString().padStart(2, "0"),
-  );
-  const [selectedDay, setSelectedDay] = useState(
-    currentDay.toString().padStart(2, "0"),
-  );
+function Calendar({ onDateSelect, onValueChange }) {
+  // Local date use karo (UTC se IST me raat ko date galat aati thi)
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1; // Months are 0-based
+  const currentDay = now.getDate();
+
+  const [selectedYear, setSelectedYear] = useState(String(currentYear));
+  const [selectedMonth, setSelectedMonth] = useState(pad(currentMonth));
+  const [selectedDay, setSelectedDay] = useState(pad(currentDay));
   const [isOpen, setIsOpen] = useState(false);
 
-  // Define years, months, and days based on current date
-  const years = Array.from({ length: 6 }, (_, i) =>
-    (2020 + i).toString(),
-  ).filter((year) => parseInt(year) <= currentYear);
-
-  const months = Array.from({ length: 12 }, (_, i) =>
-    (i + 1).toString().padStart(2, "0"),
-  ).filter(
-    (month) =>
-      parseInt(month) <=
-      (parseInt(selectedYear) === currentYear ? currentMonth : 12),
+  // Years: START_YEAR se current year tak (dynamic)
+  const years = Array.from(
+    { length: Math.max(currentYear - START_YEAR + 1, 1) },
+    (_, i) => String(START_YEAR + i),
   );
 
-  const days = Array.from({ length: 31 }, (_, i) =>
-    (i + 1).toString().padStart(2, "0"),
-  ).filter(
-    (day) =>
-      parseInt(day) <=
-      (parseInt(selectedYear) === currentYear &&
-      parseInt(selectedMonth) === currentMonth
-        ? currentDay
-        : 31),
-  );
+  const yearNum = parseInt(selectedYear, 10);
+  const monthNum = parseInt(selectedMonth, 10);
+
+  // Months: current year me sirf current month tak
+  const maxMonth = yearNum === currentYear ? currentMonth : 12;
+  const months = Array.from({ length: maxMonth }, (_, i) => pad(i + 1));
+
+  // Days: us mahine ke asli din, current month me aaj tak
+  const daysInMonth = new Date(yearNum, monthNum, 0).getDate();
+  const maxDay =
+    yearNum === currentYear && monthNum === currentMonth
+      ? Math.min(currentDay, daysInMonth)
+      : daysInMonth;
+  const days = Array.from({ length: maxDay }, (_, i) => pad(i + 1));
+
+  // Month/day invalid ho jaye (year ya month badalne par) to last valid par le aao
+  useEffect(() => {
+    if (!months.includes(selectedMonth)) {
+      setSelectedMonth(months[months.length - 1]);
+    }
+  }, [selectedYear, selectedMonth, months.length]);
+
+  useEffect(() => {
+    if (!days.includes(selectedDay)) {
+      setSelectedDay(days[days.length - 1]);
+    }
+  }, [selectedYear, selectedMonth, selectedDay, days.length]);
 
   const handleConfirm = () => {
     const selectedDate = `${selectedYear}-${selectedMonth}-${selectedDay}`;
 
-    if (onDateSelect) {
-      onDateSelect(selectedDate);
-      onValueChange(selectedDate);
-    }
+    if (onDateSelect) onDateSelect(selectedDate);
+    if (onValueChange) onValueChange(selectedDate);
     setIsOpen(false);
   };
 
