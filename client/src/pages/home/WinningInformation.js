@@ -1,158 +1,213 @@
-// src/Slider.js
 import { useEffect, useState } from "react";
 
 const Avatar1 =
   "https://ossimg.tirangaagent.com/Tiranga/gamelogo/EVO_Video/mrfykemt5slanyi5.png";
 const Avatar2 = "https://i.ibb.co/4gDkSFQh/img1.png";
 const Avatar3 = "https://ossimg.6club-club.com/6club/gamelogo/TB_Chess/800.png";
-const Avatar4 = "https://ossimg.6club-club.com/6club/gamelogo/TB_Chess/800.png";
-const Avatar5 = "https://ossimg.6club-club.com/6club/gamelogo/TB_Chess/800.png";
+const Avatar4 = Avatar3;
+const Avatar5 = Avatar3;
 
 const earnings = [
   {
     id: 1,
     name: "Mem***UEW",
-    rank: "NO1",
     amount: "100,992",
-    highlight: true,
     image: Avatar1,
   },
   {
     id: 2,
     name: "Mem***CBJ",
-    rank: "NO2",
     amount: "70,866",
-    highlight: true,
     image: Avatar2,
   },
   {
     id: 3,
     name: "Mem***ZWS",
-    rank: "NO3",
     amount: "69087",
-    highlight: true,
     image: Avatar3,
   },
   {
     id: 4,
     name: "Mem***SUG",
-    rank: "NO4",
     amount: "60560",
-    highlight: false,
     image: Avatar5,
   },
   {
     id: 5,
     name: "Mem***HOG",
-    rank: "NO5",
     amount: "58933",
-    highlight: false,
     image: Avatar3,
   },
 ];
-// Random text and number generators
+
 const generateRandomText = () => {
-  const prefix = "MEM***";
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  let result = prefix;
-  for (let i = 0; i < 3; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
+
+  return (
+    "MEM***" +
+    Array.from(
+      { length: 3 },
+      () => chars[Math.floor(Math.random() * chars.length)],
+    ).join("")
+  );
 };
 
-const getRandomINumber = () => {
-  return (Math.random() * 1000).toFixed(2);
-};
-
-// Function to pick a random item from the data array
-const getRandomItem = (array) => {
-  return array[Math.floor(Math.random() * array.length)];
-};
-
-// Component for showing winning information
 const WinningInformation = () => {
   const [currentEarnings, setCurrentEarnings] = useState(earnings);
 
-  // Function to generate a random earning entry
-  const generateRandomEarning = () => {
-    const avatars = [Avatar1, Avatar2, Avatar3, Avatar4, Avatar5];
-    const randomAmount = Math.floor(Math.random() * (100000 - 50000) + 50000);
-
-    return {
-      id: Math.random(),
-      name: generateRandomText(),
-      rank: `NO${Math.floor(Math.random() * 5) + 1}`,
-      amount: randomAmount.toLocaleString(),
-      highlight: Math.random() > 0.5,
-      image: avatars[Math.floor(Math.random() * avatars.length)],
-    };
-  };
-
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Generate a new random earning
-      const newEarning = generateRandomEarning();
+    const avatars = [Avatar1, Avatar2, Avatar3, Avatar4, Avatar5];
 
-      // Update the earnings list, keeping only the last 5 entries
-      setCurrentEarnings((prev) => {
-        const updated = [newEarning, ...prev.slice(0, 4)];
-        return updated;
-      });
-    }, 1000); // Update every 1 second
+    const interval = setInterval(() => {
+      const newEarning = {
+        id: `${Date.now()}-${Math.random()}`,
+        name: generateRandomText(),
+        amount: Math.floor(Math.random() * 50000 + 50000).toLocaleString(
+          "en-IN",
+        ),
+        image: avatars[Math.floor(Math.random() * avatars.length)],
+      };
+
+      setCurrentEarnings((prev) => [newEarning, ...prev].slice(0, 5));
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // useEffect(() => {
-  //   window.scrollTo({ top: 0, behavior: "smooth" });
-  // }, []);
   return (
     <>
-      {/* <h3 className="border-after mt-2 text-whites font-[400]">
-        Winning Information
-      </h3> */}
-      <div className="flex items-center mt-4  border-l-4 border-color-green text-sm mb-2">
-        {" "}
-        <h1 className="heading-h3 font-medium ml-1 text-whites">
-          Winning Information
-        </h1>
-      </div>
+      {/* CSS isi component ke andar */}
+      <style>{`
+        .winning-information {
+          width: 100%;
+          min-width: 0;
+          margin-top: 16px;
+        }
 
-      <div className="winning-item">
-        <div className="slider-container">
-          <div className="slider">
-            {currentEarnings.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center p-4 gap-3 nav-bg border-b border-[#525167]"
-              >
-                <div className="flex-shrink-0 w-[40px] h-[50px] object-cover overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt="profile"
-                    className="w-[40px] h-[50px] object-cover overflow-hidden "
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="flex flex-col justify-center gap-2 text-whites">
-                    <span className=" text-sm">User</span>
-                    <span className="text-sm">Winning amount</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="flex flex-col justify-between text-end gap-2">
-                    <span className=" text-sm text-whites">{item.name}</span>
-                    <span className={`text-[12px] text-blue`}>
-                      {item.amount}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+        .winning-list {
+          width: 100%;
+          height: 350px;
+          overflow: hidden;
+          position: relative;
+          isolation: isolate;
+          contain: layout paint;
+          border-radius: 10px;
+        }
+
+        .winning-row {
+          width: 100%;
+          height: 70px;
+          min-height: 70px;
+          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 8px 16px;
+          overflow: hidden;
+          flex-shrink: 0;
+          background: var(--nav-bg, #201e2b);
+          border-bottom: 1px solid #525167;
+        }
+
+        .winning-row:first-child {
+          animation: winningSlideIn 300ms ease-out both;
+        }
+
+        .winning-avatar {
+          width: 40px;
+          height: 50px;
+          flex: 0 0 40px;
+          overflow: hidden;
+          border-radius: 4px;
+        }
+
+        .winning-avatar img {
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .winning-labels,
+        .winning-values {
+          min-width: 0;
+          flex: 1 1 0;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 8px;
+          overflow: hidden;
+        }
+
+        .winning-labels span,
+        .winning-values span {
+          display: block;
+          min-width: 0;
+          font-size: 12px;
+          line-height: 16px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .winning-labels {
+          color: #fff;
+        }
+
+        .winning-values {
+          text-align: right;
+          color: #fff;
+        }
+
+        .winning-values .winning-amount {
+          color: #3b82f6;
+        }
+
+        @keyframes winningSlideIn {
+          from {
+            opacity: 0.65;
+            transform: translateY(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .winning-row:first-child {
+            animation: none;
+          }
+        }
+      `}</style>
+
+      <section className="winning-information">
+        <div className="flex items-center border-l-4 border-color-green text-sm mb-2">
+          <h2 className="heading-h3 font-medium ml-1 text-whites">
+            Winning Information
+          </h2>
         </div>
-      </div>
+
+        <div className="winning-list">
+          {currentEarnings.map((item) => (
+            <div key={item.id} className="winning-row">
+              <div className="winning-avatar">
+                <img src={item.image} alt="Profile" />
+              </div>
+
+              <div className="winning-labels">
+                <span>User</span>
+                <span>Winning amount</span>
+              </div>
+
+              <div className="winning-values">
+                <span>{item.name}</span>
+                <span className="winning-amount">{item.amount}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
     </>
   );
 };
