@@ -42,10 +42,10 @@ const FiveD = () => {
   const [pageno, setPage] = useState(1);
   const [pageto, setPageto] = useState(10);
   const [typeid1, setTypeid1] = useState(1);
-
-  // ✅ Single timer object (K3 style — 1 re-render per tick)
+  
+  // ✅ Timer state ek object mein combine (3 re-renders → 1 re-render)
   const [timerData, setTimerData] = useState({ minute: 0, sec1: 0, sec2: 0 });
-
+  
   const [changeTime, setChangeTime] = useState(true);
   const [details, setDetails] = useState(null);
   const [copyPopup, setCopyPopup] = useState(false);
@@ -59,8 +59,8 @@ const FiveD = () => {
   const [selectedNumbers, setSelectedNumbers] = useState([]);
 
   const intervalRef = useRef(null);
-  const socketRef = useRef(null);       // game results socket
-  const timeSocketRef = useRef(null);   // timer socket
+  const socketRef = useRef(null);
+  const timeSocketRef = useRef(null);
   const activeVoiceRef = useRef(activeVoice);
   const typeid1Ref = useRef(typeid1);
   const pagenoRef = useRef(pageno);
@@ -73,7 +73,6 @@ const FiveD = () => {
   const numbers3 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   const totalbalance = balance * selectedNumbers?.length;
 
-  // ✅ Refs sync — stale closure avoid
   useEffect(() => { activeVoiceRef.current = activeVoice; }, [activeVoice]);
   useEffect(() => { typeid1Ref.current = typeid1; }, [typeid1]);
   useEffect(() => { pagenoRef.current = pageno; }, [pageno]);
@@ -85,6 +84,7 @@ const FiveD = () => {
     return match ? parseInt(match[0], 10) : null;
   };
 
+  // ✅ chartFunction ko useCallback + requestAnimationFrame
   const chartFunction = useCallback(() => {
     requestAnimationFrame(() => {
       const trendList = document.getElementById("trendList");
@@ -115,7 +115,6 @@ const FiveD = () => {
   }, []);
 
   const userDispatch = useCallback(debounce(() => { dispatch(userDetail()); }, 500), [dispatch]);
-
   const debouncedDispatch = useCallback(
     debounce((dispatch, typeid1, pageno, pageto) => {
       dispatch(d5PeriodList({ typeid1, pageno, pageto }));
@@ -123,7 +122,6 @@ const FiveD = () => {
       setSpinClass("");
     }, 500), [dispatch]
   );
-
   const debouncedDispatchResult = useCallback(
     debounce((dispatch, typeid1, pageno, pageto) => {
       dispatch(d5History({ typeid1, pageno, pageto })).then((res) => {
@@ -154,7 +152,6 @@ const FiveD = () => {
     setPage(newPageNo); setPageto(newPageTo);
     await fetchNewData(newPageNo, newPageTo);
   };
-
   const handleDecrease = async () => {
     if (pageno > 10) {
       const newPageNo = pageno - 10;
@@ -226,7 +223,6 @@ const FiveD = () => {
     setTimeout(() => setOpenPopup(true), 100);
   };
 
-  // ✅ Audio refs (K3 style — lazy init)
   const audio1Ref = useRef(null);
   const audio2Ref = useRef(null);
   if (!audio1Ref.current) audio1Ref.current = new Audio(Audio1);
@@ -272,9 +268,7 @@ const FiveD = () => {
     if (gameHistory === "chart") chartFunction();
   }, [gameHistory, d5PeriodListData, chartFunction]);
 
-  // ============================================================
-  // 🔥 GAME RESULT SOCKET — K3 pattern (single shared socket + refs)
-  // ============================================================
+  // ✅ SINGLE shared socket for game results
   useEffect(() => {
     if (!socketRef.current) {
       socketRef.current = io(host, {
@@ -287,7 +281,7 @@ const FiveD = () => {
     const sock = socketRef.current;
 
     const handler = (msg) => {
-      // K3 jaisa: result popup trigger
+      // ✅ Sirf tab setPage/setPageto jab actually naya result aaye
       if (msg?.data?.[1]?.period == d5HistoryDataRef.current?.data?.gameslist?.[0]?.stage) {
         setPage(1); setPageto(10);
         setResultPopup(true);
@@ -295,16 +289,10 @@ const FiveD = () => {
       }
 
       const tid = typeid1Ref.current;
-      // ✅ K3 jaisa: har time slot ka game-specific check
-      if (
-        ((tid == 1 && msg?.game == 1) ||
-         (tid == 3 && msg?.game == 3) ||
-         (tid == 5 && msg?.game == 5) ||
-         (tid == 10 && msg?.game == 10)) &&
-        Array.isArray(msg?.data)
-      ) {
+      if ((tid == 3 || tid == 5 || tid == 10) && Array.isArray(msg?.data)) {
         debouncedDispatch(dispatch, tid, pagenoRef.current, pagetoRef.current);
         setChangeTime(true);
+        // ✅ chartFunction yahan nahi — useEffect se call hoga
       }
     };
 
@@ -312,9 +300,7 @@ const FiveD = () => {
     return () => sock.off("data-server-5d", handler);
   }, [dispatch, debouncedDispatch, debouncedDispatchResult]);
 
-  // ============================================================
-  // 🔥 TIME SOCKET — K3 pattern (single socket, event swap)
-  // ============================================================
+  // ✅ SINGLE time socket for countdown (1 re-render per tick)
   useEffect(() => {
     if (!timeSocketRef.current) {
       timeSocketRef.current = io(host, {
@@ -326,7 +312,6 @@ const FiveD = () => {
     }
     const sock = timeSocketRef.current;
 
-    // K3 jaisa: typeid ke hisaab se event name
     const eventName =
       typeid1 == 1 ? "timeUpdate_11" :
       typeid1 == 3 ? "timeUpdate_3" :
@@ -339,16 +324,14 @@ const FiveD = () => {
       if (!data) return;
       const { minute, secondtime1, secondtime2 } = data;
 
-      // ✅ Single state update — 1 re-render per tick
+      // ✅ Single state update
       setTimerData({ minute, sec1: secondtime1, sec2: secondtime2 });
 
-      // K3 jaisa openTime logic
       if (minute === 0 && secondtime1 === 0 && secondtime2 <= 5 && secondtime2 >= 1) {
         setOpenTime(true); setOpenPopup(false);
         if (activeVoiceRef.current) playAudio1();
       } else setOpenTime(false);
 
-      // K3 jaisa alert minute check
       const alertMinute =
         typeid1 == 1 ? 0 : typeid1 == 3 ? 2 : typeid1 == 5 ? 4 : typeid1 == 10 ? 9 : 0;
       if (minute === alertMinute && secondtime1 === 5 && secondtime2 === 9 && activeVoiceRef.current) {
@@ -360,7 +343,6 @@ const FiveD = () => {
     return () => sock.off(eventName, handler);
   }, [typeid1]);
 
-  // ✅ FULL CLEANUP — K3 jaisa
   useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -472,7 +454,7 @@ const FiveD = () => {
             {selectTab != "total" ? (
               <div>
                 <div className="grid grid-cols-12 mt-3 gap-2 text-white ">
-                  {[{ key: "b", label: "Big", cls: "bg-yellow text-white" }, { key: "s", label: "Small", cls: "bgs-blue-500 text-white" }, { key: "l", label: "Odd", cls: "bgs-red-200 text-white" }, { key: "c", label: "Even", cls: "bgs-green text-white" }].map(({ key, label, cls }) => (
+                  {[{ key: "b", label: "Big", cls: "bg-yellow text-white" },{ key: "s", label: "Small", cls: "bgs-blue-500 text-white" },{ key: "l", label: "Odd", cls: "bgs-red-200 text-white" },{ key: "c", label: "Even", cls: "bgs-green text-white" }].map(({ key, label, cls }) => (
                     <div key={key}
                       className={`col-span-3 cursor-pointer rounded-md font-medium text-base p-1 flex justify-between items-center ${selectedNumbers.includes(key) ? cls : " gray-1"}`}
                       onClick={() => handleSelectNumber3(key)}>
@@ -494,7 +476,7 @@ const FiveD = () => {
               </div>
             ) : (
               <div className="grid grid-cols-12 mt-3 gap-2 ">
-                {[{ key: "b", label: "Big", cls: "bg-yellow text-white" }, { key: "s", label: "Small", cls: "bgs-blue-500 text-white" }, { key: "l", label: "Odd", cls: "bgs-red-200 text-white" }, { key: "c", label: "Even", cls: "bgs-green text-white" }].map(({ key, label, cls }) => (
+                {[{ key: "b", label: "Big", cls: "bg-yellow text-white" },{ key: "s", label: "Small", cls: "bgs-blue-500 text-white" },{ key: "l", label: "Odd", cls: "bgs-red-200 text-white" },{ key: "c", label: "Even", cls: "bgs-green text-white" }].map(({ key, label, cls }) => (
                   <div key={key}
                     className={`col-span-3 cursor-pointer rounded-md font-medium text-base p-1 flex justify-between items-center ${selectedNumbers.includes(key) ? cls : "text-whites bg-color-l"}`}
                     onClick={() => handleSelectNumber3(key)}>
@@ -753,7 +735,7 @@ const FiveD = () => {
             {selectTab != "total" ? (
               <div>
                 <div className="grid grid-cols-12 mt-3 gap-2">
-                  {[{ key: "b", label: "Big", cls: "bg-yellow text-white" }, { key: "s", label: "Small", cls: "bgs-blue-500 text-white" }, { key: "l", label: "Odd", cls: "bgs-red-200 text-white" }, { key: "c", label: "Even", cls: "bgs-green text-white" }].map(({ key, label, cls }) => (
+                  {[{ key: "b", label: "Big", cls: "bg-yellow text-white" },{ key: "s", label: "Small", cls: "bgs-blue-500 text-white" },{ key: "l", label: "Odd", cls: "bgs-red-200 text-white" },{ key: "c", label: "Even", cls: "bgs-green text-white" }].map(({ key, label, cls }) => (
                     <div key={key}
                       className={`col-span-3 cursor-pointer text-white rounded-md font-medium text-base p-1 flex justify-between items-center ${selectedNumbers.includes(key) ? cls : "bg-popup-nav"}`}
                       onClick={() => handleSelectNumber3(key)}>
@@ -775,7 +757,7 @@ const FiveD = () => {
               </div>
             ) : (
               <div className="grid grid-cols-12 text-white mt-3 gap-2">
-                {[{ key: "b", label: "Big", cls: "bg-yellow text-white" }, { key: "s", label: "Small", cls: "bgs-blue-500 text-white" }, { key: "l", label: "Odd", cls: "bgs-red-200 text-white" }, { key: "c", label: "Even", cls: "bgs-green text-white" }].map(({ key, label, cls }) => (
+                {[{ key: "b", label: "Big", cls: "bg-yellow text-white" },{ key: "s", label: "Small", cls: "bgs-blue-500 text-white" },{ key: "l", label: "Odd", cls: "bgs-red-200 text-white" },{ key: "c", label: "Even", cls: "bgs-green text-white" }].map(({ key, label, cls }) => (
                   <div key={key}
                     className={`col-span-3 cursor-pointer rounded-md font-medium text-base p-1 flex justify-between items-center ${selectedNumbers.includes(key) ? cls : "bg-popup-nav"}`}
                     onClick={() => handleSelectNumber3(key)}>

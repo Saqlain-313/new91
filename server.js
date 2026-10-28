@@ -25,6 +25,21 @@ const app = express();
 const server = http.createServer(app);
 const logFilePath = path.join(__dirname, "server.log");
 
+// ============================================================
+// PROCESS-LEVEL SAFETY NET
+// Registered FIRST. Previously these handlers called process.exit(1),
+// which restarted the server on any stray rejection and wiped every
+// Socket.IO session -> clients got "400 Bad Request" on polling POSTs.
+// Now we only log and keep the process alive.
+// ============================================================
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+});
+
 const corsdata = [
   "http://localhost:3000",
   "http://localhost:5173",
@@ -40,20 +55,22 @@ const io = new Server(server, {
     methods: ["GET", "POST", "OPTIONS"],
     credentials: true,
   },
+  // websocket first, polling kept as fallback for old cached clients
+  transports: ["websocket", "polling"],
+  pingInterval: 25000,
+  pingTimeout: 60000,
+  allowEIO3: true,
 });
 
-// Log when a client connects or disconnects
 io.on("connection", (socket) => {
-  //logToFile(`Socket connected - ID: ${socket.id}`);
-
-  socket.on("disconnect", () => {
-    //logToFile(`Socket disconnected - ID: ${socket.id}`);
+  socket.on("error", (err) => {
+    console.error("Socket error:", socket.id, err?.message);
   });
+  socket.on("disconnect", () => {});
 });
 
 // Middleware for logging HTTP requests
 app.use((req, res, next) => {
-  //logToFile(`Request received - PID: ${process.pid}, Method: ${req.method}, URL: ${req.url}`);
   next();
 });
 
@@ -61,7 +78,6 @@ app.use((req, res, next) => {
 app.use(
   cors({
     origin: corsdata,
-    // origin: "/",
     methods: ["GET", "POST"],
     credentials: true,
   }),
@@ -72,7 +88,6 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(
   fileUpload({
-    //body-parser-for-file  ;
     useTempFiles: true,
     tempFileDir: "/tmp/",
   }),
@@ -121,7 +136,6 @@ routes.initWebRouter(app);
 
 // Log socket message for admin
 socketIoController.sendMessageAdmin(io);
-//logToFile('Socket message to admin sent');
 
 // Serve client-side React application
 app.use(express.static(path.join(__dirname, "/client/build")));
@@ -129,16 +143,21 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "/client/build/index.html"));
 });
 
-// Cron game 1 Phut
-// cronJobContronler.cronJobGame1p(io);
-
+// ============================================================
+// UPSTREAM PERIOD APIs
+// Tokens now come from .env (never hardcode them). Add to .env:
+//   LOTTERY7_TOKEN=...
+//   BIGDADDY_TOKEN=...
+//   DAMAN_TOKEN=...
+//   TRX_TOKEN=...
+// Tokens in the old file were exposed - rotate/refresh them.
+// ============================================================
 const apiUrl_lottery7_30 = "https://lottery7api.com/api/webapi/GetGameIssue";
 
 const headers_lottery7_30 = {
   accept: "application/json, text/plain, */*",
   "content-type": "application/json;charset=UTF-8",
-  authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOiIxNzM3OTUxMzgxIiwibmJmIjoiMTczNzk1MTM4MSIsImV4cCI6IjE3Mzc5NTMxODEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL2V4cGlyYXRpb24iOiIxLzI3LzIwMjUgMTA6MTY6MjEgQU0iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBY2Nlc3NfVG9rZW4iLCJVc2VySWQiOiIxNTAwMDQyNyIsIlVzZXJOYW1lIjoiOTEzNDYzNTY1MTY0IiwiVXNlclBob3RvIjoiMSIsIk5pY2tOYW1lIjoiTWVtYmVyTk5HWkhGSVQiLCJBbW91bnQiOiI1OC4wMCIsIkludGVncmFsIjoiMCIsIkxvZ2luTWFyayI6Ikg1IiwiTG9naW5UaW1lIjoiMS8yNy8yMDI1IDk6NDY6MjEgQU0iLCJMb2dpbklQQWRkcmVzcyI6IjIyMy4xMjMuMTkuODYiLCJEYk51bWJlciI6IjAiLCJJc3ZhbGlkYXRvciI6IjAiLCJLZXlDb2RlIjoiNiIsIlRva2VuVHlwZSI6IkFjY2Vzc19Ub2tlbiIsIlBob25lVHlwZSI6IjAiLCJVc2VyVHlwZSI6IjAiLCJVc2VyTmFtZTIiOiIiLCJpc3MiOiJqd3RJc3N1ZXIiLCJhdWQiOiJsb3R0ZXJ5VGlja2V0In0.sBtbtPw0DOQ9h3Ii13ry4v_U5eAFAXspI26rT-otMx8`,
-  //   origin: "https://www.lottery7j.com",
+  authorization: `Bearer ${process.env.LOTTERY7_TOKEN || ""}`,
   referer: "https://www.lottery7j.com/",
   "user-agent":
     "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1",
@@ -167,8 +186,7 @@ const headers_bigdaddygame_30 = {
   accept: "application/json, text/plain, */*",
   "accept-language": "en-US,en;q=0.9,ur;q=0.8",
   "ar-origin": "https://www.bdg345.com",
-  authorization:
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOiIxNzQ1NTI5OTYzIiwibmJmIjoiMTc0NTUyOTk2MyIsImV4cCI6IjE3NDU1MzE3NjMiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL2V4cGlyYXRpb24iOiI0LzI1LzIwMjUgMzoyNjowMyBBTSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFjY2Vzc19Ub2tlbiIsIlVzZXJJZCI6IjE2NTg2NDM5IiwiVXNlck5hbWUiOiI5MTM0NjM1NjUxNjQiLCJVc2VyUGhvdG8iOiIxIiwiTmlja05hbWUiOiJNZW1iZXJOTkdQM1BGQSIsIkFtb3VudCI6IjAuMDAiLCJJbnRlZ3JhbCI6IjAiLCJMb2dpbk1hcmsiOiJINSIsIkxvZ2luVGltZSI6IjQvMjUvMjAyNSAyOjU2OjAzIEFNIiwiTG9naW5JUEFkZHJlc3MiOiIyMjMuMTIzLjIyLjY1IiwiRGJOdW1iZXIiOiIwIiwiSXN2YWxpZGF0b3IiOiIwIiwiS2V5Q29kZSI6IjIiLCJUb2tlblR5cGUiOiJBY2Nlc3NfVG9rZW4iLCJQaG9uZVR5cGUiOiIwIiwiVXNlclR5cGUiOiIwIiwiVXNlck5hbWUyIjoiIiwiaXNzIjoiand0SXNzdWVyIiwiYXVkIjoibG90dGVyeVRpY2tldCJ9.R-uofUa3Q6yB0XJ3E8PE2nXb6AY8lrSHxCvItEBbJqQ",
+  authorization: `Bearer ${process.env.BIGDADDY_TOKEN || ""}`,
   "cache-control": "no-cache",
   "content-type": "application/json;charset=UTF-8",
   origin: "https://www.bdg345.com",
@@ -209,8 +227,7 @@ const headers_daman_30 = {
   accept: "application/json, text/plain, */*",
   "accept-language": "en-US,en;q=0.9,ur;q=0.8",
   "ar-origin": "https://damangames.bet",
-  authorization:
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOiIxNzQ1NTMwODM4IiwibmJmIjoiMTc0NTUzMDgzOCIsImV4cCI6IjE3NDU1MzI2MzgiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL2V4cGlyYXRpb24iOiI0LzI1LzIwMjUgMzo0MDozOCBBTSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFjY2Vzc19Ub2tlbiIsIlVzZXJJZCI6IjE2ODc5ODE3IiwiVXNlck5hbWUiOiI5MTMxMDEzNjE2NDciLCJVc2VyUGhvdG8iOiIxIiwiTmlja05hbWUiOiJNZW1iZXJOTkc5WTJOMiIsIkFtb3VudCI6IjAuMDAiLCJJbnRlZ3JhbCI6IjAiLCJMb2dpbk1hcmsiOiJINSIsIkxvZ2luVGltZSI6IjQvMjUvMjAyNSAzOjEwOjM4IEFNIiwiTG9naW5JUEFkZHJlc3MiOiIyMjMuMTIzLjIyLjY1IiwiRGJOdW1iZXIiOiIwIiwiSXN2YWxpZGF0b3IiOiIwIiwiS2V5Q29kZSI6IjEiLCJUb2tlblR5cGUiOiJBY2Nlc3NfVG9rZW4iLCJQaG9uZVR5cGUiOiIwIiwiVXNlclR5cGUiOiIwIiwiVXNlck5hbWUyIjoiIiwiaXNzIjoiand0SXNzdWVyIiwiYXVkIjoibG90dGVyeVRpY2tldCJ9.DqCHaafB_7wOnbtQb2idgujP_kBsSQwiHSS4F8V0_Mw",
+  authorization: `Bearer ${process.env.DAMAN_TOKEN || ""}`,
   "cache-control": "no-cache",
   "content-type": "application/json;charset=UTF-8",
   origin: "https://damangames.bet",
@@ -244,7 +261,7 @@ const bodyData_daman_1 = {
   timestamp: 1745530895,
 };
 
-// URLs and request bodies
+// URLs and request bodies (30 sec)
 const urls = [
   {
     url: apiUrl_lottery7_30,
@@ -266,84 +283,7 @@ const urls = [
   },
 ];
 
-// ============================================================
-// K3 HELPER  (game: 1, 3, 5, 10)
-// Naya period add + result/payout + frontend ko "data-server-k3" emit
-// ============================================================
-async function runK3(game) {
-  try {
-    await k3Controller.addK3(game);
-    await k3Controller.handlingK3(game);
-
-    // [0] = naya pending period, [1] = abhi khatam hua period
-    const [rows] = await connection.execute(
-      "SELECT * FROM `k3` WHERE `game` = ? ORDER BY `id` DESC LIMIT 2",
-      [game],
-    );
-    io.emit("data-server-k3", { data: rows, game: Number(game) });
-  } catch (error) {
-    console.error(`runK3 error for game ${game}:`, error.message);
-  }
-}
-
-const wait = (ms) => new Promise((res) => setTimeout(res, ms));
-
-const waitForNextPeriod = async (currentPeriod) => {
-  console.log("🤣 currentPeriod", currentPeriod);
-  const maxAttempts = 50;
-  const apiTimeout = 500;
-  const retryInterval = 1000;
-
-  const withTimeout = (promise, ms) =>
-    Promise.race([
-      promise,
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("API timeout")), ms),
-      ),
-    ]);
-
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    const start = Date.now();
-    let foundResponse = null;
-
-    try {
-      const calls = urls.map(({ url, headers, body, name }) =>
-        withTimeout(
-          axios
-            .post(url, body, { headers })
-            .then((res) => ({ name, data: res.data }))
-            .catch(() => null),
-          apiTimeout,
-        ),
-      );
-
-      const results = await Promise.allSettled(calls);
-
-      for (const result of results) {
-        if (
-          result.status === "fulfilled" &&
-          result.value?.data?.data?.issueNumber > currentPeriod
-        ) {
-          foundResponse = result.value;
-          break;
-        }
-      }
-
-      if (foundResponse) {
-        return foundResponse.data;
-      }
-    } catch (err) {
-      console.error(`⚠️ Attempt ${attempt} failed:`, err.message);
-    }
-
-    const elapsed = Date.now() - start;
-    const wait = Math.max(retryInterval - elapsed, 0);
-    await new Promise((res) => setTimeout(res, wait));
-  }
-
-  return null;
-};
-
+// URLs and request bodies (1 min)
 const urls_1 = [
   {
     url: apiUrl_lottery7_30,
@@ -365,32 +305,57 @@ const urls_1 = [
   },
 ];
 
-const waitForNextPeriod_1 = async (currentPeriod) => {
+// ============================================================
+// K3 HELPER  (game: 1, 3, 5, 10)
+// ============================================================
+async function runK3(game) {
+  try {
+    await k3Controller.addK3(game);
+    await k3Controller.handlingK3(game);
+
+    // [0] = new pending period, [1] = period that just finished
+    const [rows] = await connection.execute(
+      "SELECT * FROM `k3` WHERE `game` = ? ORDER BY `id` DESC LIMIT 2",
+      [game],
+    );
+    io.emit("data-server-k3", { data: rows, game: Number(game) });
+  } catch (error) {
+    console.error(`runK3 error for game ${game}:`, error.message);
+  }
+}
+
+const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+
+const withTimeout = (promise, ms) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("API timeout")), ms),
+    ),
+  ]);
+
+// ============================================================
+// Shared "wait for next period" poller (replaces the 2 duplicate fns)
+// Returns the API response body, or null if nothing found.
+// Callers MUST handle null.
+// ============================================================
+async function pollNextPeriod(urlList, currentPeriod) {
   const maxAttempts = 50;
   const apiTimeout = 500;
   const retryInterval = 1000;
 
-  const withTimeout = (promise, ms) =>
-    Promise.race([
-      promise,
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("API timeout")), ms),
-      ),
-    ]);
-
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const start = Date.now();
-    let foundResponse = null;
 
     try {
-      const calls = urls_1.map(({ url, headers, body, name }) =>
+      const calls = urlList.map(({ url, headers, body, name }) =>
         withTimeout(
           axios
             .post(url, body, { headers })
             .then((res) => ({ name, data: res.data }))
             .catch(() => null),
           apiTimeout,
-        ),
+        ).catch(() => null),
       );
 
       const results = await Promise.allSettled(calls);
@@ -400,49 +365,34 @@ const waitForNextPeriod_1 = async (currentPeriod) => {
           result.status === "fulfilled" &&
           result.value?.data?.data?.issueNumber > currentPeriod
         ) {
-          foundResponse = result.value;
-          break;
+          return result.value.data;
         }
       }
-
-      if (foundResponse) {
-        return foundResponse.data;
-      }
     } catch (err) {
-      console.error(`⚠️ Attempt ${attempt} failed:`, err.message);
+      console.error(`Attempt ${attempt} failed:`, err.message);
     }
 
     const elapsed = Date.now() - start;
-    const wait = Math.max(retryInterval - elapsed, 0);
-    await new Promise((res) => setTimeout(res, wait));
+    await sleep(Math.max(retryInterval - elapsed, 0));
   }
 
   return null;
-};
+}
 
-const bearerToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOiIxNzM3OTUxMzgxIiwibmJmIjoiMTczNzk1MTM4MSIsImV4cCI6IjE3Mzc5NTMxODEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL2V4cGlyYXRpb24iOiIxLzI3LzIwMjUgMTA6MTY6MjEgQU0iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBY2Nlc3NfVG9rZW4iLCJVc2VySWQiOiIxNTAwMDQyNyIsIlVzZXJOYW1lIjoiOTEzNDYzNTY1MTY0IiwiVXNlclBob3RvIjoiMSIsIk5pY2tOYW1lIjoiTWVtYmVyTk5HWkhGSVQiLCJBbW91bnQiOiI1OC4wMCIsIkludGVncmFsIjoiMCIsIkxvZ2luTWFyayI6Ikg1IiwiTG9naW5UaW1lIjoiMS8yNy8yMDI1IDk6NDY6MjEgQU0iLCJMb2dpbklQQWRkcmVzcyI6IjIyMy4xMjMuMTkuODYiLCJEYk51bWJlciI6IjAiLCJJc3ZhbGlkYXRvciI6IjAiLCJLZXlDb2RlIjoiNiIsIlRva2VuVHlwZSI6IkFjY2Vzc19Ub2tlbiIsIlBob25lVHlwZSI6IjAiLCJVc2VyVHlwZSI6IjAiLCJVc2VyTmFtZTIiOiIiLCJpc3MiOiJqd3RJc3N1ZXIiLCJhdWQiOiJsb3R0ZXJ5VGlja2V0In0.sBtbtPw0DOQ9h3Ii13ry4v_U5eAFAXspI26rT-otMx8";
+const waitForNextPeriod = (currentPeriod) => pollNextPeriod(urls, currentPeriod);
+const waitForNextPeriod_1 = (currentPeriod) =>
+  pollNextPeriod(urls_1, currentPeriod);
 
-const apiUrl = "https://lottery7api.com/api/webapi/GetGameIssue";
-
-const headers = {
-  accept: "application/json, text/plain, */*",
-  "content-type": "application/json;charset=UTF-8",
-  authorization: `Bearer ${bearerToken}`,
-  origin: "https://www.lottery7j.com",
-  referer: "https://www.lottery7j.com/",
-  "user-agent":
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1",
-};
-
+// ============================================================
+// TRX
+// ============================================================
 const apiUrl_trx = "https://tirangaapi.com/api/webapi/GetTRXGameIssue";
 
 const headers_trx = {
   accept: "application/json, text/plain, */*",
   "accept-language": "en-US,en;q=0.9,ur;q=0.8",
   "ar-origin": "https://www.tirangagame.top",
-  authorization:
-    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOiIxNzQyNTcwNjQwIiwibmJmIjoiMTc0MjU3MDY0MCIsImV4cCI6IjE3NDI1NzI0NDAiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL2V4cGlyYXRpb24iOiIzLzIxLzIwMjUgOToyNDowMCBQTSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFjY2Vzc19Ub2tlbiIsIlVzZXJJZCI6IjE5NzQxNDA4IiwiVXNlck5hbWUiOiI5MTM0NjM1NjUxMTEiLCJVc2VyUGhvdG8iOiIxIiwiTmlja05hbWUiOiJNZW1iZXJOTkdVQ01VRiIsIkFtb3VudCI6IjAuMDAiLCJJbnRlZ3JhbCI6IjAiLCJMb2dpbk1hcmsiOiJINSIsIkxvZ2luVGltZSI6IjMvMjEvMjAyNSA4OjU0OjAwIFBNIiwiTG9naW5JUEFkZHJlc3MiOiIyMjMuMTIzLjQuMzAiLCJEYk51bWJlciI6IjAiLCJJc3ZhbGlkYXRvciI6IjAiLCJLZXlDb2RlIjoiNyIsIlRva2VuVHlwZSI6IkFjY2Vzc19Ub2tlbiIsIlBob25lVHlwZSI6IjAiLCJVc2VyVHlwZSI6IjAiLCJVc2VyTmFtZTIiOiIiLCJpc3MiOiJqd3RJc3N1ZXIiLCJhdWQiOiJsb3R0ZXJ5VGlja2V0In0.LkXXnNLwjKqy1WpostRg3LoVo6fgv2ubYY6KJzON-c8", // use full token
+  authorization: `Bearer ${process.env.TRX_TOKEN || ""}`,
   "content-type": "application/json;charset=UTF-8",
   origin: "https://www.tirangagame.top",
   referer: "https://www.tirangagame.top/",
@@ -460,162 +410,184 @@ const bodyData_trx = {
 
 // ============================================================
 // 3 MIN & 5 MIN COUNTDOWN (gameId = 3 / 5)
+// Now fully wrapped in try/catch with auto-restart.
 // ============================================================
 async function startCountdown(gameId, requestData) {
-  var response = await axios.post(apiUrl_lottery7_30, requestData, {
-    headers_lottery7_30,
-  });
-  var data = response.data.data;
+  let dead = false;
+  let countdownInterval = null;
 
-  var end = new Date(data.endTime);
-  var service = new Date(data.serviceTime);
+  const restart = async () => {
+    if (dead) return;
+    dead = true;
+    if (countdownInterval) clearInterval(countdownInterval);
+    await sleep(2000);
+    startCountdown(gameId, requestData);
+  };
 
-  if (isNaN(end.getTime()) || isNaN(service.getTime())) {
-    console.error("Invalid date format GameID ", gameId);
-  }
+  try {
+    // FIX: headers were passed as `{ headers_lottery7_30 }` (wrong key => no headers)
+    const response = await axios.post(apiUrl_lottery7_30, requestData, {
+      headers: headers_lottery7_30,
+    });
+    const data = response.data.data;
 
-  let endWithOffset = end.getTime() + 2000;
-  var countdown = (endWithOffset - service.getTime()) / 1000;
+    let end = new Date(data.endTime);
+    let service = new Date(data.serviceTime);
 
-  let winGoTriggered = false;
-  let winGoRunning = false;
-
-  const countdownInterval = setInterval(async () => {
-    const minute = Math.floor(countdown / 60);
-    const secondtime1 = Math.floor((countdown % 60) / 10);
-    const secondtime2 = countdown % 10;
-
-    if (gameId == 10) {
-      io.emit(`timeUpdate_30`, { minute, secondtime1, secondtime2 });
-    } else if (gameId == 1) {
-      io.emit(`timeUpdate_11`, { minute, secondtime1, secondtime2 });
-    } else {
-      io.emit(`timeUpdate_${gameId}`, { minute, secondtime1, secondtime2 });
+    if (isNaN(end.getTime()) || isNaN(service.getTime())) {
+      console.error("Invalid date format GameID ", gameId);
+      return restart();
     }
 
-    if (countdown === 29) {
-      winGoRunning = false;
-    }
+    let endWithOffset = end.getTime() + 2000;
+    let countdown = (endWithOffset - service.getTime()) / 1000;
 
-    if (countdown === 4 && !winGoTriggered) {
-      await connection.execute(
-        "UPDATE wingo SET stop = ? WHERE game = ? AND status = ?",
-        [1, `wingo${gameId}`, 0],
-      );
+    let winGoTriggered = false;
+    let winGoRunning = false;
 
-      winGoTriggered = true;
-
-      // ✅ K3 for 3 min & 5 min (add period + result + payout + socket emit)
-      if (gameId === 3 || gameId === 5) {
-        runK3(gameId);
-      }
-
-      if (!winGoRunning) {
-        winGoRunning = true;
-        try {
-          await winGoController[`addWinGo_${gameId}`]();
-          await winGoController.handlingWinGo1P(gameId);
-        } catch (error) {
-          console.error(`Error in winGo logic for game ${gameId}:`, error);
-        } finally {
-          winGoRunning = false;
-        }
-      }
-    }
-
-    if (countdown == 2) {
-      if (gameId == 10) {
-        const [winGo1_10] = await connection.execute(
-          'SELECT * FROM `wingo` WHERE `game` = "wingo10" ORDER BY `id` DESC LIMIT 2',
-          [],
-        );
-        const data_10 = winGo1_10;
-        io.emit("data-server", { data: data_10 });
-      } else if (gameId == 5) {
-        const [winGo1_5] = await connection.execute(
-          'SELECT * FROM `wingo` WHERE `game` = "wingo5" ORDER BY `id` DESC LIMIT 2',
-          [],
-        );
-        const data_5 = winGo1_5;
-        io.emit("data-server", { data: data_5 });
-      } else if (gameId == 3) {
-        const [winGo1_3] = await connection.execute(
-          'SELECT * FROM `wingo` WHERE `game` = "wingo3" ORDER BY `id` DESC LIMIT 2 ',
-          [],
-        );
-        const data_3 = winGo1_3; // Cầu mới chưa có kết quả
-        io.emit("data-server", { data: data_3 });
-      } else if (gameId == 1) {
-        const [winGo1] = await connection.execute(
-          'SELECT * FROM `wingo` WHERE `game` = "wingo" ORDER BY `id` DESC LIMIT 2',
-        );
-        io.emit("data-server", { data: winGo1 });
-        io.emit("data-server-1", { data: winGo1 });
-      }
-    }
-
-    countdown--;
-
-    if (countdown == 1) {
-      let response, data;
-
+    countdownInterval = setInterval(async () => {
+      if (dead) return;
       try {
-        response = await Promise.race([
-          axios.post(apiUrl, requestData, { headers }),
-          new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Timeout")), 900),
-          ),
-        ]);
-
-        data = response.data.data;
-        end = new Date(data.endTime);
-        service = new Date(data.serviceTime);
-
-        if (isNaN(end.getTime()) || isNaN(service.getTime())) {
-          console.error("Invalid date format for GameID", gameId);
-          throw new Error("Invalid API response");
-        }
-      } catch (error) {
-        console.error(
-          `API delay or error for GameID ${gameId}, using fallback.`,
-        );
+        const minute = Math.floor(countdown / 60);
+        const secondtime1 = Math.floor((countdown % 60) / 10);
+        const secondtime2 = countdown % 10;
 
         if (gameId == 10) {
-          end = new Date(Date.now() + 30000);
-          service = new Date();
-        } else if (gameId == 5) {
-          end = new Date(Date.now() + 300000);
-          service = new Date();
-        } else if (gameId == 3) {
-          end = new Date(Date.now() + 180000);
-          service = new Date();
+          io.emit(`timeUpdate_30`, { minute, secondtime1, secondtime2 });
         } else if (gameId == 1) {
-          end = new Date(Date.now() + 60000);
-          service = new Date();
+          io.emit(`timeUpdate_11`, { minute, secondtime1, secondtime2 });
+        } else {
+          io.emit(`timeUpdate_${gameId}`, { minute, secondtime1, secondtime2 });
         }
-      }
 
-      endWithOffset = end.getTime() + 2000;
-      countdown = (endWithOffset - service.getTime()) / 1000;
-      winGoTriggered = false;
+        if (countdown === 29) {
+          winGoRunning = false;
+        }
 
-      try {
-        if (winGoRunning) {
-          while (winGoRunning) {
-            await new Promise((resolve) => setTimeout(resolve, 100));
+        if (countdown === 4 && !winGoTriggered) {
+          await connection.execute(
+            "UPDATE wingo SET stop = ? WHERE game = ? AND status = ?",
+            [1, `wingo${gameId}`, 0],
+          );
+
+          winGoTriggered = true;
+
+          // K3 for 3 min & 5 min
+          if (gameId === 3 || gameId === 5) {
+            runK3(gameId);
+          }
+
+          if (!winGoRunning) {
+            winGoRunning = true;
+            try {
+              await winGoController[`addWinGo_${gameId}`]();
+              await winGoController.handlingWinGo1P(gameId);
+            } catch (error) {
+              console.error(`Error in winGo logic for game ${gameId}:`, error);
+            } finally {
+              winGoRunning = false;
+            }
           }
         }
 
-        const [winGoData] = await connection.execute(
-          `SELECT * FROM wingo WHERE game = ? ORDER BY id DESC LIMIT 2`,
-          [`wingo${gameId}`],
-        );
-        io.emit("data-server", { data: winGoData });
+        if (countdown == 2) {
+          if (gameId == 10) {
+            const [winGo1_10] = await connection.execute(
+              'SELECT * FROM `wingo` WHERE `game` = "wingo10" ORDER BY `id` DESC LIMIT 2',
+              [],
+            );
+            io.emit("data-server", { data: winGo1_10 });
+          } else if (gameId == 5) {
+            const [winGo1_5] = await connection.execute(
+              'SELECT * FROM `wingo` WHERE `game` = "wingo5" ORDER BY `id` DESC LIMIT 2',
+              [],
+            );
+            io.emit("data-server", { data: winGo1_5 });
+          } else if (gameId == 3) {
+            const [winGo1_3] = await connection.execute(
+              'SELECT * FROM `wingo` WHERE `game` = "wingo3" ORDER BY `id` DESC LIMIT 2 ',
+              [],
+            );
+            io.emit("data-server", { data: winGo1_3 });
+          } else if (gameId == 1) {
+            const [winGo1] = await connection.execute(
+              'SELECT * FROM `wingo` WHERE `game` = "wingo" ORDER BY `id` DESC LIMIT 2',
+            );
+            io.emit("data-server", { data: winGo1 });
+            io.emit("data-server-1", { data: winGo1 });
+          }
+        }
+
+        countdown--;
+
+        if (countdown == 1) {
+          let resp, d;
+
+          try {
+            resp = await Promise.race([
+              axios.post(apiUrl_lottery7_30, requestData, {
+                headers: headers_lottery7_30,
+              }),
+              new Promise((_, reject) =>
+                setTimeout(() => reject(new Error("Timeout")), 900),
+              ),
+            ]);
+
+            d = resp.data.data;
+            end = new Date(d.endTime);
+            service = new Date(d.serviceTime);
+
+            if (isNaN(end.getTime()) || isNaN(service.getTime())) {
+              console.error("Invalid date format for GameID", gameId);
+              throw new Error("Invalid API response");
+            }
+          } catch (error) {
+            console.error(
+              `API delay or error for GameID ${gameId}, using fallback.`,
+            );
+
+            if (gameId == 10) {
+              end = new Date(Date.now() + 30000);
+              service = new Date();
+            } else if (gameId == 5) {
+              end = new Date(Date.now() + 300000);
+              service = new Date();
+            } else if (gameId == 3) {
+              end = new Date(Date.now() + 180000);
+              service = new Date();
+            } else if (gameId == 1) {
+              end = new Date(Date.now() + 60000);
+              service = new Date();
+            }
+          }
+
+          endWithOffset = end.getTime() + 2000;
+          countdown = (endWithOffset - service.getTime()) / 1000;
+          winGoTriggered = false;
+
+          try {
+            while (winGoRunning) {
+              await sleep(100);
+            }
+
+            const [winGoData] = await connection.execute(
+              `SELECT * FROM wingo WHERE game = ? ORDER BY id DESC LIMIT 2`,
+              [`wingo${gameId}`],
+            );
+            io.emit("data-server", { data: winGoData });
+          } catch (error) {
+            console.error(`Error fetching wingo data for game ${gameId}:`, error);
+          }
+        }
       } catch (error) {
-        console.error(`Error fetching wingo data for game ${gameId}:`, error);
+        console.error(`Countdown tick error (game ${gameId}):`, error.message);
+        restart();
       }
-    }
-  }, 1000);
+    }, 1000);
+  } catch (error) {
+    console.error(`startCountdown(${gameId}) failed:`, error.message);
+    restart();
+  }
 }
 
 // Request data for different games
@@ -659,19 +631,26 @@ const requestData_5 = {
   timestamp: 1737370579,
 };
 
-const logFile = path.join(__dirname, "wingo10countdown.log");
-
 // ============================================================
 // 30 SEC COUNTDOWN (wingo 30s)
 // ============================================================
 async function startCountdown_30(requestData) {
   let gameId = 10;
+  let dead = false;
+  let countdownInterval = null;
+
+  const restart = () => {
+    if (dead) return;
+    dead = true;
+    if (countdownInterval) clearInterval(countdownInterval);
+    restartCountdown(requestData);
+  };
 
   try {
     let response = await axios.post(
       apiUrl_lottery7_30,
       requestData_lottery_30,
-      { headers_lottery7_30 },
+      { headers: headers_lottery7_30 },
     );
     let data = response.data.data;
 
@@ -680,7 +659,7 @@ async function startCountdown_30(requestData) {
     let period_id = data.issueNumber;
 
     if (isNaN(end.getTime()) || isNaN(service.getTime())) {
-      return restartCountdown(requestData);
+      return restart();
     }
 
     let endWithOffset = end.getTime() + 3000;
@@ -691,11 +670,11 @@ async function startCountdown_30(requestData) {
     let winGoTriggered = false;
     let winGoRunning = false;
 
-    const countdownInterval = setInterval(async () => {
+    countdownInterval = setInterval(async () => {
+      if (dead) return;
       try {
         if (countdown <= 0) {
-          clearInterval(countdownInterval);
-          return restartCountdown(requestData);
+          return restart();
         }
 
         let minute = Math.floor(countdown_frontend / 60);
@@ -714,20 +693,24 @@ async function startCountdown_30(requestData) {
               [1, `wingo${gameId}`, 0],
             );
 
+            // FIX: waitForNextPeriod can return null -> was crashing the process
             (async () => {
-              response = await waitForNextPeriod(period_id);
-              console.log("🎯 New period response:", response);
-
-              data = response.data;
-              end = new Date(data.endTime);
-              service = new Date(data.serviceTime);
-              period_id = data.issueNumber;
+              try {
+                const r = await waitForNextPeriod(period_id);
+                if (!r?.data) return; // keep old values
+                data = r.data;
+                end = new Date(data.endTime);
+                service = new Date(data.serviceTime);
+                period_id = data.issueNumber;
+              } catch (e) {
+                console.error("waitForNextPeriod (30s) failed:", e.message);
+              }
             })();
 
             await winGoController.addWinGo_10(period_id);
             await winGoController.handlingWinGo1P(gameId);
           } catch (error) {
-            // silent
+            console.error("Error in 30s process:", error.message);
           } finally {
             winGoRunning = false;
           }
@@ -767,7 +750,7 @@ async function startCountdown_30(requestData) {
 
           try {
             while (winGoRunning) {
-              await new Promise((resolve) => setTimeout(resolve, 100));
+              await sleep(100);
             }
 
             const [winGoData] = await connection.execute(
@@ -780,30 +763,30 @@ async function startCountdown_30(requestData) {
           }
         }
       } catch (error) {
-        clearInterval(countdownInterval);
-        restartCountdown(requestData);
+        console.error("30s countdown tick error:", error.message);
+        restart();
       }
     }, 1000);
   } catch (error) {
-    restartCountdown(requestData);
+    console.error("startCountdown_30 failed:", error.message);
+    restart();
   }
 }
 
-// Function to restart the countdown after an error
 async function restartCountdown(requestData) {
-  await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait before retrying
+  await sleep(2000);
   startCountdown_30(requestData);
 }
 
-const logFile_1 = path.join(__dirname, "wingo1countdown.log");
-
-function logToFile_1(message) {
-  const timestamp = new Date().toLocaleString();
-  fs.appendFileSync(logFile_1, `[${timestamp}] ${message}\n`);
-}
-
-async function fetchIssueNumber(delay = 500) {
-  const apiUrl = "https://draw.ar-lottery01.com/TrxWinGo/TrxWinGo_1M.json";
+// ============================================================
+// TRX issue number fetcher
+// FIX 1: it was called as fetchIssueNumber(apiUrl_trx, bodyData_trx, headers_trx)
+//        so `delay` became a URL string -> NaN delay -> hot loop. No args now.
+// FIX 2: infinite while(true) could block the 1-min countdown forever.
+//        Now capped and returns null on failure.
+// ============================================================
+async function fetchIssueNumber(delay = 500, maxAttempts = 20) {
+  const url = "https://draw.ar-lottery01.com/TrxWinGo/TrxWinGo_1M.json";
   const headers = {
     accept: "application/json, text/plain, */*",
     "accept-language": "en-US,en;q=0.9,ur;q=0.8",
@@ -820,47 +803,41 @@ async function fetchIssueNumber(delay = 500) {
     referer: "https://www.tirangagame.top/",
   };
 
-  let attempt = 1;
-  while (true) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      const response = await axios.get(apiUrl, { headers });
-
+      const response = await axios.get(url, { headers, timeout: 3000 });
       const issueNumber = response.data?.current?.issueNumber;
 
       if (issueNumber) {
-        let indiaTime = new Date().toLocaleString("en-IN", {
-          timeZone: "Asia/Kolkata",
-        });
-        console.log(
-          `Attempt: ${attempt}, Issue Number: ${issueNumber}, Time (India): ${indiaTime}`,
-        );
         return issueNumber;
       }
     } catch (error) {
-      console.error(`Attempt ${attempt} Failed:`, error.message);
-      if (error.response) {
-        console.error("Status:", error.response.status);
-        console.error("Response Data:", error.response.data);
-      } else if (error.request) {
-        console.error("No response received");
-      }
+      console.error(`TRX issue attempt ${attempt} failed:`, error.message);
     }
 
-    console.log(`Attempt ${attempt} failed. Retrying in ${delay}ms...`);
-    attempt++;
-    await new Promise((res) => setTimeout(res, delay));
+    await sleep(delay);
   }
+
+  return null;
 }
 
 // ============================================================
 // 1 MIN COUNTDOWN (wingo 1m + trx + car + 5D + K3 1min)
 // ============================================================
 async function startCountdown_1(requestData) {
-  let gameId = 1;
+  let dead = false;
+  let countdownInterval = null;
+
+  const restart = () => {
+    if (dead) return;
+    dead = true;
+    if (countdownInterval) clearInterval(countdownInterval);
+    restartCountdown_1(requestData);
+  };
 
   try {
     let response = await axios.post(apiUrl_lottery7_30, requestData, {
-      headers_lottery7_30,
+      headers: headers_lottery7_30,
     });
     let data = response.data.data;
 
@@ -868,14 +845,10 @@ async function startCountdown_1(requestData) {
     let service = new Date(data.serviceTime);
     let period_id = data.issueNumber;
 
-    let issueNumber_trx = await fetchIssueNumber(
-      apiUrl_trx,
-      bodyData_trx,
-      headers_trx,
-    );
+    let issueNumber_trx = await fetchIssueNumber();
 
     if (isNaN(end.getTime()) || isNaN(service.getTime())) {
-      return restartCountdown_1(requestData);
+      return restart();
     }
 
     let endWithOffset = end.getTime() + 3000;
@@ -886,11 +859,11 @@ async function startCountdown_1(requestData) {
     let winGoTriggered = false;
     let winGoRunning = false;
 
-    let countdownInterval = setInterval(async () => {
+    countdownInterval = setInterval(async () => {
+      if (dead) return;
       try {
         if (countdown <= 0) {
-          clearInterval(countdownInterval);
-          return restartCountdown_1(requestData);
+          return restart();
         }
 
         let minute = Math.floor(countdown_frontend / 60);
@@ -909,18 +882,25 @@ async function startCountdown_1(requestData) {
               [1, `wingo`, 0],
             );
 
+            // FIX: null-safe (was crashing the process on null response)
             (async () => {
-              response = await waitForNextPeriod_1(period_id);
-
-              data = response.data;
-              end = new Date(data.endTime);
-              service = new Date(data.serviceTime);
-              period_id = data.issueNumber;
+              try {
+                const r = await waitForNextPeriod_1(period_id);
+                if (!r?.data) return;
+                data = r.data;
+                end = new Date(data.endTime);
+                service = new Date(data.serviceTime);
+                period_id = data.issueNumber;
+              } catch (e) {
+                console.error("waitForNextPeriod_1 failed:", e.message);
+              }
             })();
 
             await Promise.all([
               winGoController.addWinGo_1(period_id),
-              winGoController.addWinGo_11(issueNumber_trx),
+              issueNumber_trx
+                ? winGoController.addWinGo_11(issueNumber_trx)
+                : Promise.resolve(),
               carController.addcargame(1),
             ]);
 
@@ -933,7 +913,7 @@ async function startCountdown_1(requestData) {
             await k5Controller.add5D(1);
             await k5Controller.handling5D(1);
 
-            // ✅ K3 1 min (add + result + payout + socket emit)
+            // K3 1 min
             await runK3(1);
           } catch (error) {
             console.error("Error in 1 min process:", error.message);
@@ -969,11 +949,8 @@ async function startCountdown_1(requestData) {
 
         if (countdown === 1) {
           try {
-            issueNumber_trx = await fetchIssueNumber(
-              apiUrl_trx,
-              bodyData_trx,
-              headers_trx,
-            );
+            const newTrx = await fetchIssueNumber();
+            if (newTrx) issueNumber_trx = newTrx;
 
             if (isNaN(end.getTime()) || isNaN(service.getTime())) {
               throw new Error("Invalid API response");
@@ -991,7 +968,7 @@ async function startCountdown_1(requestData) {
 
           try {
             while (winGoRunning) {
-              await new Promise((resolve) => setTimeout(resolve, 100));
+              await sleep(100);
             }
 
             const [winGoData] = await connection.execute(
@@ -1004,25 +981,24 @@ async function startCountdown_1(requestData) {
           }
         }
       } catch (error) {
-        clearInterval(countdownInterval);
-        restartCountdown_1(requestData);
+        console.error("1 min countdown tick error:", error.message);
+        restart();
       }
     }, 1000);
   } catch (error) {
-    restartCountdown_1(requestData);
+    console.error("startCountdown_1 failed:", error.message);
+    restart();
   }
 }
 
-// Function to restart the countdown after an error
 async function restartCountdown_1(requestData) {
-  await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait before retrying
+  await sleep(2000);
   startCountdown_1(requestData);
 }
 
 // ============================================================
 // 10 MINUTE COUNTDOWN  ->  frontend event: "timeUpdate_10"
 // Wall-clock aligned (xx:00, xx:10, xx:20 ...), no drift.
-// Payload: { minute, secondtime1, secondtime2 }
 // ============================================================
 function startCountdown_10min() {
   const PERIOD = 600; // seconds
@@ -1031,23 +1007,18 @@ function startCountdown_10min() {
   setInterval(async () => {
     try {
       const nowSec = Math.floor(Date.now() / 1000);
-      // 599 -> 0, resets every 10 minutes
       const remaining = PERIOD - 1 - (nowSec % PERIOD);
 
-      const minute = Math.floor(remaining / 60); // 0-9
-      const secondtime1 = Math.floor((remaining % 60) / 10); // tens digit
-      const secondtime2 = remaining % 10; // units digit
+      const minute = Math.floor(remaining / 60);
+      const secondtime1 = Math.floor((remaining % 60) / 10);
+      const secondtime2 = remaining % 10;
 
       io.emit("timeUpdate_10", { minute, secondtime1, secondtime2 });
 
-      // Period khatam hone se 4 sec pehle game logic
-      // Double trigger se bachne ke liye period-id guard hai.
       if (remaining === 4) {
         const periodKey = Math.floor(nowSec / PERIOD);
         if (lastTriggeredPeriod !== periodKey) {
           lastTriggeredPeriod = periodKey;
-
-          // ✅ K3 10 min (add + result + payout + socket emit)
           runK3(10);
         }
       }
@@ -1059,16 +1030,17 @@ function startCountdown_10min() {
 
 // Start countdowns for different games
 startCountdown_30(requestData_30);
-
-startCountdown_1(requestData_1, requestData_1_trx);
-
+startCountdown_1(requestData_1);
 startCountdown(3, requestData_3);
-
 startCountdown(5, requestData_5);
-
-// 10 minute timer (timeUpdate_10 + K3 10 min)
 startCountdown_10min();
 
+// ============================================================
+// SERVER START
+// NOTE: if the port is busy this falls back to port+1. Behind nginx/PM2
+// that silently breaks sockets (nginx still points at the old port).
+// Make sure only ONE instance runs (pm2 fork mode, instances: 1).
+// ============================================================
 const DEFAULT_PORT = Number(process.env.PORT) || 7805;
 const MAX_PORT_ATTEMPTS = 10;
 
@@ -1105,28 +1077,15 @@ function startServer(port, attemptsLeft = MAX_PORT_ATTEMPTS) {
 
 startServer(DEFAULT_PORT);
 
-// Graceful shutdown on SIGINT (Ctrl+C)
+// Graceful shutdown (PM2 / Docker / Ctrl+C)
 process.on("SIGINT", () => {
   server.close(() => {
     process.exit(0);
   });
 });
 
-// Graceful shutdown on SIGTERM (e.g., from process managers like PM2, Docker)
 process.on("SIGTERM", () => {
   server.close(() => {
     process.exit(0);
   });
-});
-
-// Handle uncaught exceptions
-process.on("uncaughtException", (err) => {
-  console.error("Uncaught Exception:", err);
-  process.exit(1);
-});
-
-// Handle unhandled promise rejections
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled Rejection:", reason);
-  process.exit(1);
 });
