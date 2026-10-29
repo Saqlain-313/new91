@@ -1,5 +1,6 @@
 import axios from "axios";
 import moment from "moment";
+import crypto from "crypto";
 import connection from "../config/connectDB";
 
 const PaymentStatusMap = {
@@ -10,12 +11,14 @@ const PaymentStatusMap = {
 
 const PaymentMethodsMap = {
   UPI_MANUAL: "upi_manual",
-  KWIK_PAY: "kwik_pay",
+  QUROPAY: "quropay",
 };
 
 // ============================================
-// MANUAL UPI PAYMENT
+// NORMAL / MANUAL UPI
 // ============================================
+
+// GET — return UPI details for the user to pay manually
 const initiateManualUPIPayment = async (req, res) => {
   try {
     const [bank_recharge_momo] = await connection.query(
@@ -23,8 +26,6 @@ const initiateManualUPIPayment = async (req, res) => {
     );
 
     const row = bank_recharge_momo?.[0];
-
-    console.log(row);
 
     if (!row) {
       return res.status(404).json({
@@ -39,7 +40,7 @@ const initiateManualUPIPayment = async (req, res) => {
       upi_id: row.stk || "",
       bank_name: row.name_bank || "",
       username: row.name_user || "",
-      usdt_wallet_address: row.qr_code_image || "",
+      qr_code_image: row.qr_code_image || "",
     });
   } catch (err) {
     console.error("initiateManualUPIPayment error:", err);
@@ -50,16 +51,16 @@ const initiateManualUPIPayment = async (req, res) => {
   }
 };
 
+// POST — user submits amount + 12-digit UTR after paying
 const addManualUPIPaymentRequest = async (req, res) => {
+  const timeNow = Date.now();
   try {
-    const data = req.body;
-    let auth = req.cookies.auth;
-    let money = parseInt(data.money);
-    let utr = parseInt(data.utr);
-    const minimumMoneyAllowed = parseInt(process.env.MINIMUM_MONEY);
-    let timeNow = Date.now();
+    const auth = req.cookies.auth;
+    const money = parseInt(req.body.money);
+    const utr = (req.body.utr ?? "").toString().trim();
+    const minimumMoneyAllowed = parseInt(process.env.MINIMUM_MONEY) || 100;
 
-    if (!money || !(money >= 100)) {
+    if (!money || !(money >= minimumMoneyAllowed)) {
       return res.status(400).json({
         message: `Money is Required and it should be ₹${minimumMoneyAllowed} or above!`,
         status: false,
@@ -67,9 +68,9 @@ const addManualUPIPaymentRequest = async (req, res) => {
       });
     }
 
-    if (!utr && utr?.length != 12) {
+    if (!utr || utr.length !== 12) {
       return res.status(400).json({
-        message: `UPI Ref No. or UTR is Required And it should be 12 digit long`,
+        message: "UPI Ref No. or UTR is Required and it should be 12 digits long",
         status: false,
         timeStamp: timeNow,
       });
@@ -77,6 +78,7 @@ const addManualUPIPaymentRequest = async (req, res) => {
 
     const user = await getUserDataByAuthToken(auth);
 
+    // Cancel any pending manual UPI recharges
     const pendingRechargeList = await rechargeTable.getRecordByPhoneAndStatus({
       phone: user.phone,
       status: PaymentStatusMap.PENDING,
@@ -84,56 +86,56 @@ const addManualUPIPaymentRequest = async (req, res) => {
     });
 
     if (pendingRechargeList.length !== 0) {
-      const deleteRechargeQueries = pendingRechargeList.map((recharge) => {
-        return rechargeTable.cancelById(recharge.id);
-      });
-      await Promise.all(deleteRechargeQueries);
+      await Promise.all(
+        pendingRechargeList.map((r) => rechargeTable.cancelById(r.id)),
+      );
     }
 
     const orderId = getRechargeOrderId();
 
-    const newRecharge = {
-      orderId: orderId,
+    const recharge = await rechargeTable.create({
+      orderId,
       transactionId: "NULL",
-      utr: utr,
+      utr,
       phone: user.phone,
-      money: money,
+      money,
       type: PaymentMethodsMap.UPI_MANUAL,
-      status: 0,
+      status: PaymentStatusMap.PENDING,
       today: rechargeTable.getCurrentTimeForTodayField(),
       url: "NULL",
-      time: Date.now(),
-    };
-
-    const recharge = await rechargeTable.create(newRecharge);
+      time: timeNow,
+    });
 
     return res.status(200).json({
       message:
-        "Payment Requested successfully Your Balance will update shortly!",
-      recharge: recharge,
+        "Payment requested successfully. Your balance will update shortly!",
+      recharge,
       status: true,
       timeStamp: timeNow,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
+    console.log("addManualUPIPaymentRequest error:", error);
+    return res.status(500).json({
       status: false,
       message: "Something went wrong!",
-      timestamp: Date.now(),
+      timestamp: timeNow,
     });
   }
 };
 
 // ============================================
-// KWIK PAY GATEWAY
+// QUROPAY (INR CHANNEL)
 // ============================================
-const initiateKwikPayPayment = async (req, res) => {
-  let timeNow = Date.now();
-  const type = PaymentMethodsMap.KWIK_PAY;
-  let auth = req.cookies.auth;
-  let money = parseInt(req.body.money);
 
-  const minimumMoneyAllowed = parseInt(process.env.MINIMUM_MONEY);
+// POST — create an INR payin and return the checkout_url
+const initiateQuroPayPayment = async (req, res) => {
+  const timeNow = Date.now();
+  const type = PaymentMethodsMap.QUROPAY;
+  const auth = req.cookies.auth;
+  const money = parseInt(req.body.money);
+  const email = req.body.email || undefined;
+
+  const minimumMoneyAllowed = parseInt(process.env.MINIMUM_MONEY) || 100;
 
   if (!money || !(money >= minimumMoneyAllowed)) {
     return res.status(400).json({
@@ -146,153 +148,202 @@ const initiateKwikPayPayment = async (req, res) => {
   try {
     const user = await getUserDataByAuthToken(auth);
 
-    // Cancel any pending KwikPay recharges
+    // Cancel any pending QuroPay recharges
     const pendingRechargeList = await rechargeTable.getRecordByPhoneAndStatus({
       phone: user.phone,
       status: PaymentStatusMap.PENDING,
-      type: PaymentMethodsMap.KWIK_PAY,
+      type,
     });
 
     if (pendingRechargeList.length !== 0) {
-      const deleteRechargeQueries = pendingRechargeList.map((recharge) =>
-        rechargeTable.cancelById(recharge.id),
+      await Promise.all(
+        pendingRechargeList.map((r) => rechargeTable.cancelById(r.id)),
       );
-      await Promise.all(deleteRechargeQueries);
     }
 
     const orderId = getRechargeOrderId();
 
-    // Create payment request on KwikPay
-    const kwikPayResponse = await axios.post(
-      "https://kwikpay.tech/api/payments/create",
+    // Create INR payin on QuroPay
+    const quroPayResponse = await axios.post(
+      "https://quropays.com/api/v1/payin/create.php",
       {
+        channel: "INR",
         amount: money,
-        orderId: orderId,
-        customerName: user.username,
-        customerPhone: user.phone,
-        callbackUrl: `${process.env.APP_BASE_URL}/wallet/verify/kwikpay`,
-        returnUrl: `${process.env.APP_BASE_URL}/wallet/rechargerecord`,
+        order_ref: orderId,
+        phone: user.phone, // optional — placeholder generated if omitted
+        email,             // optional — placeholder generated if omitted
       },
       {
         headers: {
           "Content-Type": "application/json",
-          "X-Secret-Key": process.env.KWIKPAY_SECRET_KEY,
+          Authorization: `Bearer ${process.env.QUROPAY_API_KEY}`,
         },
+        timeout: 15000,
       },
     );
 
-    const kwikData = kwikPayResponse?.data;
+    const quroData = quroPayResponse?.data;
 
-    if (!kwikData || !kwikData.paymentUrl) {
-      throw Error("Gateway error from KwikPay!");
+    // Response: { channel, out_trade_no, order_ref, amount, status, checkout_url, created_at }
+    if (!quroData || !quroData.checkout_url) {
+      throw Error("Gateway error from QuroPay: missing checkout_url");
     }
 
-    const newRecharge = {
-      orderId: orderId,
-      transactionId: kwikData.transactionId || "NULL",
+    const recharge = await rechargeTable.create({
+      orderId,
+      transactionId: quroData.out_trade_no || "NULL",
       utr: null,
       phone: user.phone,
-      money: money,
-      type: type,
+      money,
+      type,
       status: PaymentStatusMap.PENDING,
       today: rechargeTable.getCurrentTimeForTodayField(),
-      url: kwikData.paymentUrl,
+      url: quroData.checkout_url,
       time: timeNow,
-    };
-
-    const recharge = await rechargeTable.create(newRecharge);
+    });
 
     return res.status(200).json({
-      message: "Payment Initiated successfully",
-      recharge: recharge,
-      payment_url: kwikData.paymentUrl,
+      message: "Payment initiated successfully",
+      recharge,
+      payment_url: quroData.checkout_url,
       status: true,
       timeStamp: timeNow,
     });
   } catch (error) {
-    console.log(error?.response?.data || error);
+    console.log("QuroPay initiate error:", error?.response?.data || error);
     return res.status(500).json({
       status: false,
-      message: "Something went wrong!",
+      message:
+        error?.response?.data?.error?.message || "Something went wrong!",
       timestamp: timeNow,
     });
   }
 };
 
-// ============================================
-// KwikPay Callback (Bank/Admin Approval)
-// ============================================
-const verifyKwikPayPayment = async (req, res) => {
-  let timeNow = Date.now();
+// POST — QuroPay webhook (HMAC verified over RAW body)
+// MUST be mounted with express.raw({ type: "application/json" }) BEFORE express.json().
+const verifyQuroPayPayment = async (req, res) => {
   try {
-    const { event, status, orderId, amount, utr } = req.body;
+    const signatureHeader = req.get("X-Webhook-Signature") || "";
+    const secret = process.env.QUROPAY_WEBHOOK_SECRET;
 
-    console.log("KwikPay Callback:", { event, status, orderId, amount, utr });
-
-    if (event === "payment.approved" && status === "approved") {
-      const recharge = await rechargeTable.getRechargeByOrderId({ orderId });
-
-      if (!recharge) {
-        console.log(`Recharge not found for orderId: ${orderId}`);
-        return res.status(200).json({ status: "ok" });
-      }
-
-      // Idempotency — skip if already successful
-      if (recharge.status === PaymentStatusMap.SUCCESS) {
-        console.log(`Recharge already success for orderId: ${orderId}`);
-        return res.status(200).json({ status: "ok" });
-      }
-
-      await rechargeTable.setStatusToSuccessByIdAndOrderId({
-        id: recharge.id,
-        orderId: recharge.orderId,
-      });
-
-      if (utr) {
-        await connection.query(
-          "UPDATE recharge SET utr = ? WHERE id_order = ?",
-          [utr, orderId],
-        );
-      }
-
-      const [users] = await connection.query(
-        "SELECT phone, code, name_user, invite FROM users WHERE phone = ?",
-        [recharge.phone],
-      );
-      const user = users?.[0];
-
-      if (user) {
-        await addUserAccountBalance({
-          phone: user.phone,
-          money: recharge.money,
-          code: user.code,
-          invite: user.invite,
-        });
-      }
-
-      console.log(`Payment approved for ${orderId}, UTR: ${utr}`);
+    if (!secret) {
+      console.log("QuroPay webhook secret not configured");
+      return res.sendStatus(500);
     }
 
-    // Always 200 so gateway stops retrying
-    return res.status(200).json({ status: "ok" });
+    // req.body is a raw Buffer (express.raw was applied on this route)
+    const rawBody = Buffer.isBuffer(req.body)
+      ? req.body
+      : Buffer.from(req.body || "");
+
+    const expected =
+      "sha256=" +
+      crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
+
+    const expectedBuf = Buffer.from(expected);
+    const sigBuf = Buffer.from(signatureHeader);
+
+    if (
+      expectedBuf.length !== sigBuf.length ||
+      !crypto.timingSafeEqual(expectedBuf, sigBuf)
+    ) {
+      console.log("QuroPay webhook: bad signature");
+      return res.status(401).send("bad signature");
+    }
+
+    const payload = JSON.parse(rawBody.toString("utf8"));
+    const { event, data } = payload || {};
+
+    console.log("QuroPay webhook:", event, "order_ref:", data?.order_ref);
+
+    if (event === "channel_payment.success") {
+      await handleQuroPaySuccess(data);
+    } else if (event === "channel_payment.failed") {
+      await handleQuroPayFailure(data);
+    }
+
+    return res.sendStatus(200); // always 200 so gateway stops retrying
   } catch (error) {
-    console.log(error);
-    return res.status(200).json({ status: "ok" });
+    console.log("QuroPay webhook error:", error);
+    return res.sendStatus(200);
   }
 };
 
-// ============================================
-// Optional: Check KwikPay status on user return
-// ============================================
-const checkKwikPayStatus = async (req, res) => {
-  let timeNow = Date.now();
+const handleQuroPaySuccess = async (data) => {
+  const orderId = data?.order_ref;
+  if (!orderId) {
+    console.log("QuroPay success webhook missing order_ref");
+    return;
+  }
+
+  const recharge = await rechargeTable.getRechargeByOrderId({ orderId });
+
+  if (!recharge) {
+    console.log(`QuroPay: recharge not found for orderId ${orderId}`);
+    return;
+  }
+
+  // Idempotency — already credited?
+  if (recharge.status === PaymentStatusMap.SUCCESS) {
+    console.log(`QuroPay: already success for orderId ${orderId}`);
+    return;
+  }
+
+  await rechargeTable.setStatusToSuccessByIdAndOrderId({
+    id: recharge.id,
+    orderId: recharge.orderId,
+  });
+
+  if (data?.out_trade_no) {
+    await connection.query(
+      "UPDATE recharge SET utr = ? WHERE id_order = ?",
+      [data.out_trade_no, orderId],
+    );
+  }
+
+  const [users] = await connection.query(
+    "SELECT phone, code, name_user, invite FROM users WHERE phone = ?",
+    [recharge.phone],
+  );
+  const user = users?.[0];
+
+  if (user) {
+    await addUserAccountBalance({
+      phone: user.phone,
+      money: recharge.money,
+      code: user.code,
+      invite: user.invite,
+    });
+  }
+
+  console.log(`QuroPay: payment approved for ${orderId}`);
+};
+
+const handleQuroPayFailure = async (data) => {
+  const orderId = data?.order_ref;
+  if (!orderId) return;
+
+  const recharge = await rechargeTable.getRechargeByOrderId({ orderId });
+  if (!recharge) return;
+
+  // Don't downgrade a successful recharge
+  if (recharge.status === PaymentStatusMap.SUCCESS) return;
+
+  await rechargeTable.cancelById(recharge.id);
+  console.log(`QuroPay: payment failed for ${orderId}`);
+};
+
+// GET — user returns from checkout; check status
+const checkQuroPayStatus = async (req, res) => {
+  const timeNow = Date.now();
   try {
     const auth = req.cookies.auth;
     const { orderId } = req.query;
 
     if (!auth || !orderId) {
       return res.status(400).json({
-        message: `orderId is Required!`,
+        message: "orderId is Required!",
         status: false,
         timeStamp: timeNow,
       });
@@ -302,7 +353,7 @@ const checkKwikPayStatus = async (req, res) => {
 
     if (!recharge) {
       return res.status(400).json({
-        message: `Unable to find recharge with this order id!`,
+        message: "Unable to find recharge with this order id!",
         status: false,
         timeStamp: timeNow,
       });
@@ -318,7 +369,7 @@ const checkKwikPayStatus = async (req, res) => {
       timeStamp: timeNow,
     });
   } catch (error) {
-    console.log(error);
+    console.log("checkQuroPayStatus error:", error);
     return res.status(500).json({
       status: false,
       message: "Something went wrong!",
@@ -331,15 +382,13 @@ const checkKwikPayStatus = async (req, res) => {
 // Helpers
 // ============================================
 const getUserDataByAuthToken = async (authToken) => {
-  let [users] = await connection.query(
-    "SELECT `phone`, `code`, `name_user`, `invite` FROM users WHERE `token` = ? ",
+  const [users] = await connection.query(
+    "SELECT `phone`, `code`, `name_user`, `invite` FROM users WHERE `token` = ?",
     [authToken],
   );
   const user = users?.[0];
 
-  if (user === undefined || user === null) {
-    throw Error("Unable to get user data!");
-  }
+  if (!user) throw Error("Unable to get user data!");
 
   return {
     phone: user.phone,
@@ -366,20 +415,20 @@ const addUserAccountBalance = async ({ money, phone, invite }) => {
   if (inviter.length) {
     await connection.query(
       "UPDATE users SET money = money + ?, total_money = total_money + ? WHERE `code` = ? AND `phone` = ?",
-      [inviter_money, inviter_money, invite, inviter?.[0].phone],
+      [inviter_money, inviter_money, invite, inviter[0].phone],
     );
   }
 };
 
 const getRechargeOrderId = () => {
   const date = new Date();
-  let id_time =
+  const id_time =
     date.getUTCFullYear() +
     "" +
     (date.getUTCMonth() + 1) +
     "" +
     date.getUTCDate();
-  let id_order =
+  const id_order =
     Math.floor(Math.random() * (99999999999999 - 10000000000000 + 1)) +
     10000000000000;
   return "ORD" + id_time + id_order;
@@ -432,11 +481,10 @@ const rechargeTable = {
       [orderId],
     );
 
-    if (recharge.length === 0) {
-      return null;
-    }
+    if (recharge.length === 0) return null;
 
-    return recharge.map((item) => ({
+    const item = recharge[0];
+    return {
       id: item.id,
       orderId: item.id_order,
       transactionId: item.transaction_id,
@@ -448,7 +496,7 @@ const rechargeTable = {
       today: item.today,
       url: item.url,
       time: item.time,
-    }))?.[0];
+    };
   },
 
   cancelById: async (id) => {
@@ -468,9 +516,8 @@ const rechargeTable = {
     );
   },
 
-  getCurrentTimeForTodayField: () => {
-    return moment().format("YYYY-DD-MM h:mm:ss A");
-  },
+  getCurrentTimeForTodayField: () =>
+    moment().format("YYYY-DD-MM h:mm:ss A"),
 
   create: async (newRecharge) => {
     if (newRecharge.url === undefined || newRecharge.url === null) {
@@ -498,20 +545,26 @@ const rechargeTable = {
       [newRecharge.orderId],
     );
 
-    if (recharge.length === 0) {
-      throw Error("Unable to create recharge!");
-    }
+    if (recharge.length === 0) throw Error("Unable to create recharge!");
 
     return recharge[0];
   },
 };
 
-module.exports = {
+export {
   // Manual UPI
   initiateManualUPIPayment,
   addManualUPIPaymentRequest,
-  // KwikPay
-  initiateKwikPayPayment,
-  verifyKwikPayPayment,
-  checkKwikPayStatus,
+  // QuroPay
+  initiateQuroPayPayment,
+  verifyQuroPayPayment,
+  checkQuroPayStatus,
+};
+
+export default {
+  initiateManualUPIPayment,
+  addManualUPIPaymentRequest,
+  initiateQuroPayPayment,
+  verifyQuroPayPayment,
+  checkQuroPayStatus,
 };

@@ -982,26 +982,8 @@ const initWebRouter = (app) => {
     middlewareController,
     paymentController.addManualUPIPaymentRequest,
   );
-
-  // ---- KwikPay Gateway ----
-  router.post(
-    "/api/wallet/paynow/kwikpay",
-    middlewareController,
-    paymentController.initiateKwikPayPayment,
-  );
-  // Callback — public (no auth), called by KwikPay server
-  router.post(
-    "/api/wallet/verify/kwikpay",
-    paymentController.verifyKwikPayPayment,
-  );
-  // Optional status check on user return
-  router.get(
-    "/api/wallet/check/kwikpay",
-    middlewareController,
-    paymentController.checkKwikPayStatus,
-  );
-
-  // ============================================
+  // KwikPay routes removed: this project uses the QuroPay routes below.
+// ============================================
 
   router.get("/mian", middlewareController, homeController.mianPage);
 
@@ -2306,6 +2288,25 @@ const initWebRouter = (app) => {
     adminController.middlewareAdminController,
     adminController.gameProblems,
   );
+   router.post(
+    "/api/wallet/paynow/quropay",
+    middlewareController,
+    paymentController.initiateQuroPayPayment,
+  );
+
+  // Webhook — PUBLIC (no auth), RAW body for HMAC verification
+  router.post(
+    "/api/wallet/verify/quropay",
+    express.raw({ type: "application/json" }),
+    paymentController.verifyQuroPayPayment,
+  );
+
+  // GET → checkout se return hone par status check
+  router.get(
+    "/api/wallet/check/quropay",
+    middlewareController,
+    paymentController.checkQuroPayStatus,
+  );
 
   // support system
   router.get("/api/recharge/:auth", getRecharge);
@@ -2362,6 +2363,8 @@ const initWebRouter = (app) => {
     "/api/webapi/withprob/:status/:id",
     withdrawlProblemsAcceptOrReject,
   );
+
+  
 
   return app.use("/", router);
 };
