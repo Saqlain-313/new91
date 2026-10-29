@@ -2047,7 +2047,6 @@ const Wingo = () => {
               </button>
             </div>
           </div>
-          <div className="overlay-section block"></div>
         </>
       )}
 

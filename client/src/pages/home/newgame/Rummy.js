@@ -1,10 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { platformData, fishingData } from "../lottery/AllgameData";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import JilliPopup from "../../../components/JilliPopup";
-import { userDetail } from "../../../store/reducer/authReducer";
 import debounce from "lodash/debounce";
+import { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import JilliPopup from "../../../components/JilliPopup";
 import {
   gameListByGameType,
   launchGame,
@@ -25,7 +23,7 @@ const Rummy = () => {
     debounce(() => {
       dispatch(gameListByGameType({ game_type, page, size }));
     }, 300), // Adjust the debounce delay as needed
-    [dispatch]
+    [dispatch],
   );
   useEffect(() => {
     debouncedDispatch(); // Call the debounced dispatch function
