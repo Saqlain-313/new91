@@ -11,6 +11,7 @@ const getErrorMessage = (payload, fallback = "An error occurred") => {
     payload.message ||
     payload.errorMessage ||
     payload.error ||
+    payload?.error?.message ||
     (typeof payload === "string" ? payload : fallback)
   );
 };
@@ -27,7 +28,9 @@ export const recharge = createAsyncThunk(
       });
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -41,7 +44,9 @@ export const upi = createAsyncThunk(
       });
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -55,7 +60,9 @@ export const rechargeGet = createAsyncThunk(
       });
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -69,7 +76,9 @@ export const rechargeList = createAsyncThunk(
       });
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -83,41 +92,65 @@ export const rechargeList2 = createAsyncThunk(
       });
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
 
 // ============================================
-// NEW: KwikPay Payment
+// QUROPAY PAYMENT
+// POST /api/wallet/paynow/quropay  → { payment_url, recharge, ... }
 // ============================================
-export const kwikpayRecharge = createAsyncThunk(
-  "auth/kwikpay-recharge",
-  async ({ money }, { rejectWithValue, fulfillWithValue }) => {
+export const quropayRecharge = createAsyncThunk(
+  "auth/quropay-recharge",
+  async ({ money, email }, { rejectWithValue, fulfillWithValue }) => {
     try {
-      const { data } = await api.post(
-        "/wallet/paynow/kwikpay",
-        { money: Number(money) },
-        { withCredentials: true }
-      );
+      const body = { money: Number(money) };
+      if (email) body.email = String(email).trim();
+      const { data } = await api.post("/wallet/paynow/quropay", body, {
+        withCredentials: true,
+      });
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
 
 // ============================================
-// NEW: Get Manual UPI payment details
-// GET /wallet/paynow/manual_upi?am=<amount>
-// Backend must return JSON for React requests (not rendered EJS HTML).
+// QUROPAY STATUS CHECK
+// GET /wallet/check/quropay?orderId=...
+// ============================================
+export const quropayStatus = createAsyncThunk(
+  "auth/quropay-status",
+  async ({ orderId }, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.get("/wallet/check/quropay", {
+        params: { orderId },
+        withCredentials: true,
+      });
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
+    }
+  }
+);
+
+// ============================================
+// GET MANUAL UPI PAYMENT DETAILS
+// GET /wallet/paynow/manual_upi
 // ============================================
 export const getManualUPIDetails = createAsyncThunk(
   "auth/get-manual-upi-details",
-  async ({ amount }, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const { data } = await api.get("/wallet/paynow/manual_upi", {
-        params: { am: Number(amount) },
         headers: { Accept: "application/json" },
         withCredentials: true,
       });
@@ -131,7 +164,8 @@ export const getManualUPIDetails = createAsyncThunk(
 );
 
 // ============================================
-// NEW: Manual UPI Payment
+// MANUAL UPI PAYMENT REQUEST
+// POST /wallet/paynow/manual_upi_request  → { money, utr }
 // ============================================
 export const manualUPIRecharge = createAsyncThunk(
   "auth/manual-upi-recharge",
@@ -144,25 +178,9 @@ export const manualUPIRecharge = createAsyncThunk(
       );
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
-    }
-  }
-);
-
-// ============================================
-// NEW: Check KwikPay status (optional)
-// ============================================
-export const kwikpayStatus = createAsyncThunk(
-  "auth/kwikpay-status",
-  async ({ orderId }, { rejectWithValue, fulfillWithValue }) => {
-    try {
-      const { data } = await api.get("/wallet/check/kwikpay", {
-        params: { orderId },
-        withCredentials: true,
-      });
-      return fulfillWithValue(data);
-    } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -179,7 +197,9 @@ export const addBank = createAsyncThunk(
       });
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -193,7 +213,9 @@ export const addusdt = createAsyncThunk(
       });
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -207,7 +229,9 @@ export const getBank = createAsyncThunk(
       });
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -223,7 +247,9 @@ export const withdrawal = createAsyncThunk(
       );
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -237,7 +263,9 @@ export const withdrawalHistory = createAsyncThunk(
       });
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -256,7 +284,9 @@ export const TrexoPayment = createAsyncThunk(
       );
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -302,7 +332,9 @@ export const zilpayRecharge = createAsyncThunk(
       );
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -318,7 +350,9 @@ export const recharge3 = createAsyncThunk(
       );
       return fulfillWithValue(data);
     } catch (error) {
-      return rejectWithValue(error.response?.data || { message: "Network error" });
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
     }
   }
 );
@@ -344,12 +378,14 @@ export const userReducer = createSlice({
     withdrawData: null,
     withdrawHistoryData: null,
 
-    // NEW: payment gateways
-    kwikpayData: null,       // { payment_url, recharge, ... }
-    manualUpiData: null,     // { recharge, ... }
-    manualUpiDetailsData: null, // { upi_id, bank_name, username, amount }
+    // QuroPay
+    quropayData: null,
+    quropayStatusData: null,
+
+    // Manual UPI
+    manualUpiData: null,
+    manualUpiDetailsData: null,
     manualUpiDetailsLoading: false,
-    kwikpayStatusData: null, // { status, message }
   },
   reducers: {
     messageClear: (state) => {
@@ -366,11 +402,14 @@ export const userReducer = createSlice({
       state.addBankData = null;
       state.withdrawData = null;
       state.withdrawHistoryData = null;
-      state.kwikpayData = null;
+
+      state.quropayData = null;
+      state.quropayStatusData = null;
+
       state.manualUpiData = null;
       state.manualUpiDetailsData = null;
       state.manualUpiDetailsLoading = false;
-      state.kwikpayStatusData = null;
+
       state.errorMessage = "";
       state.successMessage = "";
       state.loader = false;
@@ -378,9 +417,6 @@ export const userReducer = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ============================================
-      // recharge
-      // ============================================
       .addCase(recharge.pending, (state) => {
         state.loader = true;
         state.errorMessage = "";
@@ -396,9 +432,6 @@ export const userReducer = createSlice({
         state.rechargeData = payload?.orderid || null;
       })
 
-      // ============================================
-      // upi (add UPI)
-      // ============================================
       .addCase(upi.pending, (state) => {
         state.loader = true;
         state.errorMessage = "";
@@ -414,9 +447,6 @@ export const userReducer = createSlice({
         state.upiData = payload;
       })
 
-      // ============================================
-      // rechargeGet
-      // ============================================
       .addCase(rechargeGet.pending, (state) => {
         state.loader = true;
       })
@@ -430,9 +460,6 @@ export const userReducer = createSlice({
         state.rechargegetData = payload?.datas || null;
       })
 
-      // ============================================
-      // rechargeList
-      // ============================================
       .addCase(rechargeList.pending, (state) => {
         state.loader = true;
       })
@@ -446,9 +473,6 @@ export const userReducer = createSlice({
         state.rechargelistData = payload?.datas || null;
       })
 
-      // ============================================
-      // rechargeList2
-      // ============================================
       .addCase(rechargeList2.pending, (state) => {
         state.loader = true;
       })
@@ -462,21 +486,40 @@ export const userReducer = createSlice({
       })
 
       // ============================================
-      // KwikPay
+      // QuroPay
       // ============================================
-      .addCase(kwikpayRecharge.pending, (state) => {
+      .addCase(quropayRecharge.pending, (state) => {
         state.loader = true;
         state.errorMessage = "";
         state.successMessage = "";
       })
-      .addCase(kwikpayRecharge.rejected, (state, { payload }) => {
-        state.errorMessage = getErrorMessage(payload, "KwikPay payment failed");
+      .addCase(quropayRecharge.rejected, (state, { payload }) => {
+        state.errorMessage = getErrorMessage(
+          payload,
+          "QuroPay payment failed"
+        );
         state.loader = false;
       })
-      .addCase(kwikpayRecharge.fulfilled, (state, { payload }) => {
+      .addCase(quropayRecharge.fulfilled, (state, { payload }) => {
         state.successMessage = payload?.message || "";
         state.loader = false;
-        state.kwikpayData = payload; // { payment_url, recharge, status, ... }
+        state.quropayData = payload;
+      })
+
+      // ============================================
+      // QuroPay status
+      // ============================================
+      .addCase(quropayStatus.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(quropayStatus.rejected, (state, { payload }) => {
+        state.errorMessage = getErrorMessage(payload, "Status check failed");
+        state.loader = false;
+      })
+      .addCase(quropayStatus.fulfilled, (state, { payload }) => {
+        state.loader = false;
+        state.quropayStatusData = payload;
+        state.successMessage = payload?.message || "";
       })
 
       // ============================================
@@ -488,7 +531,10 @@ export const userReducer = createSlice({
       })
       .addCase(getManualUPIDetails.rejected, (state, { payload }) => {
         state.manualUpiDetailsLoading = false;
-        state.errorMessage = getErrorMessage(payload, "Unable to load UPI details");
+        state.errorMessage = getErrorMessage(
+          payload,
+          "Unable to load UPI details"
+        );
       })
       .addCase(getManualUPIDetails.fulfilled, (state, { payload }) => {
         state.manualUpiDetailsLoading = false;
@@ -496,7 +542,7 @@ export const userReducer = createSlice({
       })
 
       // ============================================
-      // Manual UPI
+      // Manual UPI submit
       // ============================================
       .addCase(manualUPIRecharge.pending, (state) => {
         state.loader = true;
@@ -504,35 +550,21 @@ export const userReducer = createSlice({
         state.successMessage = "";
       })
       .addCase(manualUPIRecharge.rejected, (state, { payload }) => {
-        state.errorMessage = getErrorMessage(payload, "Manual UPI request failed");
+        state.errorMessage = getErrorMessage(
+          payload,
+          "Manual UPI request failed"
+        );
         state.loader = false;
       })
       .addCase(manualUPIRecharge.fulfilled, (state, { payload }) => {
         state.loader = false;
-        state.manualUpiData = payload; // { recharge, status, ... }
+        state.manualUpiData = payload;
         if (payload?.status) {
           state.successMessage =
             payload?.message || "Payment request submitted successfully";
         } else {
-          state.errorMessage =
-            payload?.message || "Manual UPI request failed";
+          state.errorMessage = payload?.message || "Manual UPI request failed";
         }
-      })
-
-      // ============================================
-      // KwikPay status check
-      // ============================================
-      .addCase(kwikpayStatus.pending, (state) => {
-        state.loader = true;
-      })
-      .addCase(kwikpayStatus.rejected, (state, { payload }) => {
-        state.errorMessage = getErrorMessage(payload, "Status check failed");
-        state.loader = false;
-      })
-      .addCase(kwikpayStatus.fulfilled, (state, { payload }) => {
-        state.loader = false;
-        state.kwikpayStatusData = payload;
-        state.successMessage = payload?.message || "";
       })
 
       // ============================================
@@ -553,9 +585,6 @@ export const userReducer = createSlice({
         state.addBankData = payload;
       })
 
-      // ============================================
-      // addusdt
-      // ============================================
       .addCase(addusdt.pending, (state) => {
         state.loader = true;
         state.errorMessage = "";
@@ -570,9 +599,6 @@ export const userReducer = createSlice({
         state.loader = false;
       })
 
-      // ============================================
-      // getBank
-      // ============================================
       .addCase(getBank.pending, (state) => {
         state.loader = true;
       })
@@ -586,9 +612,6 @@ export const userReducer = createSlice({
         state.addBankData = payload?.datas?.[0] || null;
       })
 
-      // ============================================
-      // withdrawal
-      // ============================================
       .addCase(withdrawal.pending, (state) => {
         state.loader = true;
         state.errorMessage = "";
@@ -604,9 +627,6 @@ export const userReducer = createSlice({
         state.withdrawData = payload;
       })
 
-      // ============================================
-      // withdrawalHistory
-      // ============================================
       .addCase(withdrawalHistory.pending, (state) => {
         state.loader = true;
       })
@@ -620,9 +640,6 @@ export const userReducer = createSlice({
         state.withdrawHistoryData = payload?.datas || null;
       })
 
-      // ============================================
-      // bannerGet
-      // ============================================
       .addCase(bannerGet.pending, (state) => {
         state.loader = true;
       })
@@ -636,9 +653,6 @@ export const userReducer = createSlice({
         state.loader = false;
       })
 
-      // ============================================
-      // recharheBonus
-      // ============================================
       .addCase(recharheBonus.pending, (state) => {
         state.loader = true;
       })
@@ -652,9 +666,6 @@ export const userReducer = createSlice({
         state.loader = false;
       })
 
-      // ============================================
-      // zilpayRecharge
-      // ============================================
       .addCase(zilpayRecharge.pending, (state) => {
         state.loader = true;
         state.errorMessage = "";
@@ -669,9 +680,6 @@ export const userReducer = createSlice({
         state.loader = false;
       })
 
-      // ============================================
-      // TrexoPayment
-      // ============================================
       .addCase(TrexoPayment.pending, (state) => {
         state.loader = true;
         state.errorMessage = "";
@@ -686,16 +694,12 @@ export const userReducer = createSlice({
         state.loader = false;
       })
 
-      // ============================================
-      // recharge3
-      // ============================================
       .addCase(recharge3.pending, (state) => {
         state.loader = true;
         state.errorMessage = "";
         state.successMessage = "";
       })
       .addCase(recharge3.rejected, (state, { payload }) => {
-        console.log("register rejected payload:", payload);
         state.errorMessage = getErrorMessage(payload);
         state.loader = false;
       })
