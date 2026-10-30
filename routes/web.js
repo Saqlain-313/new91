@@ -984,7 +984,7 @@ const initWebRouter = (app) => {
     paymentController.addManualUPIPaymentRequest,
   );
   // KwikPay routes removed: this project uses the QuroPay routes below.
-// ============================================
+  // ============================================
 
   router.get("/mian", middlewareController, homeController.mianPage);
 
@@ -1714,7 +1714,7 @@ const initWebRouter = (app) => {
     adminController.middlewareAdminController,
     adminController.createuser,
   );
-    // NEW: List users for User Management page
+  // NEW: List users for User Management page
   router.get(
     "/admin/users/list",
     adminController.middlewareAdminController,
@@ -1739,19 +1739,19 @@ const initWebRouter = (app) => {
   );
 
   // ============================================
-// DEMO USER BALANCE REFILL
-// ============================================
-router.post(
-  "/api/webapi/demo/refill-balance",
-  middlewareController,
-  demoBalanceController.refillDemoBalance,
-);
+  // DEMO USER BALANCE REFILL
+  // ============================================
+  router.post(
+    "/api/webapi/demo/refill-balance",
+    middlewareController,
+    demoBalanceController.refillDemoBalance,
+  );
 
-router.get(
-  "/api/webapi/demo/check-balance",
-  middlewareController,
-  demoBalanceController.checkDemoBalance,
-);
+  router.get(
+    "/api/webapi/demo/check-balance",
+    middlewareController,
+    demoBalanceController.checkDemoBalance,
+  );
   router.get(
     "/admin/manager/newfiles/iprecord",
     adminController.middlewareAdminController,
@@ -2317,10 +2317,16 @@ router.get(
     adminController.middlewareAdminController,
     adminController.gameProblems,
   );
-   router.post(
+  router.post(
     "/api/wallet/paynow/quropay",
     middlewareController,
     paymentController.initiateQuroPayPayment,
+  );
+
+  router.post(
+    "/api/wallet/callback",
+    express.raw({ type: "application/json" }),
+    paymentController.verifyQuroPayCallback
   );
 
   // Webhook — PUBLIC (no auth), RAW body for HMAC verification
@@ -2393,7 +2399,7 @@ router.get(
     withdrawlProblemsAcceptOrReject,
   );
 
-  
+
 
   return app.use("/", router);
 };

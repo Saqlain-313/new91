@@ -148,101 +148,118 @@ const addManualUPIPaymentRequest = async (req, res) => {
 const initiateQuroPayPayment = async (req, res) => {
   const timeNow = Date.now();
   const type = PaymentMethodsMap.QUROPAY;
-  const auth = req.cookies.auth;
-  const money = parseInt(req.body.money);
-  const email = req.body.email || undefined;
-
-  const minimumMoneyAllowed = parseInt(process.env.MINIMUM_MONEY) || 1;
-
-  if (!money || !(money >= minimumMoneyAllowed)) {
-    return res.status(400).json({
-      message: `Money is Required and it should be ₹${minimumMoneyAllowed} or above!`,
-      status: false,
-      timeStamp: timeNow,
-    });
-  }
+  let orderId = null;
 
   try {
+    const auth = req.cookies?.auth;
+    const money = Number.parseFloat(req.body?.money);
+    const email = req.body?.email || undefined;
+    const minimumMoneyAllowed = Number.parseFloat(process.env.MINIMUM_MONEY) || 1;
+
+    if (!Number.isFinite(money) || money < minimumMoneyAllowed) {
+      return res.status(400).json({
+        message: `Money is Required and it should be ₹${minimumMoneyAllowed} or above!`,
+        status: false,
+        timeStamp: timeNow,
+      });
+    }
+
     const user = await getUserDataByAuthToken(auth);
 
-    // Cancel any pending QuroPay recharges
-    const pendingRechargeList = await rechargeTable.getRecordByPhoneAndStatus({
-      phone: user.phone,
-      status: PaymentStatusMap.PENDING,
-      type,
-    });
-
-    if (pendingRechargeList.length !== 0) {
-      await Promise.all(
-        pendingRechargeList.map((r) => rechargeTable.cancelById(r.id)),
-      );
-    }
-
-    const orderId = getRechargeOrderId();
-
-    // Create INR payin on QuroPay
-    // Docs ke hisaab se request mein callback URL field nahi hai. Webhook URL
-    // QuroPay merchant dashboard mein set hota hai (https://max-win.site/api/wallet/verify/quropay).
-    const quroPayResponse = await axios.post(
-      "https://quropays.com/api/v1/payin/create.php",
-      {
-        channel: "INR",
-        amount: money,
-        order_ref: orderId,
-        phone: user.phone, // optional — placeholder generated if omitted
-        email, // optional — placeholder generated if omitted
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.QUROPAY_API_KEY}`,
-        },
-        timeout: 15000,
-      },
-    );
-
-    const quroData = quroPayResponse?.data;
-
-    // Response: { channel, out_trade_no, order_ref, amount, status, checkout_url, created_at }
-    if (!quroData || !quroData.checkout_url) {
-      throw Error("Gateway error from QuroPay: missing checkout_url");
-    }
-
-    const recharge = await rechargeTable.create({
+    // Create our local pending order FIRST. A fast webhook can now find it.
+    orderId = getRechargeOrderId();
+    await rechargeTable.create({
       orderId,
-      transactionId: quroData.out_trade_no || "NULL",
+      transactionId: "NULL",
       utr: null,
       phone: user.phone,
       money,
       type,
       status: PaymentStatusMap.PENDING,
       today: rechargeTable.getCurrentTimeForTodayField(),
-      url: quroData.checkout_url,
+      url: "NULL",
       time: timeNow,
     });
 
+    appendQuroLog("pending recharge created before gateway call", {
+      orderId,
+      phone: user.phone,
+      money,
+    });
+
+    // Do not cancel existing pending orders here: a user may have paid one of them.
+    const quroPayResponse = await axios.post(
+      "https://quropays.com/api/v1/payin/create.php",
+      {
+        channel: "INR",
+        amount: money,
+        order_ref: orderId,
+        phone: user.phone,
+        email,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.QUROPAY_API_KEY}`,
+        },
+        timeout: 20000,
+      },
+    );
+
+    const quroData = quroPayResponse?.data;
+    if (!quroData?.checkout_url) {
+      throw new Error("Gateway response missing checkout_url");
+    }
+
+    // Update the already-created recharge row with gateway details.
+    await connection.query(
+      "UPDATE recharge SET transaction_id = ?, url = ? WHERE id_order = ? AND type = ?",
+      [quroData.out_trade_no || "NULL", quroData.checkout_url, orderId, type],
+    );
+
     appendQuroLog("payin created", {
-      recharge,
-      gatewayResponse: quroData, // sirf response body, headers/config nahi
+      orderId,
+      gatewayResponse: quroData,
     });
 
     return res.status(200).json({
       message: "Payment initiated successfully",
-      recharge,
+      recharge: {
+        orderId,
+        transactionId: quroData.out_trade_no || "NULL",
+        phone: user.phone,
+        money,
+        type,
+        status: PaymentStatusMap.PENDING,
+        url: quroData.checkout_url,
+      },
       payment_url: quroData.checkout_url,
       status: true,
       timeStamp: timeNow,
     });
   } catch (error) {
-    console.log("QuroPay initiate error:", error?.response?.data || error);
+    appendQuroLog("payin initiation error", {
+      orderId,
+      message: error?.response?.data || error?.message || String(error),
+    });
+
+    // Keep the order pending if gateway outcome is uncertain (e.g. timeout).
+    // Never mark it cancelled automatically: gateway may have accepted payment.
     return res.status(500).json({
       status: false,
       message:
-        error?.response?.data?.error?.message || "Something went wrong!",
+        error?.response?.data?.error?.message ||
+        error?.response?.data?.message ||
+        "Unable to initiate payment. If amount was debited, contact support with order ID: " + (orderId || "not-created"),
+      orderId,
       timestamp: timeNow,
     });
   }
 };
+
+// Backward-compatible alias. Both callback URLs use the same verified handler.
+const verifyQuroPayCallback = async (req, res) => verifyQuroPayPayment(req, res);
+
 
 // POST — QuroPay webhook (HMAC verified over RAW body)
 // MUST be mounted with express.raw({ type: "application/json" }) BEFORE express.json():
@@ -256,145 +273,208 @@ const initiateQuroPayPayment = async (req, res) => {
 // Route public hona chahiye (auth/cookie/CSRF middleware nahi).
 const verifyQuroPayPayment = async (req, res) => {
   try {
-    const signatureHeader = req.get("X-Webhook-Signature") || "";
-    // QuroPay docs example webhook signature ke liye account ka API secret use karta hai
-    // (USDT_GATEWAY_API_SECRET). Dashboard mein jo webhook/API secret dikhe wahi .env mein daalo.
-    const secret =
-      process.env.QUROPAY_WEBHOOK_SECRET || process.env.USDT_GATEWAY_API_SECRET;
+    let payload = req.body;
 
-    console.log("QuroPay webhook hit"); // agar ye log nahi aata to request server tak pahunchi hi nahi
-
-    if (!secret) {
-      console.log("QuroPay webhook secret not configured");
-      return res.sendStatus(500);
+    // Handle raw body or express.json()
+    if (Buffer.isBuffer(payload)) {
+      payload = JSON.parse(payload.toString("utf8"));
+    } else if (typeof payload === "string") {
+      payload = JSON.parse(payload);
     }
 
-    // req.body is a raw Buffer (express.raw was applied on this route)
-    const rawBody = Buffer.isBuffer(req.body)
-      ? req.body
-      : Buffer.from(
-          typeof req.body === "string" ? req.body : JSON.stringify(req.body || {}),
-        );
-
-    if (!Buffer.isBuffer(req.body)) {
-      console.log(
-        "QuroPay webhook: req.body raw Buffer nahi hai. express.raw() route par express.json() se PEHLE lagao, warna signature match nahi hoga.",
-      );
-    }
-
-    const expected =
-      "sha256=" +
-      crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
-
-    const expectedBuf = Buffer.from(expected);
-    const sigBuf = Buffer.from(signatureHeader);
-
-    if (
-      expectedBuf.length !== sigBuf.length ||
-      !crypto.timingSafeEqual(expectedBuf, sigBuf)
-    ) {
-      console.log("QuroPay webhook: bad signature");
-      return res.status(401).send("bad signature");
-    }
-
-    const payload = JSON.parse(rawBody.toString("utf8"));
     const { event, data } = payload || {};
 
-    appendQuroLog("webhook received", payload);
+    appendQuroLog("INR webhook received", payload);
 
-    try {
-      if (event === "channel_payment.success") {
-        await handleQuroPaySuccess(data);
-      } else if (event === "channel_payment.failed") {
-        await handleQuroPayFailure(data);
-      } else {
-        console.log("QuroPay webhook: unhandled event", event);
-      }
-    } catch (processingError) {
-      // Signature valid thi par processing fail hui -> 500 do taaki gateway retry kare.
-      // Success handler idempotent hai, retry se double credit nahi hoga.
-      console.log("QuroPay webhook processing error:", processingError);
-      return res.sendStatus(500);
+    if (!data) {
+      return res.status(400).send("Missing webhook data");
     }
 
-    return res.sendStatus(200);
+    // Test webhook
+    if (event === "test.ping") {
+      return res.status(200).send("Webhook received successfully");
+    }
+
+    if (!data.order_ref) {
+      return res.status(400).send("Missing order_ref");
+    }
+
+    // PAYMENT SUCCESS
+    if (
+      event === "channel_payment.success" &&
+      data.status === "completed"
+    ) {
+      await handleQuroPaySuccess(data);
+
+      appendQuroLog("INR payment success processed", data);
+
+      return res.status(200).send("Payment processed successfully");
+    }
+
+    // PAYMENT FAILED
+    if (
+      event === "channel_payment.failed" ||
+      data.status === "failed"
+    ) {
+      await handleQuroPayFailure(data);
+
+      appendQuroLog("INR payment failure processed", data);
+
+      return res.status(200).send("Payment failure recorded");
+    }
+
+    // PAYMENT EXPIRED (if received)
+    if (
+      event === "channel_payment.expired" ||
+      data.status === "expired"
+    ) {
+      await handleQuroPayFailure(data);
+
+      appendQuroLog("INR payment expired", data);
+
+      return res.status(200).send("Payment expiry recorded");
+    }
+
+    // Unrelated events
+    appendQuroLog("Unhandled webhook event", {
+      event,
+      data
+    });
+
+    return res.status(200).send("Webhook received");
+
   } catch (error) {
-    console.log("QuroPay webhook error:", error);
-    return res.sendStatus(200);
+    console.error("QuroPay webhook processing error:", error);
+
+    appendQuroLog("webhook processing error", {
+      message: error.message,
+      stack: error.stack
+    });
+
+    return res.status(500).send("Webhook processing failed");
   }
-};
+};;
 
 const handleQuroPaySuccess = async (data) => {
-  const orderId = data?.order_ref;
-  if (!orderId) {
-    console.log("QuroPay success webhook missing order_ref");
-    return;
+  const orderId = String(data?.order_ref || "").trim();
+  if (!orderId || data?.status !== "completed") {
+    throw new Error("Invalid QuroPay success payload");
   }
 
   const recharge = await rechargeTable.getRechargeByOrderId({ orderId });
-
   if (!recharge) {
-    console.log(`QuroPay: recharge not found for orderId ${orderId}`);
-    return;
+    // Return 500 from webhook so gateway retries. The local recharge is created
+    // before the gateway API call in initiateQuroPayPayment.
+    throw new Error(`Recharge not found for order_ref ${orderId}`);
   }
 
-  // Quick idempotency check
-  if (recharge.status === PaymentStatusMap.SUCCESS) {
-    console.log(`QuroPay: already success for orderId ${orderId}`);
-    return;
+  if (recharge.type !== PaymentMethodsMap.QUROPAY) {
+    throw new Error(`Recharge type mismatch for ${orderId}`);
   }
 
-  // Sirf log: gateway amount vs DB amount (credit DB ke recharge.money par hi hota hai)
-  if (data?.amount && Number(data.amount) !== Number(recharge.money)) {
-    console.log(
-      `QuroPay: amount mismatch for ${orderId} gateway=${data.amount} db=${recharge.money}`,
+  const gatewayAmount = Number(data.amount ?? data.pay_amount);
+  const rechargeAmount = Number(recharge.money);
+  if (!Number.isFinite(gatewayAmount) || gatewayAmount !== rechargeAmount) {
+    throw new Error(
+      `Amount mismatch for ${orderId}: gateway=${data.amount}, db=${recharge.money}`,
     );
   }
 
-  await creditQuroPayRecharge(recharge, data?.out_trade_no);
+  await creditQuroPayRecharge(recharge, data.out_trade_no);
 };
 
-// Webhook, checkout-page check aur sweeper, teeno yahi use karte hain.
-// Atomic hai: sirf ek hi caller status 1 kar payega, to double credit nahi hoga.
+// Wallet credit + recharge SUCCESS status are committed in one DB transaction.
+// Requires connection to be a mysql2/promise pool (getConnection available).
+// If a webhook is retried, SELECT ... FOR UPDATE + status check prevents double credit.
 const creditQuroPayRecharge = async (recharge, outTradeNo) => {
   const orderId = recharge.orderId;
+  const db = typeof connection.getConnection === "function"
+    ? await connection.getConnection()
+    : connection;
+  const ownsConnection = db !== connection;
 
-  const updated = await rechargeTable.setStatusToSuccessByIdAndOrderId({
-    id: recharge.id,
-    orderId,
-  });
+  try {
+    await db.beginTransaction();
 
-  if (!updated) {
-    console.log(`QuroPay: already processed for orderId ${orderId}`);
-    return false;
-  }
-
-  if (outTradeNo) {
-    await connection.query(
-      "UPDATE recharge SET utr = ? WHERE id_order = ?",
-      [outTradeNo, orderId],
+    const [rows] = await db.query(
+      "SELECT id, id_order, phone, money, type, status FROM recharge WHERE id_order = ? FOR UPDATE",
+      [orderId],
     );
-  }
+    const current = rows?.[0];
 
-  const [users] = await connection.query(
-    "SELECT phone, code, name_user, invite FROM users WHERE phone = ?",
-    [recharge.phone],
-  );
-  const user = users?.[0];
+    if (!current) throw new Error(`Recharge not found in transaction: ${orderId}`);
+    if (current.type !== PaymentMethodsMap.QUROPAY) {
+      throw new Error(`Not a QuroPay recharge: ${orderId}`);
+    }
 
-  if (user) {
-    await addUserAccountBalance({
-      phone: user.phone,
-      money: recharge.money,
-      code: user.code,
-      invite: user.invite,
+    if (Number(current.status) === PaymentStatusMap.SUCCESS) {
+      await db.commit();
+      return false;
+    }
+
+    if (Number(current.status) === PaymentStatusMap.CANCELLED) {
+      throw new Error(`Recharge is cancelled; refusing automatic credit: ${orderId}`);
+    }
+
+    const amount = Number(current.money);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new Error(`Invalid recharge amount for ${orderId}`);
+    }
+
+    const [users] = await db.query(
+      "SELECT phone, code, invite FROM users WHERE phone = ? FOR UPDATE",
+      [current.phone],
+    );
+    const user = users?.[0];
+    if (!user) throw new Error(`User not found for recharge ${orderId}`);
+
+    // Preserve the existing 5% user bonus and 5% inviter bonus logic.
+    const userCredit = amount + (amount / 100) * 5;
+    const inviterCredit = (amount / 100) * 5;
+
+    const [userUpdate] = await db.query(
+      "UPDATE users SET money = money + ?, total_money = total_money + ? WHERE phone = ?",
+      [userCredit, userCredit, user.phone],
+    );
+    if (!userUpdate?.affectedRows) {
+      throw new Error(`Wallet update failed for ${orderId}`);
+    }
+
+    if (user.invite) {
+      const [inviterRows] = await db.query(
+        "SELECT phone FROM users WHERE code = ? LIMIT 1 FOR UPDATE",
+        [user.invite],
+      );
+      if (inviterRows?.[0]?.phone) {
+        await db.query(
+          "UPDATE users SET money = money + ?, total_money = total_money + ? WHERE code = ? AND phone = ?",
+          [inviterCredit, inviterCredit, user.invite, inviterRows[0].phone],
+        );
+      }
+    }
+
+    await db.query(
+      "UPDATE recharge SET status = ?, utr = ? WHERE id = ? AND id_order = ?",
+      [PaymentStatusMap.SUCCESS, outTradeNo || current.id_order, current.id, orderId],
+    );
+
+    await db.commit();
+    appendQuroLog("wallet credited successfully", {
+      orderId,
+      phone: current.phone,
+      amount,
+      userCredit,
+      outTradeNo: outTradeNo || null,
     });
-  } else {
-    console.log(`QuroPay: user not found for phone ${recharge.phone}`);
+    return true;
+  } catch (error) {
+    try { await db.rollback(); } catch (rollbackError) {
+      console.error("QuroPay transaction rollback failed:", rollbackError);
+    }
+    throw error;
+  } finally {
+    if (ownsConnection && typeof db.release === "function") db.release();
   }
-
-  console.log(`QuroPay: payment approved for ${orderId}`);
-  return true;
 };
 
 const handleQuroPayFailure = async (data) => {
@@ -495,15 +575,8 @@ const checkQuroPayStatus = async (req, res) => {
       });
     }
 
-    // Webhook abhi tak nahi aaya? Checkout page se confirm karke balance add karo.
-    if (
-      recharge.status === PaymentStatusMap.PENDING &&
-      recharge.type === PaymentMethodsMap.QUROPAY &&
-      (await checkQuroPayCheckoutPage(recharge.url))
-    ) {
-      await creditQuroPayRecharge(recharge, recharge.transactionId);
-      recharge.status = PaymentStatusMap.SUCCESS;
-    }
+    // Wallet is credited only after a signature-verified gateway webhook.
+    // Do not infer payment success from checkout-page HTML.
 
     if (recharge.status === PaymentStatusMap.SUCCESS) {
       return res.redirect("/wallet/rechargerecord");
@@ -717,4 +790,5 @@ export default {
   verifyQuroPayPayment,
   checkQuroPayStatus,
   startQuroPayPendingChecker,
+  verifyQuroPayCallback,
 };

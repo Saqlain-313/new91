@@ -1,0 +1,30 @@
+
+
+========================================
+{
+  "timestamp": "2026-10-30T11:15:13.517Z",
+  "method": "POST",
+  "url": "/callback",
+  "headers": {
+    "host": "regarding-progressive-consultancy-requiring.trycloudflare.com",
+    "content-length": "258",
+    "accept": "*/*",
+    "accept-encoding": "gzip",
+    "cdn-loop": "cloudflare; loops=1; subreqs=1",
+    "cf-connecting-ip": "2a02:4780:11:1376:0:2801:a719:1",
+    "cf-ew-via": "15",
+    "cf-ipcountry": "IN",
+    "cf-ray": "a52a002f1e8f490d-DEL",
+    "cf-visitor": "{\"scheme\":\"https\"}",
+    "cf-warp-tag-id": "9eff0baf-ca8d-4d89-8d68-30bb44d8fc7c",
+    "cf-worker": "trycloudflare.com",
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "x-forwarded-for": "2a02:4780:11:1376:0:2801:a719:1",
+    "x-forwarded-proto": "https",
+    "x-webhook-event": "channel_payment.success",
+    "x-webhook-signature": "sha256=7fe2080417665136a6b2ae90ed7ba0688b4aa73896c08bfb36a492e552a8ae29"
+  },
+  "body": "{\"event\":\"channel_payment.success\",\"created_at\":\"2026-10-30T11:15:11+00:00\",\"data\":{\"channel\":\"INR\",\"provider\":\"galepay\",\"out_trade_no\":\"chn_84a42de6d442d9ecf9d5437\",\"order_ref\":\"ORD2026103088617066833043\",\"amount\":100,\"pay_amount\":100,\"status\":\"completed\"}}"
+}
+========================================
