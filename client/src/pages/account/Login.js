@@ -462,7 +462,7 @@ const Login = () => {
             </Link>
             <Link
               className="flex items-center justify-center flex-col w-[50%]"
-              to={"/main/CustomerService"}
+              to={`https://h5.workorder.support.max-win.site/`}
             >
               <img src={CustomerImg} alt="" className="w-8 filter-imgs" />
               {/* <svg

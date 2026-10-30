@@ -14,7 +14,7 @@ const BasicTools = () => {
       name: "24/7Customer service",
       icon: "👤",
       bgColor: "bg-blue-500",
-      link: `https://h5support.chennai91.co/?token=${token}`,
+      link: `https://h5.workorder.support.max-win.site/?token=${token}`,
     },
     { name: "Beginner's Guide", icon: "📖", bgColor: "bg-red-500", link: "#" },
     {

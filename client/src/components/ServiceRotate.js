@@ -2,7 +2,6 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import ServiceImg from "../assets/icon_sevice.png";
 
 const ServiceRotate = () => {
   const { userInfo } = useSelector((state) => state.auth);
@@ -80,7 +79,7 @@ const ServiceRotate = () => {
 
     if (userInfo) {
       const token = Cookies.get("auth");
-      window.location.href = `https://h5support.chennai91.co/?token=${token}`;
+      window.location.href = `https://h5.workorder.support.max-win.site/?token=${token}`;
     } else {
       navigate("/main/CustomerService");
     }
@@ -114,7 +113,11 @@ const ServiceRotate = () => {
       onMouseMove={(e) => e.preventDefault()}
     >
       <div onClick={handleClicks} style={{ display: "inline-block" }}>
-        <img src={ServiceImg} alt="Service" className="w-14" />
+        <img
+          src="https://i.ibb.co/0ptpQSsK/download-3.png"
+          alt="Service"
+          className="w-14"
+        />
       </div>
     </div>
   );
