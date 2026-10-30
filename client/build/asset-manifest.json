@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.54ff5855.css",
-    "main.js": "/static/js/main.a5c7316c.js",
+    "main.js": "/static/js/main.e4451e81.js",
     "index.html": "/index.html",
     "static/media/trxbg.png": "/static/media/trxbg.1a3c4826999516b11de7.png",
     "static/media/bg-spin-front-img.png": "/static/media/bg-spin-front-img.2e2ad3330bd9c8c6c6ce.png",
@@ -140,6 +140,6 @@
   },
   "entrypoints": [
     "static/css/main.54ff5855.css",
-    "static/js/main.a5c7316c.js"
+    "static/js/main.e4451e81.js"
   ]
 }
