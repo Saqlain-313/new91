@@ -35,6 +35,43 @@ export const recharge = createAsyncThunk(
   }
 );
 
+// ============================================
+// DEMO USER BALANCE REFILL
+// ============================================
+export const refillDemoBalance = createAsyncThunk(
+  "auth/refill-demo-balance",
+  async (_, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.post(
+        "/webapi/demo/refill-balance",
+        {},
+        { withCredentials: true }
+      );
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
+    }
+  }
+);
+
+export const checkDemoBalance = createAsyncThunk(
+  "auth/check-demo-balance",
+  async (_, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.get("/webapi/demo/check-balance", {
+        withCredentials: true,
+      });
+      return fulfillWithValue(data);
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "Network error" }
+      );
+    }
+  }
+);
+
 export const upi = createAsyncThunk(
   "auth/addUPI",
   async (info, { rejectWithValue, fulfillWithValue }) => {
@@ -377,6 +414,9 @@ export const userReducer = createSlice({
     addBankData: null,
     withdrawData: null,
     withdrawHistoryData: null,
+    demoRefillData: null,
+    demoCheckData: null,
+    demoRefillLoading: false,
 
     // QuroPay
     quropayData: null,
@@ -402,6 +442,9 @@ export const userReducer = createSlice({
       state.addBankData = null;
       state.withdrawData = null;
       state.withdrawHistoryData = null;
+      state.demoRefillData = null;
+      state.demoCheckData = null;
+      state.demoRefillLoading = false;
 
       state.quropayData = null;
       state.quropayStatusData = null;
@@ -706,6 +749,39 @@ export const userReducer = createSlice({
       .addCase(recharge3.fulfilled, (state, { payload }) => {
         state.successMessage = payload?.message || "";
         state.loader = false;
+      })// ============================================
+      // DEMO BALANCE REFILL
+      // ============================================
+      .addCase(refillDemoBalance.pending, (state) => {
+        state.demoRefillLoading = true;
+        state.errorMessage = "";
+        state.successMessage = "";
+      })
+      .addCase(refillDemoBalance.rejected, (state, { payload }) => {
+        state.demoRefillLoading = false;
+        state.errorMessage = getErrorMessage(payload, "Demo refill failed");
+      })
+      .addCase(refillDemoBalance.fulfilled, (state, { payload }) => {
+        state.demoRefillLoading = false;
+        state.demoRefillData = payload;
+        if (payload?.refilled) {
+          state.successMessage = payload?.message || "Demo balance refilled";
+        } else {
+          // refilled=false is a valid non-error case (balance already enough)
+          state.successMessage = payload?.message || "";
+        }
+      })
+
+      .addCase(checkDemoBalance.pending, (state) => {
+        state.loader = true;
+      })
+      .addCase(checkDemoBalance.rejected, (state, { payload }) => {
+        state.loader = false;
+        state.errorMessage = getErrorMessage(payload, "Demo check failed");
+      })
+      .addCase(checkDemoBalance.fulfilled, (state, { payload }) => {
+        state.loader = false;
+        state.demoCheckData = payload;
       });
   },
 });

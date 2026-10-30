@@ -1,5 +1,5 @@
 import { QRCodeSVG } from "qrcode.react";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FaSquare } from "react-icons/fa";
 import { GiSwipeCard, GiWhiteBook } from "react-icons/gi";
 import { IoMdClose, IoMdWallet } from "react-icons/io";
@@ -10,9 +10,11 @@ import CopyCopmponent from "../../components/CopyCopmponent";
 import { userDetail } from "../../store/reducer/authReducer";
 import {
   bannerGet,
+  checkDemoBalance,
   getManualUPIDetails,
   manualUPIRecharge,
   quropayRecharge,
+  refillDemoBalance,
 } from "../../store/reducer/userReducer";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -56,9 +58,7 @@ export default function Recharge() {
 
   const [amount, setAmount] = useState("");
   const [activeTab, setActiveTab] = useState("QuroPay");
-  const [activeItemLabel, setActiveItemLabel] = useState(
-    "QuroPay Gateway"
-  );
+  const [activeItemLabel, setActiveItemLabel] = useState("QuroPay Gateway");
   const [copyPopup, setCopyPopup] = useState(false);
   const [alerts, setAlerts] = useState(false);
   const [alertSuccess, setAlertSuccess] = useState(false);
@@ -69,6 +69,9 @@ export default function Recharge() {
   // QR popup (Manual UPI only)
   const [qrPopup, setQrPopup] = useState(false);
   const [qrAmount, setQrAmount] = useState(0);
+
+  // Demo refill guard — prevents double-trigger in React StrictMode / re-renders
+  const demoRefillTriedRef = useRef(false);
 
   const alertTimerRef = useRef(null);
   const copyTimerRef = useRef(null);
@@ -105,8 +108,7 @@ export default function Recharge() {
   );
   const selectedItem = useMemo(
     () =>
-      selectedChannel?.items.find((i) => i.label === activeItemLabel) ||
-      null,
+      selectedChannel?.items.find((i) => i.label === activeItemLabel) || null,
     [selectedChannel, activeItemLabel]
   );
 
@@ -247,6 +249,64 @@ export default function Recharge() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ============================================
+  // DEMO AUTO-REFILL
+  //   Jab demo user ka balance < 2000 ho to backend se +10000
+  //   add karwa ke userDetail() refresh kar deta hai.
+  //   demoRefillTriedRef se ek hi baar chalega (StrictMode safe).
+  // ============================================
+  useEffect(() => {
+    const isDemo = Number(userInfo?.isdemo) === 1;
+    const balance = Number(userInfo?.money_user ?? userInfo?.money ?? 0);
+
+    if (!isDemo) return;
+    if (demoRefillTriedRef.current) return;
+    // Agar balance already >= 2000 hai to kuch nahi karna
+    if (balance >= 2000) return;
+
+    demoRefillTriedRef.current = true;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        // 1. Server-side check (double safety)
+        const check = await dispatch(checkDemoBalance());
+        if (cancelled) return;
+
+        const needs =
+          check.meta.requestStatus === "fulfilled" &&
+          check.payload?.status &&
+          check.payload?.needsRefill;
+
+        if (!needs) return;
+
+        // 2. Refill
+        const refill = await dispatch(refillDemoBalance());
+        if (cancelled) return;
+
+        if (
+          refill.meta.requestStatus === "fulfilled" &&
+          refill.payload?.refilled
+        ) {
+          showAlert(
+            refill.payload?.message ||
+              `₹${refill.payload?.added ?? 10000} added to demo account`,
+            true
+          );
+          // 3. Navbar/wallet balance refresh
+          dispatch(userDetail());
+        }
+      } catch {
+        // Silent fail — user abhi bhi normally recharge kar sakta hai
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userInfo?.isdemo, userInfo?.money_user, userInfo?.money]);
 
   // ============================================
   // Lazy-load UPI details for Manual UPI tab

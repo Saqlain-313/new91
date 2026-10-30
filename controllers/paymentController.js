@@ -1,6 +1,8 @@
 import axios from "axios";
 import moment from "moment";
 import crypto from "crypto";
+import fs from "fs";
+import path from "path";
 import connection from "../config/connectDB";
 
 const PaymentStatusMap = {
@@ -12,6 +14,21 @@ const PaymentStatusMap = {
 const PaymentMethodsMap = {
   UPI_MANUAL: "upi_manual",
   QUROPAY: "quropay",
+};
+
+// Safe logger: console + quropay-logs.txt. File error kabhi payment flow nahi todega.
+// Yahan kabhi poora axios response / headers mat daalo (usme API key hoti hai).
+const appendQuroLog = (label, data) => {
+  try {
+    console.log(`[QuroPay] ${label}:`, data);
+    fs.appendFileSync(
+      path.join(process.cwd(), "quropay-logs.txt"),
+      `${JSON.stringify({ timestamp: new Date().toISOString(), label, data }, null, 2)}\n\n`,
+      "utf8",
+    );
+  } catch (e) {
+    console.log("QuroPay log write failed:", e.message);
+  }
 };
 
 // ============================================
@@ -135,7 +152,7 @@ const initiateQuroPayPayment = async (req, res) => {
   const money = parseInt(req.body.money);
   const email = req.body.email || undefined;
 
-  const minimumMoneyAllowed = parseInt(process.env.MINIMUM_MONEY) || 100;
+  const minimumMoneyAllowed = parseInt(process.env.MINIMUM_MONEY) || 1;
 
   if (!money || !(money >= minimumMoneyAllowed)) {
     return res.status(400).json({
@@ -164,6 +181,8 @@ const initiateQuroPayPayment = async (req, res) => {
     const orderId = getRechargeOrderId();
 
     // Create INR payin on QuroPay
+    // Docs ke hisaab se request mein callback URL field nahi hai. Webhook URL
+    // QuroPay merchant dashboard mein set hota hai (https://max-win.site/api/wallet/verify/quropay).
     const quroPayResponse = await axios.post(
       "https://quropays.com/api/v1/payin/create.php",
       {
@@ -171,7 +190,7 @@ const initiateQuroPayPayment = async (req, res) => {
         amount: money,
         order_ref: orderId,
         phone: user.phone, // optional — placeholder generated if omitted
-        email,             // optional — placeholder generated if omitted
+        email, // optional — placeholder generated if omitted
       },
       {
         headers: {
@@ -202,6 +221,11 @@ const initiateQuroPayPayment = async (req, res) => {
       time: timeNow,
     });
 
+    appendQuroLog("payin created", {
+      recharge,
+      gatewayResponse: quroData, // sirf response body, headers/config nahi
+    });
+
     return res.status(200).json({
       message: "Payment initiated successfully",
       recharge,
@@ -221,11 +245,24 @@ const initiateQuroPayPayment = async (req, res) => {
 };
 
 // POST — QuroPay webhook (HMAC verified over RAW body)
-// MUST be mounted with express.raw({ type: "application/json" }) BEFORE express.json().
+// MUST be mounted with express.raw({ type: "application/json" }) BEFORE express.json():
+//
+//   app.post(
+//     "/api/wallet/verify/quropay",
+//     express.raw({ type: "application/json" }),
+//     verifyQuroPayPayment,
+//   );
+//
+// Route public hona chahiye (auth/cookie/CSRF middleware nahi).
 const verifyQuroPayPayment = async (req, res) => {
   try {
     const signatureHeader = req.get("X-Webhook-Signature") || "";
-    const secret = process.env.QUROPAY_WEBHOOK_SECRET;
+    // QuroPay docs example webhook signature ke liye account ka API secret use karta hai
+    // (USDT_GATEWAY_API_SECRET). Dashboard mein jo webhook/API secret dikhe wahi .env mein daalo.
+    const secret =
+      process.env.QUROPAY_WEBHOOK_SECRET || process.env.USDT_GATEWAY_API_SECRET;
+
+    console.log("QuroPay webhook hit"); // agar ye log nahi aata to request server tak pahunchi hi nahi
 
     if (!secret) {
       console.log("QuroPay webhook secret not configured");
@@ -235,7 +272,15 @@ const verifyQuroPayPayment = async (req, res) => {
     // req.body is a raw Buffer (express.raw was applied on this route)
     const rawBody = Buffer.isBuffer(req.body)
       ? req.body
-      : Buffer.from(req.body || "");
+      : Buffer.from(
+          typeof req.body === "string" ? req.body : JSON.stringify(req.body || {}),
+        );
+
+    if (!Buffer.isBuffer(req.body)) {
+      console.log(
+        "QuroPay webhook: req.body raw Buffer nahi hai. express.raw() route par express.json() se PEHLE lagao, warna signature match nahi hoga.",
+      );
+    }
 
     const expected =
       "sha256=" +
@@ -255,15 +300,24 @@ const verifyQuroPayPayment = async (req, res) => {
     const payload = JSON.parse(rawBody.toString("utf8"));
     const { event, data } = payload || {};
 
-    console.log("QuroPay webhook:", event, "order_ref:", data?.order_ref);
+    appendQuroLog("webhook received", payload);
 
-    if (event === "channel_payment.success") {
-      await handleQuroPaySuccess(data);
-    } else if (event === "channel_payment.failed") {
-      await handleQuroPayFailure(data);
+    try {
+      if (event === "channel_payment.success") {
+        await handleQuroPaySuccess(data);
+      } else if (event === "channel_payment.failed") {
+        await handleQuroPayFailure(data);
+      } else {
+        console.log("QuroPay webhook: unhandled event", event);
+      }
+    } catch (processingError) {
+      // Signature valid thi par processing fail hui -> 500 do taaki gateway retry kare.
+      // Success handler idempotent hai, retry se double credit nahi hoga.
+      console.log("QuroPay webhook processing error:", processingError);
+      return res.sendStatus(500);
     }
 
-    return res.sendStatus(200); // always 200 so gateway stops retrying
+    return res.sendStatus(200);
   } catch (error) {
     console.log("QuroPay webhook error:", error);
     return res.sendStatus(200);
@@ -284,21 +338,41 @@ const handleQuroPaySuccess = async (data) => {
     return;
   }
 
-  // Idempotency — already credited?
+  // Quick idempotency check
   if (recharge.status === PaymentStatusMap.SUCCESS) {
     console.log(`QuroPay: already success for orderId ${orderId}`);
     return;
   }
 
-  await rechargeTable.setStatusToSuccessByIdAndOrderId({
+  // Sirf log: gateway amount vs DB amount (credit DB ke recharge.money par hi hota hai)
+  if (data?.amount && Number(data.amount) !== Number(recharge.money)) {
+    console.log(
+      `QuroPay: amount mismatch for ${orderId} gateway=${data.amount} db=${recharge.money}`,
+    );
+  }
+
+  await creditQuroPayRecharge(recharge, data?.out_trade_no);
+};
+
+// Webhook, checkout-page check aur sweeper, teeno yahi use karte hain.
+// Atomic hai: sirf ek hi caller status 1 kar payega, to double credit nahi hoga.
+const creditQuroPayRecharge = async (recharge, outTradeNo) => {
+  const orderId = recharge.orderId;
+
+  const updated = await rechargeTable.setStatusToSuccessByIdAndOrderId({
     id: recharge.id,
-    orderId: recharge.orderId,
+    orderId,
   });
 
-  if (data?.out_trade_no) {
+  if (!updated) {
+    console.log(`QuroPay: already processed for orderId ${orderId}`);
+    return false;
+  }
+
+  if (outTradeNo) {
     await connection.query(
       "UPDATE recharge SET utr = ? WHERE id_order = ?",
-      [data.out_trade_no, orderId],
+      [outTradeNo, orderId],
     );
   }
 
@@ -315,9 +389,12 @@ const handleQuroPaySuccess = async (data) => {
       code: user.code,
       invite: user.invite,
     });
+  } else {
+    console.log(`QuroPay: user not found for phone ${recharge.phone}`);
   }
 
   console.log(`QuroPay: payment approved for ${orderId}`);
+  return true;
 };
 
 const handleQuroPayFailure = async (data) => {
@@ -332,6 +409,55 @@ const handleQuroPayFailure = async (data) => {
 
   await rechargeTable.cancelById(recharge.id);
   console.log(`QuroPay: payment failed for ${orderId}`);
+};
+
+// Fallback: FreePay ka hosted checkout page server se kholkar dekhta hai ki
+// "Payment Successful" dikh raha hai ya nahi. Ye QuroPay ka documented API nahi hai,
+// isliye webhook hi main tareeka hai, ye sirf backup hai.
+const checkQuroPayCheckoutPage = async (url) => {
+  if (!url || !/^https:\/\//i.test(url)) return false;
+  try {
+    const r = await axios.get(url, {
+      timeout: 10000,
+      validateStatus: (s) => s < 500,
+    });
+    const html = typeof r.data === "string" ? r.data : "";
+    return /<title>[^<]*payment successful[^<]*<\/title>/i.test(html);
+  } catch (e) {
+    console.log("QuroPay checkout page check failed:", e.message);
+    return false;
+  }
+};
+
+// Server start par ek baar call karo: pending QuroPay orders (last 30 min) ko
+// har 30 sec mein check karke success hone par balance add karta hai.
+let quroPaySweeperTimer = null;
+const startQuroPayPendingChecker = (intervalMs = 30000) => {
+  if (quroPaySweeperTimer) return;
+  quroPaySweeperTimer = setInterval(async () => {
+    try {
+      const since = Date.now() - 30 * 60 * 1000;
+      const [rows] = await connection.query(
+        "SELECT * FROM recharge WHERE type = ? AND status = ? AND CAST(`time` AS UNSIGNED) > ?",
+        [PaymentMethodsMap.QUROPAY, PaymentStatusMap.PENDING, since],
+      );
+      for (const row of rows) {
+        if (await checkQuroPayCheckoutPage(row.url)) {
+          await creditQuroPayRecharge(
+            {
+              id: row.id,
+              orderId: row.id_order,
+              phone: row.phone,
+              money: row.money,
+            },
+            row.transaction_id,
+          );
+        }
+      }
+    } catch (e) {
+      console.log("QuroPay pending checker error:", e.message);
+    }
+  }, intervalMs);
 };
 
 // GET — user returns from checkout; check status
@@ -357,6 +483,26 @@ const checkQuroPayStatus = async (req, res) => {
         status: false,
         timeStamp: timeNow,
       });
+    }
+
+    // Sirf apna order check ho sakta hai
+    const user = await getUserDataByAuthToken(auth);
+    if (String(recharge.phone) !== String(user.phone)) {
+      return res.status(403).json({
+        message: "Not allowed!",
+        status: false,
+        timeStamp: timeNow,
+      });
+    }
+
+    // Webhook abhi tak nahi aaya? Checkout page se confirm karke balance add karo.
+    if (
+      recharge.status === PaymentStatusMap.PENDING &&
+      recharge.type === PaymentMethodsMap.QUROPAY &&
+      (await checkQuroPayCheckoutPage(recharge.url))
+    ) {
+      await creditQuroPayRecharge(recharge, recharge.transactionId);
+      recharge.status = PaymentStatusMap.SUCCESS;
     }
 
     if (recharge.status === PaymentStatusMap.SUCCESS) {
@@ -506,14 +652,16 @@ const rechargeTable = {
     await connection.query("UPDATE recharge SET status = 2 WHERE id = ?", [id]);
   },
 
+  // Returns true only if THIS call changed the status (atomic, prevents double credit)
   setStatusToSuccessByIdAndOrderId: async ({ id, orderId }) => {
     if (typeof id !== "number") {
       throw Error("Invalid Recharge 'id' expected a number!");
     }
-    await connection.query(
-      "UPDATE recharge SET status = 1 WHERE id = ? AND id_order = ?",
+    const [result] = await connection.query(
+      "UPDATE recharge SET status = 1 WHERE id = ? AND id_order = ? AND status != 1",
       [id, orderId],
     );
+    return (result?.affectedRows || 0) > 0;
   },
 
   getCurrentTimeForTodayField: () =>
@@ -559,6 +707,7 @@ export {
   initiateQuroPayPayment,
   verifyQuroPayPayment,
   checkQuroPayStatus,
+  startQuroPayPendingChecker,
 };
 
 export default {
@@ -567,4 +716,5 @@ export default {
   initiateQuroPayPayment,
   verifyQuroPayPayment,
   checkQuroPayStatus,
+  startQuroPayPendingChecker,
 };

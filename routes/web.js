@@ -17,6 +17,7 @@ import paymentController from "../controllers/paymentController";
 import supportController from "../controllers/supportController";
 import userController from "../controllers/userController";
 import winGoController from "../controllers/winGoController";
+import demoBalanceController from "../controllers/demoBalanceController";
 
 import {
   addBonus,
@@ -1713,6 +1714,19 @@ const initWebRouter = (app) => {
     adminController.middlewareAdminController,
     adminController.createuser,
   );
+    // NEW: List users for User Management page
+  router.get(
+    "/admin/users/list",
+    adminController.middlewareAdminController,
+    adminController.listAdminUsers,
+  );
+
+  // NEW: Update user level (Active/Inactive)
+  router.put(
+    "/admin/users/update-level/:id",
+    adminController.middlewareAdminController,
+    adminController.updateUserLevel,
+  );
   router.get(
     "/admin/manager/newfiles/apitransaction",
     adminController.middlewareAdminController,
@@ -1723,6 +1737,21 @@ const initWebRouter = (app) => {
     adminController.middlewareAdminController,
     adminController.topperformance,
   );
+
+  // ============================================
+// DEMO USER BALANCE REFILL
+// ============================================
+router.post(
+  "/api/webapi/demo/refill-balance",
+  middlewareController,
+  demoBalanceController.refillDemoBalance,
+);
+
+router.get(
+  "/api/webapi/demo/check-balance",
+  middlewareController,
+  demoBalanceController.checkDemoBalance,
+);
   router.get(
     "/admin/manager/newfiles/iprecord",
     adminController.middlewareAdminController,

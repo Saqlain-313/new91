@@ -4488,7 +4488,7 @@ const todayrechargeexport = async (req, res) => {
     fileStream.pipe(res);
 
     fileStream.on("end", () => {
-      fs.unlink(filePath, () => {});
+      fs.unlink(filePath, () => { });
     });
   } catch (error) {
     console.error("Error exporting to Excel:", error);  // ← uncomment this!
@@ -7145,6 +7145,91 @@ const enableWithdraw = async (req, res) => {
   }
 }
 
+// ============================================
+// USER MANAGEMENT — LIST / UPDATE LEVEL
+// ============================================
+
+const listAdminUsers = async (req, res) => {
+  try {
+    const [admins] = await connection.query(
+      `SELECT id_user, phone, name_user, code, invite, today, level, status
+       FROM users
+       WHERE level IN (1, 2, 3) AND isdemo = 0
+       ORDER BY id DESC`
+    );
+
+    const formattedAdmins = admins.map((admin) => ({
+      id: admin.id_user,
+      username: admin.phone,
+      mobile: admin.phone,
+      accountType:
+        admin.level === 1
+          ? "Admin"
+          : admin.level === 2
+            ? "Manager"
+            : "Staff",
+      inviteCode: admin.code || "-",
+      dateCreated: admin.today || "-",
+      level: admin.status === 1 ? 1 : 0, // 1 = Active, 0 = Inactive
+      status: admin.status,
+    }));
+
+    return res.status(200).json({
+      message: "Users fetched successfully",
+      status: true,
+      data: formattedAdmins,
+    });
+  } catch (error) {
+    console.error("listAdminUsers error:", error);
+    return res.status(500).json({
+      message: "Server Error",
+      status: false,
+      error: error.message,
+    });
+  }
+};
+
+const updateUserLevel = async (req, res) => {
+  const { id } = req.params; // id_user
+  const { level } = req.body; // 1 = Active, 0 = Inactive
+
+  try {
+    if (level === undefined || level === null || level === "") {
+      return res.status(400).json({
+        message: "Level is required",
+        status: false,
+      });
+    }
+
+    // Frontend 1/0 → DB 1 (Active) / 2 (Inactive)
+    const dbStatus = Number(level) === 1 ? 1 : 2;
+
+    const [result] = await connection.query(
+      "UPDATE users SET status = ? WHERE id_user = ?",
+      [dbStatus, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        message: "User not found",
+        status: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "User level updated successfully",
+      status: true,
+    });
+  } catch (error) {
+    console.error("updateUserLevel error:", error);
+    return res.status(500).json({
+      message: "Server Error",
+      status: false,
+      error: error.message,
+    });
+  }
+};
+
 
 module.exports = {
   todayrechargeexport,
@@ -7152,6 +7237,8 @@ module.exports = {
   adminPage3,
   adminPage5,
   adminPage10,
+  listAdminUsers,
+  updateUserLevel,
 
   admintrxPage,
   admintrxPage3,

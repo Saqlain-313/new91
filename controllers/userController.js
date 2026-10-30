@@ -2228,13 +2228,23 @@ const withdrawal3 = async (req, res) => {
   let action_id = "1234567890";
   let action_status = "fail";
   let info = "";
-  let money = req.body.money || null;
+  let money = req.body.money ? Number(req.body.money) : null;
 
   try {
     let auth = req.cookies.auth;
     let type = req.body.type;
     let password = req.body.password;
-    let timeNow = Date.now(); // Or your own time logic
+    let timeNow = Date.now();
+
+    // ---- Basic input validation ----
+    if (!money || !Number.isFinite(money) || money <= 0) {
+      info = JSON.stringify({ reason: "invalid_amount" });
+      return res.status(200).json({
+        message: "Invalid withdrawal amount",
+        status: false,
+        timeStamp: timeNow,
+      });
+    }
 
     if (type === "USDT" && money < 850) {
       info = JSON.stringify({ reason: "usdt_below_min" });
@@ -2245,7 +2255,7 @@ const withdrawal3 = async (req, res) => {
       });
     }
 
-    if (!auth || !money || money < 109) {
+    if (!auth || money < 109) {
       info = JSON.stringify({ reason: "below_minimum" });
       return res.status(200).json({
         message: "Minimum amount 110",
@@ -2254,22 +2264,13 @@ const withdrawal3 = async (req, res) => {
       });
     }
 
+    // ---- Auth ----
     const [user] = await connection.query(
       "SELECT * FROM users WHERE `token` = ? AND password = ?",
       [auth, md5(password)],
     );
 
-    if (type === "BANK CARD" && money > 50000) {
-      user_phone = user[0]?.phone || null;
-      info = JSON.stringify({ reason: "bankcard_above_max" });
-      return res.status(200).json({
-        message: "withdraw amount 110 to 50000",
-        status: false,
-        timeStamp: timeNow,
-      });
-    }
-
-    if (user.length == 0) {
+    if (user.length === 0) {
       info = JSON.stringify({ reason: "invalid_user" });
       return res.status(200).json({
         message: "Invalid user",
@@ -2277,8 +2278,18 @@ const withdrawal3 = async (req, res) => {
         timeStamp: timeNow,
       });
     }
+
     let userInfo = user[0];
     user_phone = userInfo.phone;
+
+    if (type === "BANK CARD" && money > 50000) {
+      info = JSON.stringify({ reason: "bankcard_above_max" });
+      return res.status(200).json({
+        message: "withdraw amount 110 to 50000",
+        status: false,
+        timeStamp: timeNow,
+      });
+    }
 
     if (userInfo.enableWithdraw === 0) {
       info = JSON.stringify({ reason: "enableWithdraw_blocked" });
@@ -2289,19 +2300,78 @@ const withdrawal3 = async (req, res) => {
       });
     }
 
-    const date = new Date();
-    let id_time =
-      date.getUTCFullYear() +
-      "" +
-      (date.getUTCMonth() + 1) +
-      "" +
-      date.getUTCDate();
-    let id_order = generateOrderId();
+    // ---- Shared timers ----
+    const dates = timerJoin2(Date.now());
+    const checkTime = timerJoin2(Date.now());
+    const checkTime4 = timerJoin4(Date.now());
 
-    let dates = timerJoin2(Date.now());
-    let checkTime = timerJoin2(Date.now());
-    let checkTime4 = timerJoin4(Date.now());
+    // ============================================
+    // DEMO MODE — DIRECT SUCCESS (no pending, no bank, no recharge, no needbet)
+    // ============================================
+    if (Number(userInfo.isdemo) === 1) {
+      const currentBalance = Number(userInfo.money) || 0;
 
+      if (currentBalance < money) {
+        info = JSON.stringify({ reason: "insufficient_balance", type: "demo" });
+        return res.status(200).json({
+          message: "The balance is not enough to fulfill the request",
+          status: false,
+          timeStamp: timeNow,
+        });
+      }
+
+      // Atomic balance decrement — sirf tabhi jab balance kaafi ho
+      const [updateResult] = await connection.execute(
+        "UPDATE users SET money = money - ? WHERE phone = ? AND money >= ?",
+        [money, userInfo.phone, money],
+      );
+
+      if (!updateResult || updateResult.affectedRows === 0) {
+        info = JSON.stringify({
+          reason: "insufficient_balance_race",
+          type: "demo",
+        });
+        return res.status(200).json({
+          message: "The balance is not enough to fulfill the request",
+          status: false,
+          timeStamp: timeNow,
+        });
+      }
+
+      // Demo withdrawal row — status = 1 (SUCCESS) direct
+      const sql = `INSERT INTO withdraw SET 
+        id_order = ?, phone = ?, money = ?, stk = ?, sdt = ?, type = ?, usdt = ?, name_bank = ?, ifsc = ?, name_user = ?, status = ?, today = ?, time = ?, isdemo = ?`;
+      await connection.execute(sql, [
+        action_id,
+        userInfo.phone,
+        money,
+        "demo",
+        "demo",
+        "demo",
+        "demo",
+        "demo",
+        "demo",
+        "demo",
+        1, // <-- SUCCESS, not pending
+        checkTime,
+        dates,
+        1,
+      ]);
+
+      action_status = "success";
+      info = JSON.stringify({ type: "demo", auto_success: true });
+
+      return res.status(200).json({
+        message: "Withdrawal successful",
+        status: true,
+        money: currentBalance - money,
+        timeStamp: timeNow,
+      });
+    }
+
+    // ============================================
+    // NORMAL (NON-DEMO) WITHDRAWAL — existing flow
+    // ============================================
     const [recharge] = await connection.query(
       "SELECT * FROM recharge WHERE phone = ? AND status = 1",
       [userInfo.phone],
@@ -2310,6 +2380,7 @@ const withdrawal3 = async (req, res) => {
       "SELECT * FROM minutes_1 WHERE phone = ?",
       [userInfo.phone],
     );
+
     let total = 0;
     recharge.forEach((data) => {
       total += parseFloat(data.money);
@@ -2329,7 +2400,7 @@ const withdrawal3 = async (req, res) => {
     let needbet = userInfo.recharge;
 
     const [withdraw] = await connection.query(
-      "SELECT * FROM withdraw WHERE `phone` = ? AND DATE(today)=?",
+      "SELECT * FROM withdraw WHERE `phone` = ? AND DATE(today) = ?",
       [userInfo.phone, checkTime4],
     );
 
@@ -2338,110 +2409,15 @@ const withdrawal3 = async (req, res) => {
       [userInfo.phone],
     );
 
-    // Agar recharge hi nahi hua
     if (!rowss[0].total_recharge || rowss[0].total_recharge < 200) {
-      const info = JSON.stringify({ reason: "insufficient_recharge" });
+      info = JSON.stringify({ reason: "insufficient_recharge" });
       return res.status(200).json({
         message: "Need at least ₹200 recharge",
         status: false,
       });
     }
 
-    if (userInfo.isdemo == 1) {
-      // DEMO MODE
-      const sql = `INSERT INTO withdraw SET 
-        id_order = ?, phone = ?, money = ?, stk = ?, sdt = ?, type=?, usdt=?, name_bank = ?, ifsc = ?, name_user = ?, status = ?, today = ?, time = ?, isdemo=?`;
-      await connection.execute(sql, [
-        action_id,
-        userInfo.phone,
-        money,
-        "demo",
-        "demo",
-        "demo",
-        "demo",
-        "demo",
-        "demo",
-        "demo",
-        "1",
-        checkTime,
-        dates,
-        1,
-      ]);
-      await connection.execute(
-        "UPDATE users SET money = money - ? WHERE phone = ? ",
-        [money, userInfo.phone],
-      );
-      action_status = "success";
-      info = JSON.stringify({ type: "demo" });
-      return res.status(200).json({
-        message: "Withdrawal successful",
-        status: true,
-        money: userInfo.money - money,
-        timeStamp: timeNow,
-      });
-    }
-
-    // Normal withdrawal
-    if (user_bank.length != 0) {
-      if (withdraw.length < 3) {
-        if (userInfo.money - money >= 0) {
-          if (needbet == 0) {
-            let infoBank = user_bank[0];
-            const sql = `INSERT INTO withdraw SET 
-              id_order = ?, phone = ?, money = ?, stk = ?, sdt = ?, type=?, usdt=?, name_bank = ?, ifsc = ?, name_user = ?, status = ?, today = ?, time = ?`;
-            await connection.execute(sql, [
-              action_id,
-              userInfo.phone,
-              money,
-              infoBank.stk,
-              infoBank.sdt,
-              type,
-              infoBank.chi_nhanh,
-              infoBank.name_bank,
-              infoBank.email,
-              infoBank.name_user,
-              0,
-              checkTime,
-              dates,
-            ]);
-            await connection.execute(
-              "UPDATE users SET money = money - ? WHERE phone = ? ",
-              [money, userInfo.phone],
-            );
-            action_status = "success";
-            info = JSON.stringify({ type });
-            return res.status(200).json({
-              message: "Withdrawal successful",
-              status: true,
-              money: userInfo.money - money,
-              timeStamp: timeNow,
-            });
-          } else {
-            info = JSON.stringify({ reason: "need_bet", result });
-            return res.status(200).json({
-              message: "The total bet is not enough to fulfill the request",
-              status: false,
-              result: result,
-              timeStamp: timeNow,
-            });
-          }
-        } else {
-          info = JSON.stringify({ reason: "insufficient_balance" });
-          return res.status(200).json({
-            message: "The balance is not enough to fulfill the request",
-            status: false,
-            timeStamp: timeNow,
-          });
-        }
-      } else {
-        info = JSON.stringify({ reason: "max_daily_withdraw" });
-        return res.status(200).json({
-          message: "You can only make 2 withdrawals  request per day",
-          status: false,
-          timeStamp: timeNow,
-        });
-      }
-    } else {
+    if (user_bank.length === 0) {
       info = JSON.stringify({ reason: "no_bank_linked" });
       return res.status(200).json({
         message: "Please link your bank first",
@@ -2449,15 +2425,90 @@ const withdrawal3 = async (req, res) => {
         timeStamp: timeNow,
       });
     }
+
+    if (withdraw.length >= 3) {
+      info = JSON.stringify({ reason: "max_daily_withdraw" });
+      return res.status(200).json({
+        message: "You can only make 2 withdrawals  request per day",
+        status: false,
+        timeStamp: timeNow,
+      });
+    }
+
+    if (Number(userInfo.money) - money < 0) {
+      info = JSON.stringify({ reason: "insufficient_balance" });
+      return res.status(200).json({
+        message: "The balance is not enough to fulfill the request",
+        status: false,
+        timeStamp: timeNow,
+      });
+    }
+
+    if (needbet != 0) {
+      info = JSON.stringify({ reason: "need_bet", result });
+      return res.status(200).json({
+        message: "The total bet is not enough to fulfill the request",
+        status: false,
+        result: result,
+        timeStamp: timeNow,
+      });
+    }
+
+    // Normal insert — status = 0 (PENDING, admin approval)
+    let infoBank = user_bank[0];
+    const sql = `INSERT INTO withdraw SET 
+      id_order = ?, phone = ?, money = ?, stk = ?, sdt = ?, type = ?, usdt = ?, name_bank = ?, ifsc = ?, name_user = ?, status = ?, today = ?, time = ?`;
+    await connection.execute(sql, [
+      action_id,
+      userInfo.phone,
+      money,
+      infoBank.stk,
+      infoBank.sdt,
+      type,
+      infoBank.chi_nhanh,
+      infoBank.name_bank,
+      infoBank.email,
+      infoBank.name_user,
+      0, // PENDING
+      checkTime,
+      dates,
+    ]);
+
+    // Atomic balance decrement
+    const [updateResult] = await connection.execute(
+      "UPDATE users SET money = money - ? WHERE phone = ? AND money >= ?",
+      [money, userInfo.phone, money],
+    );
+
+    if (!updateResult || updateResult.affectedRows === 0) {
+      // Rollback the withdraw row — balance race
+      await connection.execute(
+        "UPDATE withdraw SET status = 2 WHERE id_order = ? AND phone = ?",
+        [action_id, userInfo.phone],
+      );
+      info = JSON.stringify({ reason: "insufficient_balance_race" });
+      return res.status(200).json({
+        message: "The balance is not enough to fulfill the request",
+        status: false,
+        timeStamp: timeNow,
+      });
+    }
+
+    action_status = "success";
+    info = JSON.stringify({ type });
+
+    return res.status(200).json({
+      message: "Withdrawal successful",
+      status: true,
+      money: Number(userInfo.money) - money,
+      timeStamp: timeNow,
+    });
   } catch (error) {
     info = JSON.stringify({ error: error.message });
-    //console.log("errrorrr",error.message)
     return res
       .status(500)
       .json({ message: "Internal server error", status: false });
   } finally {
-    // Final log, always called before function ends
-    // Only log if there's some meaningful user_phone or money or status context
     if (user_phone || money) {
       await logUserAction({
         user_phone,
@@ -4986,7 +5037,7 @@ const userProblemGet = async (req, res) => {
       success: true,
       data: datas[0],
     });
-  } catch (error) {}
+  } catch (error) { }
 };
 
 const adminProblemGet = async (req, res) => {
@@ -5018,7 +5069,7 @@ const adminProblemGet = async (req, res) => {
       success: true,
       data: datas[0],
     });
-  } catch (error) {}
+  } catch (error) { }
 };
 
 const adminProblemSubmit = async (req, res) => {
@@ -5063,7 +5114,7 @@ const adminProblemSubmit = async (req, res) => {
         success: true,
       });
     }
-  } catch (error) {}
+  } catch (error) { }
 };
 
 const getpromotiondata = async (req, res) => {
