@@ -80,7 +80,7 @@ const ServiceRotate = () => {
 
     if (userInfo) {
       const token = Cookies.get("auth");
-      window.location.href = `https://h5support.chennai91.co/?token=${token}`;
+      window.location.href = `https://h5.workorder.support.max-win.site/?token=${token}`;
     } else {
       navigate("/main/CustomerService");
     }

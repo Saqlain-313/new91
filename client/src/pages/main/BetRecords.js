@@ -33,10 +33,10 @@ import FilterType from "../../components/FilterType";
 import { userDetail } from "../../store/reducer/authReducer";
 import { gameHistory } from "../../store/reducer/spribeGameReducer";
 
-const WingoImg = "https://i.ibb.co/zVZgB3R4/wingo.png";
-const k3Img = "https://i.ibb.co/tNYcJVL/K3.png";
-const FivedImg = "https://i.ibb.co/Wp47LJKC/5D.png";
-const TrxImg = "https://i.ibb.co/7NNbggVw/motoracing.png";
+const WingoImg = "https://i.ibb.co/PvF6n675/wingo-1.png";
+const k3Img = "https://i.ibb.co/YB46Rgh8/k3-1.png";
+const FivedImg = "https://i.ibb.co/B5GRf7y0/5d-1.png";
+const TrxImg = "https://i.ibb.co/fzwhzMcp/trxcard.png";
 // const carImg = "https://i.ibb.co/7NNbggVw/motoracing.png";
 const ImgData = [
   ZeroImg,
@@ -701,7 +701,7 @@ const BetRecords = () => {
                 }}
               >
                 {item.img ? (
-                  <img src={item.img} alt="" className="w-10 h-10" />
+                  <img src={item.img} alt="" className="w-16 h-10" />
                 ) : (
                   <div className="w-10 h-10" />
                 )}
