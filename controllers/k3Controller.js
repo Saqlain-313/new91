@@ -164,7 +164,7 @@ const betK3 = async (req, res) => {
     let { listJoin, game, gameJoin, xvalue, money } = req.body;
     let auth = req.cookies.auth;
 
-    // ✅ Normalize types
+    // Normalize types
     game = Number(game);
     gameJoin = Number(gameJoin);
     xvalue = Number(xvalue);
@@ -190,7 +190,50 @@ const betK3 = async (req, res) => {
     const userInfo = user[0];
     const period = k3Now[0];
 
-    // ✅ Safe split for gameJoin 2/3/4
+    // ==========================================
+    // DEPOSIT REQUIREMENT CHECK
+    // 0 = OFF: allow betting without recharge
+    // 1 = ON: require at least one successful recharge
+    // ==========================================
+    const [adminRows] = await connection.execute(
+      "SELECT deposite_requre FROM admin LIMIT 1",
+    );
+
+    if (!adminRows.length) {
+      return res.status(500).json({
+        message: "Admin settings not found.",
+        status: false,
+      });
+    }
+
+    const depositRequirement = Number(adminRows[0].deposite_requre);
+
+    if (![0, 1].includes(depositRequirement)) {
+      return res.status(500).json({
+        message: "Invalid deposit requirement setting.",
+        status: false,
+      });
+    }
+
+    // Only check recharge when the requirement is ON
+    if (depositRequirement === 1) {
+      const [rechargeRows] = await connection.execute(
+        `SELECT id
+         FROM recharge
+         WHERE phone = ? AND status = 1
+         LIMIT 1`,
+        [userInfo.phone],
+      );
+
+      if (!rechargeRows.length) {
+        return res.status(200).json({
+          message: "Need to first recharge",
+          status: false,
+        });
+      }
+    }
+
+    // Safe split for gameJoin 2/3/4
     const parts = String(listJoin).split("@");
     const safeParts = (i) => (parts[i] !== undefined ? String(parts[i]) : "");
 
@@ -728,7 +771,7 @@ async function plusMoney(game) {
           const check2 = arr1[j].includes(kq2);
           if (check1 || check2) {
             const total = o.money / o.amount / (lengthArr + arr1.length);
-            nhan_duoc += total * 13.83; // ✅ FIXED: 12.83 → 13.83
+            nhan_duoc += total * 13.83;
           }
         }
 
@@ -993,13 +1036,13 @@ const getAdminListOrders = async (req, res) => {
   try {
     let game = req.body.gameJoin || req.body.game;
 
-    // Live bets fetch karein (jo status 0 par hain, matlab abhi chal rahe hain)
+    // Live bets (status 0 = still running)
     const [orders] = await connection.query(
       `SELECT bet, money, typeGame FROM result_k3 WHERE status = 0 AND game = ?`,
       [game],
     );
 
-    // History fetch karein (jo win/loss ho chuke hain)
+    // History (already resulted)
     const [history] = await connection.query(
       `SELECT * FROM k3 WHERE status != 0 AND game = ? ORDER BY id DESC LIMIT 10`,
       [game],
@@ -1014,7 +1057,7 @@ const getAdminListOrders = async (req, res) => {
     return res.status(200).json({
       status: true,
       data: { gameslist: history },
-      bet: orders, // 👈 YEH ARRAY FRONTEND KO BHEJNA HAI
+      bet: orders,
       settings: settings,
       period: period.length > 0 ? period[0].period : "---",
     });
@@ -1026,7 +1069,6 @@ const getAdminListOrders = async (req, res) => {
   }
 };
 
-// Export me add karein:
 module.exports = {
   K3Page,
   betK3,
@@ -1034,5 +1076,5 @@ module.exports = {
   handlingK3,
   listOrderOld,
   GetMyEmerdList,
-  getAdminListOrders, // 👈 Add kiya
+  getAdminListOrders,
 };

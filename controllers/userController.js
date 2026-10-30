@@ -2404,18 +2404,8 @@ const withdrawal3 = async (req, res) => {
       [userInfo.phone, checkTime4],
     );
 
-    const [rowss] = await connection.query(
-      "SELECT SUM(money) AS total_recharge FROM recharge WHERE phone = ? AND status = 1",
-      [userInfo.phone],
-    );
-
-    if (!rowss[0].total_recharge || rowss[0].total_recharge < 200) {
-      info = JSON.stringify({ reason: "insufficient_recharge" });
-      return res.status(200).json({
-        message: "Need at least ₹200 recharge",
-        status: false,
-      });
-    }
+    // NOTE: ₹200 recharge minimum check removed per request.
+    // Bet requirement (needbet) is still enforced below.
 
     if (user_bank.length === 0) {
       info = JSON.stringify({ reason: "no_bank_linked" });

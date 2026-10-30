@@ -143,6 +143,49 @@ const betK5D = async (req, res) => {
     let userInfo = user[0];
     let period = k5DNow[0];
 
+    // ==========================================
+    // DEPOSIT REQUIREMENT CHECK
+    // 0 = OFF: allow betting without recharge
+    // 1 = ON: require at least one successful recharge
+    // ==========================================
+    const [adminRows] = await connection.execute(
+      "SELECT deposite_requre FROM admin LIMIT 1",
+    );
+
+    if (!adminRows.length) {
+      return res.status(500).json({
+        message: "Admin settings not found.",
+        status: false,
+      });
+    }
+
+    const depositRequirement = Number(adminRows[0].deposite_requre);
+
+    if (![0, 1].includes(depositRequirement)) {
+      return res.status(500).json({
+        message: "Invalid deposit requirement setting.",
+        status: false,
+      });
+    }
+
+    // Only check recharge when the requirement is ON
+    if (depositRequirement === 1) {
+      const [rechargeRows] = await connection.execute(
+        `SELECT id
+         FROM recharge
+         WHERE phone = ? AND status = 1
+         LIMIT 1`,
+        [userInfo.phone],
+      );
+
+      if (!rechargeRows.length) {
+        return res.status(200).json({
+          message: "Need to first recharge",
+          status: false,
+        });
+      }
+    }
+
     let date = new Date();
     let years = formateT(date.getFullYear());
     let months = formateT(date.getMonth() + 1);
@@ -217,7 +260,10 @@ const betK5D = async (req, res) => {
       return res.status(200).json({ message: "The amount is not enough", status: false });
     }
   } catch (error) {
-    if (error) console.log(error);
+    console.error("betK5D error:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", status: false });
   }
 };
 
@@ -314,7 +360,7 @@ function makeid(length) {
   return result;
 }
 
-// ✅ FULLY FIXED add5D
+// FULLY FIXED add5D
 const add5D = async (game) => {
   try {
     let join = "";
@@ -325,7 +371,6 @@ const add5D = async (game) => {
 
     let result2 = makeid(5);
 
-    // ✅ Backticks added to `5d`
     let [k5D] = await connection.query(
       `SELECT period FROM \`5d\` WHERE status = 0 AND game = ? ORDER BY id DESC LIMIT 1 `,
       [game]
@@ -360,7 +405,6 @@ const add5D = async (game) => {
     const timeNow = timerJoin2(Date.now());
     let newArr = "";
 
-    // ✅ Backticks and proper ? placeholders
     if (nextResult == "-1") {
       await connection.execute(
         `UPDATE \`5d\` SET result = ?, status = ? WHERE period = ? AND game = ?`,
@@ -384,7 +428,6 @@ const add5D = async (game) => {
       );
     }
 
-    // ✅ Backticks added to INSERT
     const sql = `INSERT INTO \`5d\` SET period = ?, result = ?, game = ?, status = ?, time = ?`;
     await connection.execute(sql, [Number(period) + 1, 0, game, 0, timeNow]);
 
@@ -396,7 +439,6 @@ const add5D = async (game) => {
 
 async function funHanding(game) {
   try {
-    // ✅ Backticks
     const [k5d] = await connection.query(
       `SELECT * FROM \`5d\` WHERE status != 0 AND game = ? ORDER BY id DESC LIMIT 1 `,
       [game]

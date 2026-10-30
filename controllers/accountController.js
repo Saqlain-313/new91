@@ -276,7 +276,6 @@ const login = async (req, res) => {
 const register = async (req, res) => {
   let now = new Date().getTime();
   let { username, pwd, cpass, invitecode } = req.body;
-  //  let id_user = randomNumber(10000, 99999);
   let otp2 = randomNumber(100000, 999999);
   let name_user = "Member" + randomNumber(10000, 99999);
   let code = randomNumber(10000, 99999);
@@ -284,6 +283,8 @@ const register = async (req, res) => {
   let time = timeCreate();
 
   const agent = req.headers["user-agent"] || "";
+  // Always set enableWithdraw to 1
+  const enableWithdraw = 1;
 
   if (!username || !pwd) {
     return res.status(200).json({
@@ -305,17 +306,13 @@ const register = async (req, res) => {
     });
   }
 
-  // If invitecode not provided by request body, use default
   if (!invitecode) {
-    // invitecode = "xWtUd92947";
     invitecode = "46028100038";
   }
 
   try {
     const [admin] = await connection.query("SELECT * FROM `admin`");
     const sinupBonus = admin[0].sinupbonus;
-
-    //console.log("sinupBonus", sinupBonus);
 
     const [check_u] = await connection.query(
       "SELECT * FROM users WHERE phone = ?",
@@ -327,8 +324,6 @@ const register = async (req, res) => {
 
     let attendencsDta = attendencs_bonus[0];
 
-    // //console.log("attendencs_bonus", attendencsDta);
-
     const [check_i] = await connection.query(
       "SELECT * FROM users WHERE code = ? ",
       [invitecode],
@@ -337,14 +332,6 @@ const register = async (req, res) => {
       "SELECT * FROM users WHERE ip_address = ? ",
       [ip],
     );
-
-    //   if (check_ip.length >= 1) {
-    //         return res.status(200).json({
-    //             message: 'Ip already Registered',
-    //             error:"Ip already Registered ",
-    //             status: false
-    //         });
-    //   }
 
     if (check_u.length == 1 && check_u[0].veri == 1) {
       return res.status(200).json({
@@ -364,8 +351,8 @@ const register = async (req, res) => {
         const [rows] = await connection.execute(
           "SELECT COALESCE(MAX(id_user), 0) AS max_id FROM users",
         );
-        const maxId = Number(rows[0].max_id); // Convert to number
-        const id_user = maxId + 1; // Add 1
+        const maxId = Number(rows[0].max_id);
+        const id_user = maxId + 1;
 
         const userData = { id: maxId, phone: username, name_user };
         const accessToken = jwt.sign(userData, process.env.JWT_ACCESS_TOKEN, {
@@ -374,8 +361,9 @@ const register = async (req, res) => {
 
         const token = md5(accessToken);
 
+        // Added enableWithdraw column to INSERT
         const sql =
-          "INSERT INTO users SET id_user = ?,phone = ?, token = ?, name_user = ?,password = ?, plain_password = ?, money = ?, recharge = ?, code = ?,invite = ?,ctv = ?,veri = ?,otp = ?,ip_address = ?,status = ?, message = ?, time = ?";
+          "INSERT INTO users SET id_user = ?, phone = ?, token = ?, name_user = ?, password = ?, plain_password = ?, money = ?, recharge = ?, code = ?, invite = ?, ctv = ?, veri = ?, otp = ?, ip_address = ?, status = ?, message = ?, time = ?, enableWithdraw = ?";
         await connection.execute(sql, [
           id_user,
           username,
@@ -394,7 +382,9 @@ const register = async (req, res) => {
           1,
           0,
           time,
+          enableWithdraw, // Always 1
         ]);
+
         await connection.execute(
           "INSERT INTO point_list SET total1 = ?, total2 = ?, total3 = ?, total4 = ?, total5 = ?, total6 = ?, total7 = ?, phone = ?",
           [
