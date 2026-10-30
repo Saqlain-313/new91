@@ -312,13 +312,8 @@ async function runK3(game) {
   try {
     await k3Controller.addK3(game);
     await k3Controller.handlingK3(game);
-
-    // [0] = new pending period, [1] = period that just finished
-    const [rows] = await connection.execute(
-      "SELECT * FROM `k3` WHERE `game` = ? ORDER BY `id` DESC LIMIT 2",
-      [game],
-    );
-    io.emit("data-server-k3", { data: rows, game: Number(game) });
+    // NOTE: the socket event is sent at the period boundary by
+    // startPeriodScheduler() -> emitPeriodChange(), not here.
   } catch (error) {
     console.error(`runK3 error for game ${game}:`, error.message);
   }
@@ -472,10 +467,7 @@ async function startCountdown(gameId, requestData) {
 
           winGoTriggered = true;
 
-          // K3 for 3 min & 5 min
-          if (gameId === 3 || gameId === 5) {
-            runK3(gameId);
-          }
+          // NOTE: K3 / 5D periods are handled by startPeriodScheduler()
 
           if (!winGoRunning) {
             winGoRunning = true;
@@ -910,11 +902,7 @@ async function startCountdown_1(requestData) {
               carController.handlingcargame1P(1),
             ]);
 
-            await k5Controller.add5D(1);
-            await k5Controller.handling5D(1);
-
-            // K3 1 min
-            await runK3(1);
+            // NOTE: K3 / 5D (1 min) are handled by startPeriodScheduler()
           } catch (error) {
             console.error("Error in 1 min process:", error.message);
           } finally {
@@ -1002,9 +990,8 @@ async function restartCountdown_1(requestData) {
 // ============================================================
 function startCountdown_10min() {
   const PERIOD = 600; // seconds
-  let lastTriggeredPeriod = null;
 
-  setInterval(async () => {
+  setInterval(() => {
     try {
       const nowSec = Math.floor(Date.now() / 1000);
       const remaining = PERIOD - 1 - (nowSec % PERIOD);
@@ -1014,18 +1001,88 @@ function startCountdown_10min() {
       const secondtime2 = remaining % 10;
 
       io.emit("timeUpdate_10", { minute, secondtime1, secondtime2 });
-
-      if (remaining === 4) {
-        const periodKey = Math.floor(nowSec / PERIOD);
-        if (lastTriggeredPeriod !== periodKey) {
-          lastTriggeredPeriod = periodKey;
-          runK3(10);
-        }
-      }
     } catch (error) {
       console.error("Error in 10 min countdown:", error);
     }
   }, 1000);
+}
+
+// ============================================================
+// K3 + 5D PERIOD SCHEDULER
+// Wall-clock aligned, independent of WinGo / upstream APIs.
+// Runs add + result + payout once per period for games 1, 3, 5, 10.
+// (Previously 5D never ran for 3/5/10 min, and 1-min K3/5D were skipped
+//  whenever any WinGo/Car step before them threw.)
+// ============================================================
+async function run5D(game) {
+  try {
+    await k5Controller.add5D(game);
+    await k5Controller.handling5D(game);
+  } catch (error) {
+    console.error(`run5D error for game ${game}:`, error.message);
+  }
+}
+
+// Sends the "period changed" events to the frontend.
+// rows[0] = new pending period, rows[1] = period that just finished.
+async function emitPeriodChange(game) {
+  try {
+    const [k3rows] = await connection.execute(
+      "SELECT * FROM `k3` WHERE `game` = ? ORDER BY `id` DESC LIMIT 2",
+      [game],
+    );
+    io.emit("data-server-k3", { data: k3rows, game: Number(game) });
+
+    const [d5rows] = await connection.execute(
+      "SELECT * FROM `5d` WHERE `game` = ? ORDER BY `id` DESC LIMIT 2",
+      [game],
+    );
+    io.emit("data-server-5d", { data: d5rows, game: Number(game) });
+  } catch (error) {
+    console.error(`emitPeriodChange error for game ${game}:`, error.message);
+  }
+}
+
+function startPeriodScheduler() {
+  const GAMES = [
+    { game: 1, period: 60 },
+    { game: 3, period: 180 },
+    { game: 5, period: 300 },
+    { game: 10, period: 600 },
+  ];
+  const lastComputeKey = {}; // last period window where result was computed
+  const lastEmitKey = {}; // last period window we announced to clients
+  const computing = {}; // game -> Promise of the running compute
+
+  setInterval(() => {
+    const nowSec = Math.floor(Date.now() / 1000);
+
+    for (const { game, period } of GAMES) {
+      const remaining = period - 1 - (nowSec % period);
+      const key = Math.floor(nowSec / period);
+
+      // 1) ~4s before the end: close the period, compute result + payouts,
+      //    create the next period in the DB.
+      //    (<= 4, not === 4, so a delayed tick can never skip a period)
+      if (remaining <= 4 && lastComputeKey[game] !== key && !computing[game]) {
+        lastComputeKey[game] = key;
+        computing[game] = Promise.allSettled([runK3(game), run5D(game)]).finally(
+          () => {
+            computing[game] = null;
+          },
+        );
+      }
+
+      // 2) exactly when the timer is over (new period window starts):
+      //    tell every client so the period id / result changes right away.
+      if (lastEmitKey[game] === undefined) {
+        lastEmitKey[game] = key;
+      } else if (lastEmitKey[game] !== key) {
+        lastEmitKey[game] = key;
+        Promise.resolve(computing[game]).then(() => emitPeriodChange(game));
+      }
+    }
+  }, 250);
 }
 
 // Start countdowns for different games
@@ -1034,6 +1091,7 @@ startCountdown_1(requestData_1);
 startCountdown(3, requestData_3);
 startCountdown(5, requestData_5);
 startCountdown_10min();
+startPeriodScheduler();
 
 // ============================================================
 // SERVER START

@@ -409,11 +409,16 @@ const K3 = () => {
     }, 2000);
 
     const handler = (msg) => {
+      // server har game ka event bhejta hai -> sirf active game ka lo
+      if (msg?.game != typeid1) return;
+
       setPage(1);
       setPageto(10);
       // Realtime data
 
-      if (msg?.data[1]?.period == k3HistoryData?.data?.gameslist[0]?.stage) {
+      if (
+        msg?.data?.[1]?.period == k3HistoryData?.data?.gameslist?.[0]?.stage
+      ) {
         setResultPopup(true);
         debouncedDispatchResult(dispatch, typeid1, pageno, pageto);
         setChangeDice(true);

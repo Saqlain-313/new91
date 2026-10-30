@@ -331,17 +331,21 @@ const FiveD = () => {
     if (!sock) return;
 
     const handler = (msg) => {
-      // Sirf tab setPage/setPageto jab actually naya result aaye
-      if (msg?.data?.[1]?.period == d5HistoryDataRef.current?.data?.gameslist?.[0]?.stage) {
-        setPage(1); setPageto(10);
-        setResultPopup(true);
-        debouncedDispatchResult(dispatch, typeid1Ref.current, pagenoRef.current, pagetoRef.current);
-      }
+      if (!Array.isArray(msg?.data)) return;
 
-      const tid = typeid1Ref.current;
-      if ((tid == 3 || tid == 5 || tid == 10) && Array.isArray(msg?.data)) {
-        debouncedDispatch(dispatch, tid, pagenoRef.current, pagetoRef.current);
-        setChangeTime(true);
+      // server har game (1/3/5/10) ka event bhejta hai -> sirf active game ka lo
+      const tid = Number(typeid1Ref.current);
+      if (msg.game != null && Number(msg.game) !== tid) return;
+
+      // Period khatam hote hi: naya period id + latest result turant refresh (1/3/5/10 sab)
+      setPage(1); setPageto(10);
+      debouncedDispatch(dispatch, tid, 1, 10);
+      setChangeTime(true);
+
+      // Agar user ki bet isi period ki thi to win/lose popup dikhao
+      if (msg?.data?.[1]?.period == d5HistoryDataRef.current?.data?.gameslist?.[0]?.stage) {
+        setResultPopup(true);
+        debouncedDispatchResult(dispatch, tid, 1, 10);
       }
     };
 

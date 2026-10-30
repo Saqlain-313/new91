@@ -467,6 +467,9 @@ const addK3 = async (game) => {
     if (game === 5) nextResult = setting[0].k3d5;
     if (game === 10) nextResult = setting[0].k3d10;
 
+    // null / empty admin value must not break the period change
+    if (nextResult == null || String(nextResult).trim() === "") nextResult = "-1";
+
     let newArr = "-1";
     if (nextResult == "-1") {
       await connection.execute(

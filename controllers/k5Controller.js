@@ -396,7 +396,7 @@ const add5D = async (game) => {
       }
     }
 
-    let nextResult = "";
+    let nextResult = "-1";
     if (game == 1) nextResult = setting[0].k5d;
     if (game == 3) nextResult = setting[0].k5d3;
     if (game == 5) nextResult = setting[0].k5d5;
@@ -405,7 +405,10 @@ const add5D = async (game) => {
     const timeNow = timerJoin2(Date.now());
     let newArr = "";
 
-    if (nextResult == "-1") {
+    // null / empty admin value must not crash before the new period is inserted
+    nextResult = nextResult == null ? "-1" : String(nextResult).trim();
+
+    if (nextResult === "" || nextResult == "-1") {
       await connection.execute(
         `UPDATE \`5d\` SET result = ?, status = ? WHERE period = ? AND game = ?`,
         [result2, 1, period, game]
